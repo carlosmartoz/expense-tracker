@@ -12,7 +12,7 @@ import {
 } from "recharts";
 import type { MonthSummary } from "@/lib/analytics";
 import { EXPENSE_CATEGORIES } from "@/lib/types";
-import { formatCurrency, formatMonthKey } from "@/lib/format";
+import { formatAmount, formatMonthKey } from "@/lib/format";
 
 interface Props {
   current: MonthSummary;
@@ -20,8 +20,8 @@ interface Props {
 }
 
 export default function MonthComparison({ current, previous }: Props) {
-  const prevLabel = formatMonthKey(previous.monthKey).replace(/ de \d+/, "");
-  const currLabel = formatMonthKey(current.monthKey).replace(/ de \d+/, "");
+  const prevLabel = formatMonthKey(previous.monthKey).replace(/\s\d{4}$/, "");
+  const currLabel = formatMonthKey(current.monthKey).replace(/\s\d{4}$/, "");
 
   const data = EXPENSE_CATEGORIES.map((cat) => ({
     category: cat,
@@ -32,7 +32,7 @@ export default function MonthComparison({ current, previous }: Props) {
   return (
     <ResponsiveContainer width="100%" height={300}>
       <BarChart data={data} margin={{ top: 8, right: 8, left: 8, bottom: 0 }}>
-        <CartesianGrid vertical={false} stroke="#eef2f7" />
+        <CartesianGrid vertical={false} stroke="#1c2336" />
         <XAxis
           dataKey="category"
           tick={{ fontSize: 11, fill: "#94a3b8" }}
@@ -47,17 +47,26 @@ export default function MonthComparison({ current, previous }: Props) {
           tickFormatter={(v) => `${Math.round(v / 1000)}k`}
         />
         <Tooltip
-          formatter={(value: number, name: string) => [formatCurrency(value), name]}
-          contentStyle={{ borderRadius: 12, border: "1px solid #e2e8f0", fontSize: 13 }}
+          cursor={{ fill: "rgba(255,255,255,0.04)" }}
+          formatter={(value, name) => [formatAmount(Number(value)), name]}
+          contentStyle={{
+            borderRadius: 12,
+            border: "1px solid #28324d",
+            background: "#0f1626",
+            color: "#f1f5f9",
+            fontSize: 13,
+          }}
+          itemStyle={{ color: "#f1f5f9" }}
+          labelStyle={{ color: "#94a3b8" }}
         />
         <Legend
           iconType="circle"
           iconSize={9}
           formatter={(value: string) => (
-            <span className="text-xs text-slate-600">{value}</span>
+            <span className="text-xs text-slate-400">{value}</span>
           )}
         />
-        <Bar dataKey={prevLabel} fill="#cbd5e1" radius={[6, 6, 0, 0]} maxBarSize={26} />
+        <Bar dataKey={prevLabel} fill="#3b475f" radius={[6, 6, 0, 0]} maxBarSize={26} />
         <Bar dataKey={currLabel} fill="#5b7cfa" radius={[6, 6, 0, 0]} maxBarSize={26} />
       </BarChart>
     </ResponsiveContainer>

@@ -1,6 +1,6 @@
 import type { Transaction } from "./types";
 import { EXPENSE_CATEGORIES } from "./types";
-import { formatCurrency, formatMonthKey } from "./format";
+import { formatAmount, formatMonthKey } from "./format";
 import {
   sortedMonthKeys,
   summarizeMonth,
@@ -40,24 +40,24 @@ export function detectInsights(transactions: Transaction[]): Insight[] {
       insights.push({
         id: "savings-good",
         tone: "good",
-        title: `Ahorraste ${rate.toFixed(0)}% de tus ingresos`,
-        detail: `Este mes guardaste ${formatCurrency(curr.balance)}. Vas por buen camino.`,
+        title: `You saved ${rate.toFixed(0)}% of your income`,
+        detail: `You set aside ${formatAmount(curr.balance)} this month. Keep it up.`,
       });
     } else if (rate < 0) {
       insights.push({
         id: "savings-negative",
         tone: "alert",
-        title: "Gastaste más de lo que ingresaste",
-        detail: `Tu balance de ${formatMonthKey(currKey)} es ${formatCurrency(curr.balance)}.`,
+        title: "You spent more than you earned",
+        detail: `Your balance for ${formatMonthKey(currKey)} is ${formatAmount(curr.balance)}.`,
       });
     } else {
       insights.push({
         id: "savings-low",
         tone: "tip",
-        title: `Tu tasa de ahorro fue ${rate.toFixed(0)}%`,
-        detail: `Apuntá a un 20% para construir un colchón. Te faltan ${formatCurrency(
+        title: `Your savings rate was ${rate.toFixed(0)}%`,
+        detail: `Aim for 20% to build a cushion. You're ${formatAmount(
           curr.income * 0.2 - curr.balance
-        )}.`,
+        )} short.`,
       });
     }
   }
@@ -66,8 +66,8 @@ export function detectInsights(transactions: Transaction[]): Insight[] {
     insights.push({
       id: "need-history",
       tone: "info",
-      title: "Cargá más meses para detectar tendencias",
-      detail: "Con al menos dos meses de datos puedo comparar y encontrar patrones.",
+      title: "Add more months to detect trends",
+      detail: "With at least two months of data I can compare and find patterns.",
     });
     return insights;
   }
@@ -88,14 +88,14 @@ export function detectInsights(transactions: Transaction[]): Insight[] {
     insights.push({
       id: `cat-${cat}`,
       tone: up ? "alert" : "good",
-      title: `Tus gastos en ${cat} ${up ? "subieron" : "bajaron"} ${Math.abs(
+      title: `Your ${cat} spending ${up ? "rose" : "dropped"} ${Math.abs(
         pct!
-      ).toFixed(0)}% este mes`,
-      detail: `Pasaste de ${formatCurrency(p)} a ${formatCurrency(c)}.`,
+      ).toFixed(0)}% this month`,
+      detail: `It went from ${formatAmount(p)} to ${formatAmount(c)}.`,
     });
   }
 
-  // Delivery-specific signal (the classic "gastaste 35% más en delivery")
+  // Delivery-specific signal (the classic "you spent 35% more on delivery")
   const deliveryCurr = descTotal(transactions, "delivery", currKey);
   const deliveryPrev = descTotal(transactions, "delivery", prevKey);
   const deliveryPct = pctChange(deliveryCurr, deliveryPrev);
@@ -103,10 +103,10 @@ export function detectInsights(transactions: Transaction[]): Insight[] {
     insights.push({
       id: "delivery-spike",
       tone: "alert",
-      title: `Gastaste ${deliveryPct.toFixed(0)}% más en delivery este mes`,
-      detail: `${formatCurrency(deliveryCurr)} en pedidos vs ${formatCurrency(
+      title: `You spent ${deliveryPct.toFixed(0)}% more on delivery this month`,
+      detail: `${formatAmount(deliveryCurr)} on orders vs ${formatAmount(
         deliveryPrev
-      )} el mes pasado.`,
+      )} last month.`,
     });
   }
 
@@ -115,7 +115,7 @@ export function detectInsights(transactions: Transaction[]): Insight[] {
     cat,
     amount: categoryTotal(transactions, cat, currKey),
   }))
-    .filter((x) => ["Transporte", "Comida", "Gaming", "Suscripciones"].includes(x.cat))
+    .filter((x) => ["Transport", "Food", "Gaming", "Subscriptions"].includes(x.cat))
     .sort((a, b) => b.amount - a.amount)[0];
 
   if (topCat && topCat.amount >= 5000) {
@@ -123,8 +123,8 @@ export function detectInsights(transactions: Transaction[]): Insight[] {
     insights.push({
       id: "tip-reduce",
       tone: "tip",
-      title: `Si reducís ${topCat.cat} un 20%, ahorrás ${formatCurrency(saving)}`,
-      detail: `Equivale a ${formatCurrency(saving * 12)} al año si lo sostenés.`,
+      title: `Cut ${topCat.cat} by 20% and save ${formatAmount(saving)}`,
+      detail: `That's ${formatAmount(saving * 12)} a year if you keep it up.`,
     });
   }
 

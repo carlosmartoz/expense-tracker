@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useStore } from "@/lib/store";
 import { sortedMonthKeys } from "@/lib/analytics";
-import { monthKeyOf, formatCurrency } from "@/lib/format";
+import { monthKeyOf, formatAmount } from "@/lib/format";
 import type { Filters } from "@/lib/types";
 import TransactionForm from "./TransactionForm";
 import TransactionList from "./TransactionList";
@@ -52,7 +52,7 @@ export default function MovementsView() {
     <div className="grid gap-5 lg:grid-cols-[340px_1fr]">
       {/* Add form */}
       <div className="card h-fit p-5 lg:sticky lg:top-6">
-        <h2 className="mb-4 text-lg font-bold">Nuevo movimiento</h2>
+        <h2 className="mb-4 text-lg font-bold">New transaction</h2>
         <TransactionForm />
       </div>
 
@@ -60,15 +60,15 @@ export default function MovementsView() {
       <div className="space-y-4">
         <div className="card p-5">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-lg font-bold">Historial</h2>
+            <h2 className="text-lg font-bold">History</h2>
             <p className="text-sm text-slate-500">
-              {totals.count} movimientos · saldo{" "}
+              {totals.count} transactions · balance{" "}
               <span
                 className={
                   totals.income - totals.expense >= 0 ? "text-mint" : "text-coral"
                 }
               >
-                {formatCurrency(totals.income - totals.expense)}
+                {formatAmount(totals.income - totals.expense)}
               </span>
             </p>
           </div>

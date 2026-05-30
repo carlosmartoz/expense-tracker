@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 import { useStore } from "@/lib/store";
-import { EXPENSE_CATEGORIES, type Category, type TransactionType } from "@/lib/types";
+import {
+  EXPENSE_CATEGORIES,
+  CATEGORY_META,
+  type Category,
+  type TransactionType,
+} from "@/lib/types";
+import { formatAmount, formatAmountInput, parseAmount } from "@/lib/format";
+import Select from "./Select";
 
 function todayISO(): string {
   return new Date().toISOString().slice(0, 10);
@@ -11,24 +18,34 @@ function todayISO(): string {
 export default function TransactionForm({ onDone }: { onDone?: () => void }) {
   const { addTransaction } = useStore();
   const [type, setType] = useState<TransactionType>("expense");
-  const [amount, setAmount] = useState("");
-  const [category, setCategory] = useState<Category>("Comida");
+  const [amount, setAmount] = useState(""); // formatted display string, e.g. "2.672.371,00"
+  const [category, setCategory] = useState<Category>("Food");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState(todayISO());
   const [error, setError] = useState<string | null>(null);
 
+  function onAmountChange(raw: string) {
+    setAmount(formatAmountInput(raw));
+  }
+
+  function onAmountBlur() {
+    if (!amount) return;
+    const value = parseAmount(amount);
+    if (Number.isFinite(value)) setAmount(formatAmount(value));
+  }
+
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    const value = Number(amount);
+    const value = parseAmount(amount);
     if (!value || value <= 0) {
-      setError("Ingresá un monto válido mayor a 0.");
+      setError("Enter a valid amount greater than 0.");
       return;
     }
     addTransaction({
       type,
       amount: value,
-      category: type === "income" ? "Ingreso" : category,
-      description: description.trim() || (type === "income" ? "Ingreso" : category),
+      category: type === "income" ? "Income" : category,
+      description: description.trim() || (type === "income" ? "Income" : category),
       date,
     });
     setAmount("");
@@ -40,7 +57,7 @@ export default function TransactionForm({ onDone }: { onDone?: () => void }) {
   return (
     <form onSubmit={submit} className="space-y-4">
       {/* Type toggle */}
-      <div className="grid grid-cols-2 gap-2 rounded-xl bg-slate-100 p-1">
+      <div className="grid grid-cols-2 gap-2 rounded-xl bg-ink-700 p-1">
         {(["expense", "income"] as TransactionType[]).map((t) => (
           <button
             key={t}
@@ -51,54 +68,55 @@ export default function TransactionForm({ onDone }: { onDone?: () => void }) {
                 ? t === "expense"
                   ? "bg-coral text-white shadow"
                   : "bg-mint text-white shadow"
-                : "text-slate-500 hover:text-slate-700"
+                : "text-slate-400 hover:text-slate-200"
             }`}
           >
-            {t === "expense" ? "Gasto" : "Ingreso"}
+            {t === "expense" ? "Expense" : "Income"}
           </button>
         ))}
       </div>
 
       <div>
-        <label className="stat-label">Monto</label>
+        <label className="stat-label">Amount</label>
         <input
           inputMode="decimal"
           className="input mt-1"
-          placeholder="0"
+          placeholder="0,00"
           value={amount}
-          onChange={(e) => setAmount(e.target.value)}
+          onChange={(e) => onAmountChange(e.target.value)}
+          onBlur={onAmountBlur}
         />
       </div>
 
       {type === "expense" && (
         <div>
-          <label className="stat-label">Categoría</label>
-          <select
-            className="input mt-1"
+          <label className="stat-label">Category</label>
+          <Select
+            className="mt-1"
+            ariaLabel="Category"
             value={category}
-            onChange={(e) => setCategory(e.target.value as Category)}
-          >
-            {EXPENSE_CATEGORIES.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
+            onChange={(v) => setCategory(v as Category)}
+            options={EXPENSE_CATEGORIES.map((c) => ({
+              value: c,
+              label: c,
+              icon: CATEGORY_META[c].icon,
+            }))}
+          />
         </div>
       )}
 
       <div>
-        <label className="stat-label">Descripción</label>
+        <label className="stat-label">Description</label>
         <input
           className="input mt-1"
-          placeholder={type === "income" ? "Sueldo, freelance…" : "Ej: Delivery, Uber…"}
+          placeholder={type === "income" ? "Salary, freelance…" : "e.g. Delivery, Uber…"}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
       </div>
 
       <div>
-        <label className="stat-label">Fecha</label>
+        <label className="stat-label">Date</label>
         <input
           type="date"
           className="input mt-1"
@@ -110,7 +128,7 @@ export default function TransactionForm({ onDone }: { onDone?: () => void }) {
       {error && <p className="text-sm text-coral">{error}</p>}
 
       <button type="submit" className="btn-primary w-full">
-        Agregar {type === "expense" ? "gasto" : "ingreso"}
+        Add {type === "expense" ? "expense" : "income"}
       </button>
     </form>
   );

@@ -1,16 +1,51 @@
-export function formatCurrency(value: number): string {
-  return new Intl.NumberFormat("es-AR", {
-    style: "currency",
-    currency: "ARS",
-    maximumFractionDigits: 0,
-  }).format(value);
+// Amounts use the "2.672.371,00" convention: dot for thousands, comma for the
+// decimal, always two decimals. (es-AR / de-DE style.)
+const amountFormatter = new Intl.NumberFormat("es-AR", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+export function formatAmount(value: number): string {
+  return amountFormatter.format(Number.isFinite(value) ? value : 0);
+}
+
+/** Parse a display string like "2.672.371,00" back into a number. */
+export function parseAmount(input: string): number {
+  if (!input) return NaN;
+  const normalized = input
+    .replace(/\./g, "") // drop thousand separators
+    .replace(",", ".") // decimal comma -> dot
+    .replace(/[^\d.-]/g, "");
+  return Number(normalized);
+}
+
+/**
+ * Live-format what the user types into the amount field:
+ * group the integer part with dots and allow up to two decimals after a comma.
+ * e.g. "2672371" -> "2.672.371", "2672371,5" -> "2.672.371,5".
+ */
+export function formatAmountInput(raw: string): string {
+  let cleaned = raw.replace(/[^\d,]/g, "");
+  // keep only the first comma
+  const firstComma = cleaned.indexOf(",");
+  if (firstComma !== -1) {
+    cleaned =
+      cleaned.slice(0, firstComma + 1) +
+      cleaned.slice(firstComma + 1).replace(/,/g, "");
+  }
+  let [intPart, decPart] = cleaned.split(",");
+  intPart = intPart.replace(/^0+(?=\d)/, ""); // strip leading zeros
+  if (intPart === "") intPart = decPart !== undefined ? "0" : "";
+  const grouped = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  if (decPart !== undefined) return `${grouped},${decPart.slice(0, 2)}`;
+  return grouped;
 }
 
 export function formatMonthKey(monthKey: string): string {
   // monthKey: "YYYY-MM"
   const [year, month] = monthKey.split("-").map(Number);
   const d = new Date(year, month - 1, 1);
-  return d.toLocaleDateString("es-AR", { month: "long", year: "numeric" });
+  return d.toLocaleDateString("en-US", { month: "long", year: "numeric" });
 }
 
 export function monthKeyOf(isoDate: string): string {
@@ -19,7 +54,7 @@ export function monthKeyOf(isoDate: string): string {
 
 export function formatDate(isoDate: string): string {
   const d = new Date(isoDate + "T00:00:00");
-  return d.toLocaleDateString("es-AR", {
+  return d.toLocaleDateString("en-US", {
     day: "2-digit",
     month: "short",
     year: "numeric",

@@ -1,26 +1,54 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-:root {
-  color-scheme: light;
+@theme {
+  /* Dark surfaces (deepest -> elevated) */
+  --color-ink-900: #070b14;
+  --color-ink-800: #0f1626;
+  --color-ink-700: #19223a;
+  --color-ink-600: #28324d;
+
+  --color-brand-400: #8aa3ff;
+  --color-brand-500: #6b8aff;
+  --color-brand-600: #5b7cfa;
+
+  --color-mint: #34d399;
+  --color-coral: #fb7185;
+  --color-amber: #fbbf24;
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.45), 0 16px 40px rgba(0, 0, 0, 0.35);
+
+  --font-sans: var(--font-inter), system-ui, sans-serif;
 }
 
-body {
-  @apply bg-slate-100 text-ink-900 antialiased;
+@layer base {
+  html {
+    /* Renders native controls (date picker, scrollbars) in dark */
+    color-scheme: dark;
+  }
+  body {
+    @apply bg-ink-900 text-slate-100 antialiased;
+  }
+  /* Fallback styling for any native <select> options */
+  option {
+    background-color: #19223a;
+    color: #f1f5f9;
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--color-brand-500) 35%, transparent);
+  }
 }
 
 @layer components {
   .card {
-    @apply rounded-2xl bg-white shadow-card border border-slate-100;
+    @apply rounded-2xl bg-ink-800 border border-white/[0.06] shadow-card;
   }
   .stat-label {
-    @apply text-xs font-medium uppercase tracking-wide text-slate-400;
+    @apply text-xs font-medium uppercase tracking-wide text-slate-500;
   }
   .input {
-    @apply w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm
-      text-ink-900 outline-none transition focus:border-brand-500 focus:bg-white
-      focus:ring-2 focus:ring-brand-500/20;
+    @apply w-full rounded-xl border border-ink-600 bg-ink-700 px-3 py-2 text-sm
+      text-slate-100 outline-none transition placeholder:text-slate-500
+      focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30;
   }
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600
@@ -29,8 +57,8 @@ body {
   }
   .btn-ghost {
     @apply inline-flex items-center justify-center gap-2 rounded-xl border
-      border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 transition
-      hover:bg-slate-50;
+      border-ink-600 px-3 py-2 text-sm font-medium text-slate-300 transition
+      hover:bg-ink-700 hover:text-slate-100;
   }
 }
 
@@ -38,4 +66,10 @@ body {
 .recharts-wrapper:focus,
 .recharts-surface:focus {
   outline: none;
+}
+
+/* Subtle dark scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #28324d transparent;
 }

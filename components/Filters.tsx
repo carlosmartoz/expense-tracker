@@ -1,7 +1,8 @@
 "use client";
 
-import { CATEGORIES, type Filters } from "@/lib/types";
+import { CATEGORIES, CATEGORY_META, type Filters } from "@/lib/types";
 import { formatMonthKey } from "@/lib/format";
+import Select, { type SelectOption } from "./Select";
 
 interface Props {
   filters: Filters;
@@ -14,50 +15,54 @@ export default function FiltersBar({ filters, months, onChange }: Props) {
     onChange({ ...filters, ...part });
   }
 
+  const monthOptions: SelectOption[] = [
+    { value: "all", label: "All months" },
+    ...months.map((m) => ({ value: m, label: formatMonthKey(m) })),
+  ];
+
+  const categoryOptions: SelectOption[] = [
+    { value: "all", label: "All categories" },
+    ...CATEGORIES.map((c) => ({ value: c, label: c, icon: CATEGORY_META[c].icon })),
+  ];
+
+  const typeOptions: SelectOption[] = [
+    { value: "all", label: "All" },
+    { value: "expense", label: "Expenses" },
+    { value: "income", label: "Income" },
+  ];
+
   return (
     <div className="flex flex-wrap items-center gap-2">
       <input
         className="input max-w-[180px]"
-        placeholder="Buscar…"
+        placeholder="Search…"
         value={filters.search}
         onChange={(e) => patch({ search: e.target.value })}
       />
 
-      <select
-        className="input max-w-[150px]"
+      <Select
+        className="w-[160px]"
+        ariaLabel="Filter by month"
         value={filters.month}
-        onChange={(e) => patch({ month: e.target.value })}
-      >
-        <option value="all">Todos los meses</option>
-        {months.map((m) => (
-          <option key={m} value={m}>
-            {formatMonthKey(m)}
-          </option>
-        ))}
-      </select>
+        options={monthOptions}
+        onChange={(v) => patch({ month: v })}
+      />
 
-      <select
-        className="input max-w-[150px]"
+      <Select
+        className="w-[190px]"
+        ariaLabel="Filter by category"
         value={filters.category}
-        onChange={(e) => patch({ category: e.target.value as Filters["category"] })}
-      >
-        <option value="all">Todas las categorías</option>
-        {CATEGORIES.map((c) => (
-          <option key={c} value={c}>
-            {c}
-          </option>
-        ))}
-      </select>
+        options={categoryOptions}
+        onChange={(v) => patch({ category: v as Filters["category"] })}
+      />
 
-      <select
-        className="input max-w-[130px]"
+      <Select
+        className="w-[130px]"
+        ariaLabel="Filter by type"
         value={filters.type}
-        onChange={(e) => patch({ type: e.target.value as Filters["type"] })}
-      >
-        <option value="all">Todo</option>
-        <option value="expense">Gastos</option>
-        <option value="income">Ingresos</option>
-      </select>
+        options={typeOptions}
+        onChange={(v) => patch({ type: v as Filters["type"] })}
+      />
     </div>
   );
 }

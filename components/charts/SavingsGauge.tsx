@@ -23,7 +23,7 @@ export default function SavingsGauge({ rate }: { rate: number }) {
           endAngle={-40}
         >
           <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
-          <RadialBar background={{ fill: "#eef2f7" }} dataKey="value" cornerRadius={20} />
+          <RadialBar background={{ fill: "#19223a" }} dataKey="value" cornerRadius={20} />
         </RadialBarChart>
       </ResponsiveContainer>
       <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">

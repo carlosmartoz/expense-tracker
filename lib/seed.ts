@@ -37,33 +37,33 @@ export function buildSeedData(reference = new Date()): Transaction[] {
     const isPrev = back === 1;
 
     // Salary income
-    out.push(tx("income", 950000, "Ingreso", "Sueldo", day(3)));
+    out.push(tx("income", 950000, "Income", "Salary", day(3)));
     if (isCurrent || isPrev) {
-      out.push(tx("income", 120000, "Ingreso", "Freelance", day(18)));
+      out.push(tx("income", 120000, "Income", "Freelance", day(18)));
     }
 
-    // Comida + delivery (spike in current month)
+    // Food + delivery (spike in current month)
     const deliveryBase = isCurrent ? 9 : 6;
     for (let i = 0; i < deliveryBase; i++) {
       out.push(
-        tx("expense", 6500 + (i % 3) * 1500, "Comida", i % 2 ? "Delivery PedidosYa" : "Supermercado", day(2 + i * 3))
+        tx("expense", 6500 + (i % 3) * 1500, "Food", i % 2 ? "Delivery" : "Supermarket", day(2 + i * 3))
       );
     }
 
-    // Transporte (Uber)
+    // Transport (Uber)
     const uberTrips = isCurrent ? 12 : 9;
     for (let i = 0; i < uberTrips; i++) {
-      out.push(tx("expense", 2800 + (i % 4) * 600, "Transporte", "Uber", day(1 + i * 2)));
+      out.push(tx("expense", 2800 + (i % 4) * 600, "Transport", "Uber", day(1 + i * 2)));
     }
 
-    // Suscripciones (grows in the last month)
-    out.push(tx("expense", 4990, "Suscripciones", "Netflix", day(5)));
-    out.push(tx("expense", 3490, "Suscripciones", "Spotify", day(7)));
+    // Subscriptions (grows in the last month)
+    out.push(tx("expense", 4990, "Subscriptions", "Netflix", day(5)));
+    out.push(tx("expense", 3490, "Subscriptions", "Spotify", day(7)));
     if (isCurrent) {
-      out.push(tx("expense", 7990, "Suscripciones", "HBO Max", day(8)));
-      out.push(tx("expense", 5990, "Suscripciones", "ChatGPT Plus", day(9)));
+      out.push(tx("expense", 7990, "Subscriptions", "HBO Max", day(8)));
+      out.push(tx("expense", 5990, "Subscriptions", "ChatGPT Plus", day(9)));
     } else if (isPrev) {
-      out.push(tx("expense", 7990, "Suscripciones", "HBO Max", day(8)));
+      out.push(tx("expense", 7990, "Subscriptions", "HBO Max", day(8)));
     }
 
     // Gaming
@@ -71,9 +71,9 @@ export function buildSeedData(reference = new Date()): Transaction[] {
       out.push(tx("expense", 12000, "Gaming", "Steam", day(14)));
     }
 
-    // Hogar
-    out.push(tx("expense", 38000, "Hogar", "Alquiler / Expensas", day(10)));
-    out.push(tx("expense", 9500, "Hogar", "Servicios (luz/gas)", day(12)));
+    // Home
+    out.push(tx("expense", 38000, "Home", "Rent / Fees", day(10)));
+    out.push(tx("expense", 9500, "Home", "Utilities (power/gas)", day(12)));
   }
 
   return out;

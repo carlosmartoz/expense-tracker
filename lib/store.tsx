@@ -11,7 +11,7 @@ import {
 import type { Transaction } from "./types";
 import { buildSeedData } from "./seed";
 
-const STORAGE_KEY = "expense-tracker:transactions:v1";
+const STORAGE_KEY = "expense-tracker:transactions:v2";
 
 interface StoreValue {
   transactions: Transaction[];

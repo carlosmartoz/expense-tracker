@@ -10,7 +10,7 @@ import {
 } from "recharts";
 import type { CategorySlice } from "@/lib/analytics";
 import { CATEGORY_META } from "@/lib/types";
-import { formatCurrency } from "@/lib/format";
+import { formatAmount } from "@/lib/format";
 
 export default function CategoryPie({ data }: { data: CategorySlice[] }) {
   if (data.length === 0) {
@@ -41,18 +41,22 @@ export default function CategoryPie({ data }: { data: CategorySlice[] }) {
           ))}
         </Pie>
         <Tooltip
-          formatter={(value: number, name: string) => [formatCurrency(value), name]}
+          formatter={(value, name) => [formatAmount(Number(value)), name]}
           contentStyle={{
             borderRadius: 12,
-            border: "1px solid #e2e8f0",
+            border: "1px solid #28324d",
+            background: "#0f1626",
+            color: "#f1f5f9",
             fontSize: 13,
           }}
+          itemStyle={{ color: "#f1f5f9" }}
+          labelStyle={{ color: "#94a3b8" }}
         />
         <Legend
           iconType="circle"
           iconSize={9}
           formatter={(value: string) => (
-            <span className="text-xs text-slate-600">{value}</span>
+            <span className="text-xs text-slate-400">{value}</span>
           )}
         />
       </PieChart>

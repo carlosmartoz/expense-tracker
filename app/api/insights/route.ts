@@ -13,7 +13,7 @@ export async function POST(req: Request) {
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ error: "JSON inválido" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
   const transactions = Array.isArray(body.transactions) ? body.transactions : [];
@@ -43,19 +43,19 @@ async function callOpenAI(
   const context = buildInsightContext(transactions);
 
   const system =
-    "Sos un asistente financiero personal. Analizás un resumen mensual de gastos " +
-    "e ingresos (en pesos argentinos) y devolvés observaciones accionables, " +
-    "concretas y motivadoras en español rioplatense. Cada observación debe citar " +
-    "números reales del contexto. No inventes datos.";
+    "You are a personal finance assistant. You analyze a monthly summary of " +
+    "expenses and income and return concrete, actionable, motivating insights in " +
+    "English. Every insight must cite real numbers from the context. Do not make " +
+    "up data. Amounts use a dot for thousands and a comma for decimals.";
 
-  const user = `Datos de los últimos meses (montos en ARS):
+  const user = `Data for the last months (amounts):
 ${JSON.stringify(context, null, 2)}
 
-Patrones que detectó el sistema local (usalos como referencia, podés reformular o ampliar):
+Patterns the local system detected (use them as reference; you may rephrase or expand):
 ${local.map((i) => `- ${i.title}: ${i.detail}`).join("\n")}
 
-Devolvé entre 3 y 5 observaciones en JSON con esta forma exacta:
-{"insights":[{"id":"string","tone":"alert|good|tip|info","title":"string corto","detail":"una frase"}]}`;
+Return between 3 and 5 insights as JSON with this exact shape:
+{"insights":[{"id":"string","tone":"alert|good|tip|info","title":"short string","detail":"one sentence"}]}`;
 
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
@@ -80,12 +80,12 @@ Devolvé entre 3 y 5 observaciones en JSON con esta forma exacta:
 
   const json = await res.json();
   const content = json.choices?.[0]?.message?.content;
-  if (!content) throw new Error("Respuesta vacía de OpenAI");
+  if (!content) throw new Error("Empty response from OpenAI");
 
   const parsed = JSON.parse(content);
   const insights = parsed.insights;
   if (!Array.isArray(insights) || insights.length === 0) {
-    throw new Error("Formato inesperado");
+    throw new Error("Unexpected format");
   }
 
   // Sanitize into our shape.
@@ -94,7 +94,7 @@ Devolvé entre 3 y 5 observaciones en JSON con esta forma exacta:
     tone: ["alert", "good", "tip", "info"].includes(i.tone as string)
       ? (i.tone as Insight["tone"])
       : "info",
-    title: String(i.title ?? "Observación"),
+    title: String(i.title ?? "Insight"),
     detail: String(i.detail ?? ""),
   }));
 }

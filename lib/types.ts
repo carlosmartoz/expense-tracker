@@ -1,25 +1,25 @@
 export type TransactionType = "income" | "expense";
 
 export const CATEGORIES = [
-  "Comida",
-  "Transporte",
-  "Suscripciones",
+  "Food",
+  "Transport",
+  "Subscriptions",
   "Gaming",
-  "Hogar",
-  "Ingreso",
-  "Otros",
+  "Home",
+  "Income",
+  "Other",
 ] as const;
 
 export type Category = (typeof CATEGORIES)[number];
 
-/** Categories that apply to expenses (income uses the "Ingreso" bucket). */
+/** Categories that apply to expenses (income uses the "Income" bucket). */
 export const EXPENSE_CATEGORIES: Category[] = [
-  "Comida",
-  "Transporte",
-  "Suscripciones",
+  "Food",
+  "Transport",
+  "Subscriptions",
   "Gaming",
-  "Hogar",
-  "Otros",
+  "Home",
+  "Other",
 ];
 
 export interface Transaction {
@@ -40,11 +40,11 @@ export interface Filters {
 }
 
 export const CATEGORY_META: Record<Category, { color: string; icon: string }> = {
-  Comida: { color: "#fb7185", icon: "🍔" },
-  Transporte: { color: "#5b7cfa", icon: "🚗" },
-  Suscripciones: { color: "#a78bfa", icon: "📺" },
+  Food: { color: "#fb7185", icon: "🍔" },
+  Transport: { color: "#5b7cfa", icon: "🚗" },
+  Subscriptions: { color: "#a78bfa", icon: "📺" },
   Gaming: { color: "#34d399", icon: "🎮" },
-  Hogar: { color: "#fbbf24", icon: "🏠" },
-  Ingreso: { color: "#22d3ee", icon: "💰" },
-  Otros: { color: "#94a3b8", icon: "🧾" },
+  Home: { color: "#fbbf24", icon: "🏠" },
+  Income: { color: "#22d3ee", icon: "💰" },
+  Other: { color: "#94a3b8", icon: "🧾" },
 };
