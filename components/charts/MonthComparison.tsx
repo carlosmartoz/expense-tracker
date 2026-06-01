@@ -11,9 +11,9 @@ import {
   Legend,
 } from "recharts";
 import type { MonthSummary } from "@/lib/analytics";
-import { EXPENSE_CATEGORIES } from "@/lib/types";
 import { formatAmount, formatMonthKey } from "@/lib/format";
 import { resolveColor, chartColors } from "@/lib/colors";
+import { useStore } from "@/lib/store";
 
 interface Props {
   current: MonthSummary;
@@ -22,16 +22,25 @@ interface Props {
 
 export default function MonthComparison({ current, previous }: Props) {
   const c = chartColors();
+  const { categoryMap } = useStore();
   const prevLabel = formatMonthKey(previous.monthKey).replace(/\s\d{4}$/, "");
   const currLabel = formatMonthKey(current.monthKey).replace(/\s\d{4}$/, "");
 
-  const data = EXPENSE_CATEGORIES.map((cat) => ({
-    category: cat,
-    [prevLabel]: Math.round(previous.byCategory[cat] ?? 0),
-    [currLabel]: Math.round(current.byCategory[cat] ?? 0),
-  })).filter(
-    (d) => (d[prevLabel] as number) > 0 || (d[currLabel] as number) > 0,
+  // Every category that appears in either month (keeps custom categories too).
+  const categoryIds = Array.from(
+    new Set([
+      ...Object.keys(previous.byCategory),
+      ...Object.keys(current.byCategory),
+    ])
   );
+
+  const data = categoryIds
+    .map((cat) => ({
+      category: categoryMap[cat]?.name ?? cat,
+      [prevLabel]: Math.round(previous.byCategory[cat] ?? 0),
+      [currLabel]: Math.round(current.byCategory[cat] ?? 0),
+    }))
+    .filter((d) => (d[prevLabel] as number) > 0 || (d[currLabel] as number) > 0);
 
   return (
     <ResponsiveContainer width="100%" height={300}>

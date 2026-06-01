@@ -1,17 +1,32 @@
 "use client";
 
-import { Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Pencil, Trash2, X } from "lucide-react";
 import type { Transaction } from "@/lib/types";
-import { CATEGORY_META } from "@/lib/types";
-import { formatAmount, formatDate } from "@/lib/format";
+import { categoryIcon, FALLBACK_CATEGORY_ID } from "@/lib/types";
+import { formatMoney, formatDate } from "@/lib/format";
 import { useStore } from "@/lib/store";
+import TransactionForm from "./TransactionForm";
+import ConfirmDialog from "./ConfirmDialog";
 
 export default function TransactionList({
   transactions,
 }: {
   transactions: Transaction[];
 }) {
-  const { deleteTransaction } = useStore();
+  const { deleteTransaction, categoryMap } = useStore();
+  const [editing, setEditing] = useState<Transaction | null>(null);
+  const [deleting, setDeleting] = useState<Transaction | null>(null);
+
+  // Close the edit modal with Escape.
+  useEffect(() => {
+    if (!editing) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setEditing(null);
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [editing]);
 
   if (transactions.length === 0) {
     return (
@@ -22,54 +37,114 @@ export default function TransactionList({
   }
 
   return (
-    <ul className="divide-y divide-white/[0.06]">
-      {transactions.map((t) => {
-        const meta = CATEGORY_META[t.category];
-        const Icon = meta.icon;
-        const isIncome = t.type === "income";
-        return (
-          <li key={t.id} className="group flex items-center gap-3 py-3">
-            <span className="shrink-0" style={{ color: meta.color }}>
-              <Icon className="h-6 w-6" />
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-text-primary">
-                {t.description}
-              </p>
-              <div className="mt-0.5 flex min-w-0 items-center gap-1.5 overflow-hidden">
-                <span className="min-w-0 truncate text-xs text-text-secondary">
-                  {t.category} · {formatDate(t.date)}
-                </span>
-                {t.tags?.map((tag) => (
-                  <span
-                    key={tag}
-                    className="max-w-[10ch] shrink-0 truncate rounded-md bg-dark--600 px-1.5 py-0.5 text-xs font-medium text-text-secondary"
-                    title={tag}
-                  >
-                    {tag}
-                  </span>
-                ))}
+    <>
+      <ul className="divide-y divide-white/[0.06]">
+        {transactions.map((t) => {
+          const meta =
+            categoryMap[t.category] ?? categoryMap[FALLBACK_CATEGORY_ID];
+          const Icon = categoryIcon(meta?.icon);
+          const isIncome = t.type === "income";
+          return (
+            <li key={t.id} className="group flex items-start gap-3 py-3">
+              <span className="mt-0.5 shrink-0" style={{ color: meta?.color }}>
+                <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-text-primary">
+                  {t.description}
+                </p>
+                <p className="mt-0.5 truncate text-xs text-text-secondary">
+                  {meta?.name ?? t.category} · {formatDate(t.date)}
+                </p>
+                {t.tags && t.tags.length > 0 && (
+                  <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                    {t.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="rounded-md bg-dark--600 px-1.5 py-0.5 text-[0.6875rem] font-medium leading-tight text-text-secondary"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
+              <span
+                className={`mt-0.5 shrink-0 text-sm font-semibold ${
+                  isIncome ? "text-mint" : "text-coral"
+                }`}
+              >
+                {isIncome ? "+" : "−"}
+                {formatMoney(t.amount, t.currency)}
+              </span>
+              {/* Actions: always visible on touch, hover-reveal on desktop. */}
+              <div className="mt-0.5 flex shrink-0 items-center gap-0.5 opacity-100 transition sm:opacity-0 sm:group-hover:opacity-100">
+                <button
+                  onClick={() => setEditing(t)}
+                  className="cursor-pointer rounded-lg p-1.5 text-slate-300 transition hover:bg-dark--700 hover:text-text-primary"
+                  aria-label="Edit"
+                  title="Edit"
+                >
+                  <Pencil className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => setDeleting(t)}
+                  className="cursor-pointer rounded-lg p-1.5 text-slate-300 transition hover:bg-coral/10 hover:text-coral"
+                  aria-label="Delete"
+                  title="Delete"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+
+      {editing && (
+        <div
+          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 p-4 backdrop-blur-sm"
+          onClick={() => setEditing(null)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="card my-6 w-full max-w-md p-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-lg font-bold">Edit transaction</h2>
+              <button
+                onClick={() => setEditing(null)}
+                aria-label="Close"
+                className="cursor-pointer rounded-lg p-1.5 text-text-secondary transition hover:bg-dark--700 hover:text-text-primary"
+              >
+                <X className="h-5 w-5" />
+              </button>
             </div>
-            <span
-              className={`shrink-0 text-sm font-semibold ${
-                isIncome ? "text-mint" : "text-text-primary"
-              }`}
-            >
-              {isIncome ? "+" : "−"}
-              {formatAmount(t.amount)}
-            </span>
-            <button
-              onClick={() => deleteTransaction(t.id)}
-              className="shrink-0 cursor-pointer rounded-lg p-1.5 text-slate-300 opacity-0 transition hover:bg-coral/10 hover:text-coral group-hover:opacity-100"
-              aria-label="Delete"
-              title="Delete"
-            >
-              <Trash2 className="h-4 w-4" />
-            </button>
-          </li>
-        );
-      })}
-    </ul>
+            <TransactionForm initial={editing} onDone={() => setEditing(null)} />
+          </div>
+        </div>
+      )}
+
+      <ConfirmDialog
+        open={deleting !== null}
+        title="Delete transaction"
+        message={
+          deleting ? (
+            <>
+              Delete “<span className="text-text-primary">{deleting.description}</span>
+              ”? This can&apos;t be undone.
+            </>
+          ) : null
+        }
+        confirmLabel="Delete"
+        onConfirm={() => {
+          if (deleting) deleteTransaction(deleting.id);
+          setDeleting(null);
+        }}
+        onCancel={() => setDeleting(null)}
+      />
+    </>
   );
 }

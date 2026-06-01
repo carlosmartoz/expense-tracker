@@ -95,6 +95,11 @@
       border border-dark--600 px-3 py-2 text-sm font-medium text-text-secondary
       transition hover:bg-dark--700 hover:text-text-primary;
   }
+  .btn-danger {
+    @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl
+      bg-coral px-4 py-2 text-sm font-semibold text-white transition
+      hover:opacity-90 active:scale-[0.98];
+  }
 }
 
 /* Recharts: remove the default focus outline on active segments */

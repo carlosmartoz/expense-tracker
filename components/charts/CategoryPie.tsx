@@ -9,12 +9,14 @@ import {
   Legend,
 } from "recharts";
 import type { CategorySlice } from "@/lib/analytics";
-import { CATEGORY_META } from "@/lib/types";
 import { formatAmount } from "@/lib/format";
 import { resolveColor, chartColors } from "@/lib/colors";
+import { useStore } from "@/lib/store";
 
 export default function CategoryPie({ data }: { data: CategorySlice[] }) {
   const c = chartColors();
+  const { categoryMap } = useStore();
+  const nameOf = (id: string) => categoryMap[id]?.name ?? id;
   if (data.length === 0) {
     return (
       <div className="grid h-[280px] place-items-center text-sm text-text-secondary">
@@ -40,14 +42,13 @@ export default function CategoryPie({ data }: { data: CategorySlice[] }) {
             <Cell
               key={slice.category}
               fill={resolveColor(
-                CATEGORY_META[slice.category as keyof typeof CATEGORY_META]?.color ??
-                  "var(--color-cat-other)"
+                categoryMap[slice.category]?.color ?? "var(--color-cat-other)"
               )}
             />
           ))}
         </Pie>
         <Tooltip
-          formatter={(value, name) => [formatAmount(Number(value)), name]}
+          formatter={(value, name) => [formatAmount(Number(value)), nameOf(String(name))]}
           contentStyle={{
             borderRadius: 12,
             border: `1px solid ${c.border}`,
@@ -62,7 +63,7 @@ export default function CategoryPie({ data }: { data: CategorySlice[] }) {
           iconType="circle"
           iconSize={9}
           formatter={(value: string) => (
-            <span className="text-xs text-text-secondary">{value}</span>
+            <span className="text-xs text-text-secondary">{nameOf(value)}</span>
           )}
         />
       </PieChart>

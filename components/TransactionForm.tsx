@@ -4,34 +4,66 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import { useStore } from "@/lib/store";
 import {
-  EXPENSE_CATEGORIES,
-  CATEGORY_META,
+  categoryIcon,
+  CURRENCY_LIST,
+  DEFAULT_CURRENCY,
+  INCOME_CATEGORY_ID,
   MAX_TAGS,
   MAX_TAG_LENGTH,
   type Category,
+  type CurrencyCode,
+  type Transaction,
   type TransactionType,
 } from "@/lib/types";
 import { formatAmount, formatAmountInput, parseAmount } from "@/lib/format";
-import Select from "./Select";
+import Select, { type SelectOption } from "./Select";
 import DatePicker from "./DatePicker";
 
 function todayISO(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-export default function TransactionForm({ onDone }: { onDone?: () => void }) {
-  const { addTransaction } = useStore();
-  const [type, setType] = useState<TransactionType>("expense");
-  const [amount, setAmount] = useState(""); // formatted display string, e.g. "2.672.371,00"
-  const [category, setCategory] = useState<Category>("Food");
-  const [description, setDescription] = useState("");
-  const [date, setDate] = useState(todayISO());
-  const [tags, setTags] = useState<string[]>([]);
+export default function TransactionForm({
+  onDone,
+  initial,
+}: {
+  onDone?: () => void;
+  /** When provided, the form edits this transaction instead of creating one. */
+  initial?: Transaction;
+}) {
+  const { addTransaction, updateTransaction, categories } = useStore();
+  const isEditing = Boolean(initial);
+  const expenseCategories = categories.filter(
+    (c) => c.id !== INCOME_CATEGORY_ID
+  );
+  const currencyOptions: SelectOption[] = CURRENCY_LIST.map((c) => ({
+    value: c.code,
+    label: `${c.symbol} ${c.code}`,
+  }));
+  const [type, setType] = useState<TransactionType>(initial?.type ?? "expense");
+  const [amount, setAmount] = useState(
+    initial ? formatAmount(initial.amount) : ""
+  ); // formatted display string, e.g. "2.672.371,00"
+  const [currency, setCurrency] = useState<CurrencyCode>(
+    initial?.currency ?? DEFAULT_CURRENCY
+  );
+  const [category, setCategory] = useState<Category>(
+    initial && initial.type === "expense" ? initial.category : "Food"
+  );
+  const [description, setDescription] = useState(initial?.description ?? "");
+  const [date, setDate] = useState(initial?.date ?? todayISO());
+  const [tags, setTags] = useState<string[]>(initial?.tags ?? []);
   const [tagInput, setTagInput] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   function onAmountChange(raw: string) {
     setAmount(formatAmountInput(raw));
+  }
+
+  function onCurrencyChange(next: CurrencyCode) {
+    setCurrency(next);
+    // Switching currency clears the amount so values aren't mixed up.
+    setAmount("");
   }
 
   function onAmountBlur() {
@@ -81,18 +113,26 @@ export default function TransactionForm({ onDone }: { onDone?: () => void }) {
     ) {
       finalTags.push(pending);
     }
-    addTransaction({
+    const categoryName =
+      categories.find((c) => c.id === category)?.name ?? category;
+    const payload = {
       type,
       amount: value,
-      category: type === "income" ? "Income" : category,
-      description:
-        description.trim() || (type === "income" ? "Income" : category),
+      currency,
+      category: type === "income" ? INCOME_CATEGORY_ID : category,
+      description: description.trim() || (type === "income" ? "Income" : categoryName),
       date,
       tags: finalTags.length ? finalTags : undefined,
-    });
-    setAmount("");
-    setDescription("");
-    setTags([]);
+    };
+    if (initial) {
+      updateTransaction(initial.id, payload);
+    } else {
+      addTransaction(payload);
+      // Reset the form for the next entry (only when creating).
+      setAmount("");
+      setDescription("");
+      setTags([]);
+    }
     setTagInput("");
     setError(null);
     onDone?.();
@@ -122,14 +162,22 @@ export default function TransactionForm({ onDone }: { onDone?: () => void }) {
 
       <div>
         <label className="stat-label">Amount</label>
-        <input
-          inputMode="decimal"
-          className="input mt-1"
-          placeholder="0,00"
-          value={amount}
-          onChange={(e) => onAmountChange(e.target.value)}
-          onBlur={onAmountBlur}
-        />
+        <div className="mt-1 grid grid-cols-[1fr_7rem] gap-2">
+          <input
+            inputMode="decimal"
+            className="input"
+            placeholder="0,00"
+            value={amount}
+            onChange={(e) => onAmountChange(e.target.value)}
+            onBlur={onAmountBlur}
+          />
+          <Select
+            ariaLabel="Currency"
+            value={currency}
+            options={currencyOptions}
+            onChange={(v) => onCurrencyChange(v as CurrencyCode)}
+          />
+        </div>
       </div>
 
       {type === "expense" && (
@@ -140,11 +188,11 @@ export default function TransactionForm({ onDone }: { onDone?: () => void }) {
             ariaLabel="Category"
             value={category}
             onChange={(v) => setCategory(v as Category)}
-            options={EXPENSE_CATEGORIES.map((c) => ({
-              value: c,
-              label: c,
-              icon: CATEGORY_META[c].icon,
-              iconColor: CATEGORY_META[c].color,
+            options={expenseCategories.map((c) => ({
+              value: c.id,
+              label: c.name,
+              icon: categoryIcon(c.icon),
+              iconColor: c.color,
             }))}
           />
         </div>
@@ -183,7 +231,7 @@ export default function TransactionForm({ onDone }: { onDone?: () => void }) {
                 aria-label={`Remove ${tag}`}
                 className="cursor-pointer text-text-subtle transition hover:text-coral"
               >
-                <X className="h-3 w-3" />
+                <X className="h-3 w-3" strokeWidth={3} />
               </button>
             </span>
           ))}
@@ -217,7 +265,9 @@ export default function TransactionForm({ onDone }: { onDone?: () => void }) {
       {error && <p className="text-sm text-coral">{error}</p>}
 
       <button type="submit" className="btn-primary w-full">
-        Add {type === "expense" ? "expense" : "income"}
+        {isEditing
+          ? "Save changes"
+          : `Add ${type === "expense" ? "expense" : "income"}`}
       </button>
     </form>
   );

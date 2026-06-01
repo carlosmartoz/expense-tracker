@@ -1,3 +1,5 @@
+import { CURRENCIES, DEFAULT_CURRENCY, type CurrencyCode } from "./types";
+
 // Amounts use the "2.672.371,00" convention: dot for thousands, comma for the
 // decimal, always two decimals. (es-AR / de-DE style.)
 const amountFormatter = new Intl.NumberFormat("es-AR", {
@@ -7,6 +9,15 @@ const amountFormatter = new Intl.NumberFormat("es-AR", {
 
 export function formatAmount(value: number): string {
   return amountFormatter.format(Number.isFinite(value) ? value : 0);
+}
+
+/** Like formatAmount but prefixed with the currency symbol, e.g. "US$ 1.200,00". */
+export function formatMoney(
+  value: number,
+  currency: CurrencyCode = DEFAULT_CURRENCY
+): string {
+  const symbol = CURRENCIES[currency]?.symbol ?? "";
+  return `${symbol} ${formatAmount(value)}`.trim();
 }
 
 /** Parse a display string like "2.672.371,00" back into a number. */
