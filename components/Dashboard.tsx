@@ -65,7 +65,7 @@ export default function Dashboard() {
         <StatCard
           label="Monthly balance"
           value={formatAmount(current.balance)}
-          accent={current.balance >= 0 ? "mint" : "coral"}
+          accent="brand"
           icon={Gem}
           hint={
             balanceChange !== null && (
@@ -78,7 +78,7 @@ export default function Dashboard() {
         <StatCard
           label="Income"
           value={formatAmount(current.income)}
-          accent="brand"
+          accent="mint"
           icon={TrendingUp}
         />
         <StatCard
@@ -97,7 +97,7 @@ export default function Dashboard() {
         <StatCard
           label="Savings rate"
           value={`${Math.round(current.savingsRate)}%`}
-          accent="neutral"
+          accent="violet"
           icon={PiggyBank}
         />
       </div>

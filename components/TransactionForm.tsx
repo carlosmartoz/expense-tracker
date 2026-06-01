@@ -1,15 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import { X } from "lucide-react";
 import { useStore } from "@/lib/store";
 import {
   EXPENSE_CATEGORIES,
   CATEGORY_META,
+  MAX_TAGS,
+  MAX_TAG_LENGTH,
   type Category,
   type TransactionType,
 } from "@/lib/types";
 import { formatAmount, formatAmountInput, parseAmount } from "@/lib/format";
 import Select from "./Select";
+import DatePicker from "./DatePicker";
 
 function todayISO(): string {
   return new Date().toISOString().slice(0, 10);
@@ -22,6 +26,8 @@ export default function TransactionForm({ onDone }: { onDone?: () => void }) {
   const [category, setCategory] = useState<Category>("Food");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState(todayISO());
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   function onAmountChange(raw: string) {
@@ -34,12 +40,46 @@ export default function TransactionForm({ onDone }: { onDone?: () => void }) {
     if (Number.isFinite(value)) setAmount(formatAmount(value));
   }
 
+  function addTag(raw: string) {
+    const v = raw.trim().slice(0, MAX_TAG_LENGTH);
+    setTagInput("");
+    if (!v) return;
+    setTags((prev) => {
+      if (prev.length >= MAX_TAGS) return prev;
+      if (prev.some((t) => t.toLowerCase() === v.toLowerCase())) return prev;
+      return [...prev, v];
+    });
+  }
+
+  function removeTag(tag: string) {
+    setTags((prev) => prev.filter((t) => t !== tag));
+  }
+
+  function onTagKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      addTag(tagInput);
+    } else if (e.key === "Backspace" && !tagInput && tags.length) {
+      setTags((prev) => prev.slice(0, -1));
+    }
+  }
+
   function submit(e: React.FormEvent) {
     e.preventDefault();
     const value = parseAmount(amount);
     if (!value || value <= 0) {
       setError("Enter a valid amount greater than 0.");
       return;
+    }
+    // Fold any tag still sitting in the input that wasn't committed with Enter.
+    const pending = tagInput.trim().slice(0, MAX_TAG_LENGTH);
+    const finalTags = [...tags];
+    if (
+      pending &&
+      finalTags.length < MAX_TAGS &&
+      !finalTags.some((t) => t.toLowerCase() === pending.toLowerCase())
+    ) {
+      finalTags.push(pending);
     }
     addTransaction({
       type,
@@ -48,9 +88,12 @@ export default function TransactionForm({ onDone }: { onDone?: () => void }) {
       description:
         description.trim() || (type === "income" ? "Income" : category),
       date,
+      tags: finalTags.length ? finalTags : undefined,
     });
     setAmount("");
     setDescription("");
+    setTags([]);
+    setTagInput("");
     setError(null);
     onDone?.();
   }
@@ -101,6 +144,7 @@ export default function TransactionForm({ onDone }: { onDone?: () => void }) {
               value: c,
               label: c,
               icon: CATEGORY_META[c].icon,
+              iconColor: CATEGORY_META[c].color,
             }))}
           />
         </div>
@@ -119,12 +163,54 @@ export default function TransactionForm({ onDone }: { onDone?: () => void }) {
       </div>
 
       <div>
+        <label className="stat-label">
+          Tags <span className="normal-case text-text-subtle">· optional</span>
+        </label>
+        <div
+          className="mt-1 flex flex-wrap items-center gap-1.5 rounded-xl border border-dark--600
+            bg-dark--700 px-2.5 py-2 transition focus-within:border-brand-500
+            focus-within:ring-2 focus-within:ring-brand-500/30"
+        >
+          {tags.map((tag) => (
+            <span
+              key={tag}
+              className="inline-flex items-center gap-1 rounded-md bg-dark--600 px-2 py-0.5 text-xs font-medium text-text-secondary"
+            >
+              {tag}
+              <button
+                type="button"
+                onClick={() => removeTag(tag)}
+                aria-label={`Remove ${tag}`}
+                className="cursor-pointer text-text-subtle transition hover:text-coral"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          ))}
+          {tags.length < MAX_TAGS && (
+            <input
+              className="min-w-[8ch] flex-1 bg-transparent text-sm text-text-primary outline-none placeholder:text-text-subtle"
+              placeholder={tags.length ? "Add another…" : "e.g. Credit card, Work…"}
+              value={tagInput}
+              maxLength={MAX_TAG_LENGTH}
+              onChange={(e) => setTagInput(e.target.value)}
+              onKeyDown={onTagKeyDown}
+              onBlur={() => addTag(tagInput)}
+            />
+          )}
+        </div>
+        <p className="mt-1 text-xs text-text-subtle">
+          Press Enter to add · up to {MAX_TAGS} tags
+        </p>
+      </div>
+
+      <div>
         <label className="stat-label">Date</label>
-        <input
-          type="date"
-          className="input mt-1"
+        <DatePicker
+          className="mt-1"
+          ariaLabel="Date"
           value={date}
-          onChange={(e) => setDate(e.target.value)}
+          onChange={setDate}
         />
       </div>
 

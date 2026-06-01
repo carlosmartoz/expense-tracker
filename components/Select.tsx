@@ -8,6 +8,8 @@ export interface SelectOption {
   label: string;
   /** Optional leading icon shown in the trigger and list. */
   icon?: LucideIcon;
+  /** Optional color for the leading icon (any CSS color, e.g. a var() token). */
+  iconColor?: string;
 }
 
 interface SelectProps {
@@ -127,7 +129,10 @@ export default function Select({
           hover:border-dark--600/80 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30"
       >
         {SelectedIcon && (
-          <SelectedIcon className="h-4 w-4 shrink-0 text-slate-300" />
+          <SelectedIcon
+            className="h-4 w-4 shrink-0 text-slate-300"
+            style={selected?.iconColor ? { color: selected.iconColor } : undefined}
+          />
         )}
         <span className={`flex-1 truncate ${selected ? "" : "text-text-subtle"}`}>
           {selected ? selected.label : placeholder}
@@ -163,7 +168,10 @@ export default function Select({
                   ${isActive ? "bg-dark--700 text-text-primary" : "text-slate-300"}`}
               >
                 {OptionIcon && (
-                  <OptionIcon className="h-4 w-4 shrink-0 text-slate-300" />
+                  <OptionIcon
+                    className="h-4 w-4 shrink-0 text-slate-300"
+                    style={opt.iconColor ? { color: opt.iconColor } : undefined}
+                  />
                 )}
                 <span className="flex-1 truncate">{opt.label}</span>
                 {isSelected && (

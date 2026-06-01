@@ -22,7 +22,12 @@ export default function FiltersBar({ filters, months, onChange }: Props) {
 
   const categoryOptions: SelectOption[] = [
     { value: "all", label: "All categories" },
-    ...CATEGORIES.map((c) => ({ value: c, label: c, icon: CATEGORY_META[c].icon })),
+    ...CATEGORIES.map((c) => ({
+      value: c,
+      label: c,
+      icon: CATEGORY_META[c].icon,
+      iconColor: CATEGORY_META[c].color,
+    })),
   ];
 
   const typeOptions: SelectOption[] = [

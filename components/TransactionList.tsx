@@ -36,9 +36,20 @@ export default function TransactionList({
               <p className="truncate text-sm font-medium text-text-primary">
                 {t.description}
               </p>
-              <p className="text-xs text-text-secondary">
-                {t.category} · {formatDate(t.date)}
-              </p>
+              <div className="mt-0.5 flex min-w-0 items-center gap-1.5 overflow-hidden">
+                <span className="min-w-0 truncate text-xs text-text-secondary">
+                  {t.category} · {formatDate(t.date)}
+                </span>
+                {t.tags?.map((tag) => (
+                  <span
+                    key={tag}
+                    className="max-w-[10ch] shrink-0 truncate rounded-md bg-dark--600 px-1.5 py-0.5 text-xs font-medium text-text-secondary"
+                    title={tag}
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
             </div>
             <span
               className={`shrink-0 text-sm font-semibold ${

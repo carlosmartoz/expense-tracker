@@ -5,7 +5,7 @@ interface StatCardProps {
   label: string;
   value: string;
   hint?: ReactNode;
-  accent?: "brand" | "mint" | "coral" | "neutral";
+  accent?: "brand" | "mint" | "coral" | "neutral" | "violet";
   icon?: LucideIcon;
 }
 
@@ -14,6 +14,7 @@ const accentColor: Record<NonNullable<StatCardProps["accent"]>, string> = {
   mint: "text-mint",
   coral: "text-coral",
   neutral: "text-neutral",
+  violet: "text-violet",
 };
 
 export default function StatCard({

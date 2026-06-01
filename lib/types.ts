@@ -40,7 +40,14 @@ export interface Transaction {
   category: Category;
   description: string;
   date: string; // ISO date string (YYYY-MM-DD)
+  /** Optional short labels for extra context, e.g. "Credit card", "Work". */
+  tags?: string[];
 }
+
+/** Max number of tags allowed per transaction (keeps the row UI from breaking). */
+export const MAX_TAGS = 3;
+/** Max characters per tag. */
+export const MAX_TAG_LENGTH = 16;
 
 export interface Filters {
   category: Category | "all";

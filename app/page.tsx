@@ -97,6 +97,27 @@ export default function Home() {
             </button>
           );
         })}
+
+        {/* Always-reachable data actions */}
+        <span className="mx-1 h-5 w-px bg-dark--600" />
+        <button
+          onClick={resetToSeed}
+          aria-label="Restore demo"
+          title="Restore demo"
+          className="cursor-pointer rounded-lg px-2.5 py-1.5 text-text-subtle transition hover:bg-dark--700 hover:text-text-primary"
+        >
+          <RotateCcw className="h-[18px] w-[18px]" />
+        </button>
+        <button
+          onClick={() => {
+            if (confirm("Delete all transactions?")) clearAll();
+          }}
+          aria-label="Clear all"
+          title="Clear all"
+          className="cursor-pointer rounded-lg px-2.5 py-1.5 text-text-subtle transition hover:bg-coral/10 hover:text-coral"
+        >
+          <Trash2 className="h-[18px] w-[18px]" />
+        </button>
       </div>
 
       {/* Main content */}

@@ -11,9 +11,10 @@ function tx(
   amount: number,
   category: Category,
   description: string,
-  date: string
+  date: string,
+  tags?: string[]
 ): Transaction {
-  return { id: id(), type, amount, category, description, date };
+  return { id: id(), type, amount, category, description, date, tags };
 }
 
 /**
@@ -37,7 +38,7 @@ export function buildSeedData(reference = new Date()): Transaction[] {
     const isPrev = back === 1;
 
     // Salary income
-    out.push(tx("income", 950000, "Income", "Salary", day(3)));
+    out.push(tx("income", 950000, "Income", "Salary", day(3), ["Bank transfer"]));
     if (isCurrent || isPrev) {
       out.push(tx("income", 120000, "Income", "Freelance", day(18)));
     }
@@ -46,7 +47,14 @@ export function buildSeedData(reference = new Date()): Transaction[] {
     const deliveryBase = isCurrent ? 9 : 6;
     for (let i = 0; i < deliveryBase; i++) {
       out.push(
-        tx("expense", 6500 + (i % 3) * 1500, "Food", i % 2 ? "Delivery" : "Supermarket", day(2 + i * 3))
+        tx(
+          "expense",
+          6500 + (i % 3) * 1500,
+          "Food",
+          i % 2 ? "Delivery" : "Supermarket",
+          day(2 + i * 3),
+          i % 2 ? ["Credit card", "Rappi"] : ["Debit card"]
+        )
       );
     }
 
@@ -57,8 +65,8 @@ export function buildSeedData(reference = new Date()): Transaction[] {
     }
 
     // Subscriptions (grows in the last month)
-    out.push(tx("expense", 4990, "Subscriptions", "Netflix", day(5)));
-    out.push(tx("expense", 3490, "Subscriptions", "Spotify", day(7)));
+    out.push(tx("expense", 4990, "Subscriptions", "Netflix", day(5), ["Credit card"]));
+    out.push(tx("expense", 3490, "Subscriptions", "Spotify", day(7), ["Credit card"]));
     if (isCurrent) {
       out.push(tx("expense", 7990, "Subscriptions", "HBO Max", day(8)));
       out.push(tx("expense", 5990, "Subscriptions", "ChatGPT Plus", day(9)));

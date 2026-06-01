@@ -24,6 +24,9 @@
   /* ----- Neutral----- */
   --color-neutral: #f8f9fa;
 
+  /* ----- Accent (savings, misc highlights) ----- */
+  --color-violet: #a78bfa;
+
   /* ----- Positive ----- */
   --color-positive: #34d399;
   --color-mint: #34d399; /* alias used across the UI */
