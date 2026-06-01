@@ -6,10 +6,19 @@ import {
   PolarAngleAxis,
   ResponsiveContainer,
 } from "recharts";
+import { resolveColor } from "@/lib/colors";
 
 export default function SavingsGauge({ rate }: { rate: number }) {
   const clamped = Math.max(0, Math.min(100, Math.round(rate)));
-  const color = clamped >= 20 ? "#34d399" : clamped >= 1 ? "#fbbf24" : "#fb7185";
+  // var() for the HTML label (same on server & client -> no hydration mismatch);
+  // a resolved value for Recharts, which paints via SVG attributes.
+  const colorVar =
+    clamped >= 20
+      ? "var(--color-positive)"
+      : clamped >= 1
+        ? "var(--color-neutral)"
+        : "var(--color-negative)";
+  const color = resolveColor(colorVar);
   const data = [{ name: "savings", value: clamped, fill: color }];
 
   return (
@@ -23,15 +32,23 @@ export default function SavingsGauge({ rate }: { rate: number }) {
           endAngle={-40}
         >
           <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
-          <RadialBar background={{ fill: "#19223a" }} dataKey="value" cornerRadius={20} />
+          <RadialBar
+            background={{ fill: resolveColor("var(--color-dark--700)") }}
+            dataKey="value"
+            cornerRadius={20}
+            isAnimationActive={false}
+          />
         </RadialBarChart>
       </ResponsiveContainer>
       <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-4xl font-bold tracking-tight" style={{ color }}>
+        <span
+          className="text-4xl font-bold tracking-tight"
+          style={{ color: colorVar }}
+        >
           {clamped}%
         </span>
-        <span className="text-xs font-medium uppercase tracking-wide text-slate-400">
-          Ahorro
+        <span className="text-xs font-medium uppercase tracking-wide text-text-secondary">
+          Savings
         </span>
       </div>
     </div>

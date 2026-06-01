@@ -7,6 +7,7 @@ import {
   expenseByCategory,
   pctChange,
 } from "@/lib/analytics";
+import { Gem, TrendingUp, CreditCard, PiggyBank } from "lucide-react";
 import { formatAmount, formatMonthKey, formatPercent } from "@/lib/format";
 import StatCard from "./StatCard";
 import CategoryPie from "./charts/CategoryPie";
@@ -30,12 +31,12 @@ export default function Dashboard() {
   );
 
   if (!hydrated) {
-    return <div className="py-20 text-center text-slate-400">Loading…</div>;
+    return <div className="py-20 text-center text-text-secondary">Loading…</div>;
   }
 
   if (!current) {
     return (
-      <div className="card grid place-items-center p-12 text-center text-slate-400">
+      <div className="card grid place-items-center p-12 text-center text-text-secondary">
         No data yet. Add your first transaction.
       </div>
     );
@@ -54,7 +55,7 @@ export default function Dashboard() {
         <h1 className="text-2xl font-bold tracking-tight">
           Here's your overview
         </h1>
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-text-subtle">
           {formatMonthKey(current.monthKey)}
         </p>
       </div>
@@ -65,7 +66,7 @@ export default function Dashboard() {
           label="Monthly balance"
           value={formatAmount(current.balance)}
           accent={current.balance >= 0 ? "mint" : "coral"}
-          icon="💎"
+          icon={Gem}
           hint={
             balanceChange !== null && (
               <span className={balanceChange >= 0 ? "text-mint" : "text-coral"}>
@@ -78,13 +79,13 @@ export default function Dashboard() {
           label="Income"
           value={formatAmount(current.income)}
           accent="brand"
-          icon="📈"
+          icon={TrendingUp}
         />
         <StatCard
           label="Expenses"
           value={formatAmount(current.expense)}
           accent="coral"
-          icon="💳"
+          icon={CreditCard}
           hint={
             expenseChange !== null && (
               <span className={expenseChange <= 0 ? "text-mint" : "text-coral"}>
@@ -96,44 +97,44 @@ export default function Dashboard() {
         <StatCard
           label="Savings rate"
           value={`${Math.round(current.savingsRate)}%`}
-          accent="amber"
-          icon="🐷"
+          accent="neutral"
+          icon={PiggyBank}
         />
       </div>
 
       {/* Charts grid */}
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="card p-5 lg:col-span-2">
-          <h2 className="mb-1 text-sm font-bold text-slate-100">
+          <h2 className="mb-1 text-sm font-bold text-text-primary">
             Income vs Expenses by month
           </h2>
-          <p className="mb-3 text-xs text-slate-400">Recent months</p>
+          <p className="mb-3 text-xs text-text-secondary">Recent months</p>
           <MonthlyTrend data={months} />
         </div>
         <div className="card p-5">
-          <h2 className="mb-1 text-sm font-bold text-slate-100">
+          <h2 className="mb-1 text-sm font-bold text-text-primary">
             Monthly savings
           </h2>
-          <p className="mb-3 text-xs text-slate-400">% of income set aside</p>
+          <p className="mb-3 text-xs text-text-secondary">% of income set aside</p>
           <SavingsGauge rate={current.savingsRate} />
         </div>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="card p-5">
-          <h2 className="mb-1 text-sm font-bold text-slate-100">
+          <h2 className="mb-1 text-sm font-bold text-text-primary">
             Expenses by category
           </h2>
-          <p className="mb-3 text-xs text-slate-400">
+          <p className="mb-3 text-xs text-text-secondary">
             {formatMonthKey(current.monthKey)}
           </p>
           <CategoryPie data={pie} />
         </div>
         <div className="card p-5 lg:col-span-2">
-          <h2 className="mb-1 text-sm font-bold text-slate-100">
+          <h2 className="mb-1 text-sm font-bold text-text-primary">
             Month-over-month comparison
           </h2>
-          <p className="mb-3 text-xs text-slate-400">
+          <p className="mb-3 text-xs text-text-secondary">
             {previous
               ? `${formatMonthKey(previous.monthKey)} vs ${formatMonthKey(current.monthKey)}`
               : "Needs at least two months"}
@@ -141,7 +142,7 @@ export default function Dashboard() {
           {previous ? (
             <MonthComparison current={current} previous={previous} />
           ) : (
-            <div className="grid h-[300px] place-items-center text-sm text-slate-400">
+            <div className="grid h-[300px] place-items-center text-sm text-text-secondary">
               Add transactions from another month to compare.
             </div>
           )}

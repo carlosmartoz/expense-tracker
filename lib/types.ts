@@ -1,3 +1,14 @@
+import type { LucideIcon } from "lucide-react";
+import {
+  UtensilsCrossed,
+  Car,
+  Tv,
+  Gamepad2,
+  House,
+  Wallet,
+  Receipt,
+} from "lucide-react";
+
 export type TransactionType = "income" | "expense";
 
 export const CATEGORIES = [
@@ -39,12 +50,14 @@ export interface Filters {
   search: string;
 }
 
-export const CATEGORY_META: Record<Category, { color: string; icon: string }> = {
-  Food: { color: "#fb7185", icon: "🍔" },
-  Transport: { color: "#5b7cfa", icon: "🚗" },
-  Subscriptions: { color: "#a78bfa", icon: "📺" },
-  Gaming: { color: "#34d399", icon: "🎮" },
-  Home: { color: "#fbbf24", icon: "🏠" },
-  Income: { color: "#22d3ee", icon: "💰" },
-  Other: { color: "#94a3b8", icon: "🧾" },
+// Colors reference the CSS variables defined in app/globals.css (@theme), so the
+// whole palette can be changed from one place.
+export const CATEGORY_META: Record<Category, { color: string; icon: LucideIcon }> = {
+  Food: { color: "var(--color-cat-food)", icon: UtensilsCrossed },
+  Transport: { color: "var(--color-cat-transport)", icon: Car },
+  Subscriptions: { color: "var(--color-cat-subscriptions)", icon: Tv },
+  Gaming: { color: "var(--color-cat-gaming)", icon: Gamepad2 },
+  Home: { color: "var(--color-cat-home)", icon: House },
+  Income: { color: "var(--color-cat-income)", icon: Wallet },
+  Other: { color: "var(--color-cat-other)", icon: Receipt },
 };

@@ -61,7 +61,7 @@ export default function MovementsView() {
         <div className="card p-5">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-lg font-bold">History</h2>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-text-subtle">
               {totals.count} transactions · balance{" "}
               <span
                 className={

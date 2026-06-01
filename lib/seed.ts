@@ -19,7 +19,7 @@ function tx(
 /**
  * Builds a few months of realistic demo data ending at the current month,
  * with an intentional spike in delivery/subscriptions in the latest month so
- * the AI insights have something to detect.
+ * the charts and comparisons have something interesting to show.
  */
 export function buildSeedData(reference = new Date()): Transaction[] {
   const out: Transaction[] = [];

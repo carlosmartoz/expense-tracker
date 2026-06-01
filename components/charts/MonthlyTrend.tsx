@@ -13,8 +13,10 @@ import {
 } from "recharts";
 import type { MonthSummary } from "@/lib/analytics";
 import { formatAmount, formatMonthKey } from "@/lib/format";
+import { resolveColor, chartColors } from "@/lib/colors";
 
 export default function MonthlyTrend({ data }: { data: MonthSummary[] }) {
+  const c = chartColors();
   const chartData = data.map((m) => ({
     month: formatMonthKey(m.monthKey).replace(/\s\d{4}$/, ""),
     Expenses: Math.round(m.expense),
@@ -24,15 +26,15 @@ export default function MonthlyTrend({ data }: { data: MonthSummary[] }) {
   return (
     <ResponsiveContainer width="100%" height={300}>
       <ComposedChart data={chartData} margin={{ top: 8, right: 8, left: 8, bottom: 0 }}>
-        <CartesianGrid vertical={false} stroke="#1c2336" />
+        <CartesianGrid vertical={false} stroke={c.grid} />
         <XAxis
           dataKey="month"
-          tick={{ fontSize: 12, fill: "#94a3b8" }}
+          tick={{ fontSize: 12, fill: c.textMuted }}
           axisLine={false}
           tickLine={false}
         />
         <YAxis
-          tick={{ fontSize: 12, fill: "#94a3b8" }}
+          tick={{ fontSize: 12, fill: c.textMuted }}
           axisLine={false}
           tickLine={false}
           width={70}
@@ -43,28 +45,35 @@ export default function MonthlyTrend({ data }: { data: MonthSummary[] }) {
           formatter={(value, name) => [formatAmount(Number(value)), name]}
           contentStyle={{
             borderRadius: 12,
-            border: "1px solid #28324d",
-            background: "#0f1626",
-            color: "#f1f5f9",
+            border: `1px solid ${c.border}`,
+            background: c.card,
+            color: c.text,
             fontSize: 13,
           }}
-          itemStyle={{ color: "#f1f5f9" }}
-          labelStyle={{ color: "#94a3b8" }}
+          itemStyle={{ color: c.text }}
+          labelStyle={{ color: c.textMuted }}
         />
         <Legend
           iconType="circle"
           iconSize={9}
           formatter={(value: string) => (
-            <span className="text-xs text-slate-400">{value}</span>
+            <span className="text-xs text-text-secondary">{value}</span>
           )}
         />
-        <Bar dataKey="Expenses" fill="#fb7185" radius={[6, 6, 0, 0]} maxBarSize={38} />
+        <Bar
+          dataKey="Expenses"
+          fill={resolveColor("var(--color-negative)")}
+          radius={[6, 6, 0, 0]}
+          maxBarSize={38}
+          isAnimationActive={false}
+        />
         <Line
           dataKey="Income"
-          stroke="#34d399"
+          stroke={resolveColor("var(--color-positive)")}
           strokeWidth={3}
-          dot={{ r: 4, fill: "#34d399" }}
+          dot={{ r: 4, fill: resolveColor("var(--color-positive)") }}
           activeDot={{ r: 6 }}
+          isAnimationActive={false}
         />
       </ComposedChart>
     </ResponsiveContainer>

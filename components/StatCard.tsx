@@ -1,18 +1,19 @@
 import type { ReactNode } from "react";
+import type { LucideIcon } from "lucide-react";
 
 interface StatCardProps {
   label: string;
   value: string;
   hint?: ReactNode;
-  accent?: "brand" | "mint" | "coral" | "amber";
-  icon?: ReactNode;
+  accent?: "brand" | "mint" | "coral" | "neutral";
+  icon?: LucideIcon;
 }
 
-const accentBg: Record<NonNullable<StatCardProps["accent"]>, string> = {
-  brand: "bg-brand-500/10 text-brand-600",
-  mint: "bg-mint/10 text-mint",
-  coral: "bg-coral/10 text-coral",
-  amber: "bg-amber/10 text-amber",
+const accentColor: Record<NonNullable<StatCardProps["accent"]>, string> = {
+  brand: "text-brand-400",
+  mint: "text-mint",
+  coral: "text-coral",
+  neutral: "text-neutral",
 };
 
 export default function StatCard({
@@ -20,22 +21,20 @@ export default function StatCard({
   value,
   hint,
   accent = "brand",
-  icon,
+  icon: Icon,
 }: StatCardProps) {
   return (
     <div className="card p-5">
       <div className="flex items-start justify-between">
         <span className="stat-label">{label}</span>
-        {icon && (
-          <span
-            className={`grid h-9 w-9 place-items-center rounded-xl text-lg ${accentBg[accent]}`}
-          >
-            {icon}
+        {Icon && (
+          <span className={accentColor[accent]}>
+            <Icon className="h-6 w-6" />
           </span>
         )}
       </div>
       <p className="mt-3 text-2xl font-bold tracking-tight">{value}</p>
-      {hint && <div className="mt-1 text-sm text-slate-500">{hint}</div>}
+      {hint && <div className="mt-1 text-sm text-text-subtle">{hint}</div>}
     </div>
   );
 }

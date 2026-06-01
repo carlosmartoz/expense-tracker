@@ -6,9 +6,9 @@ import { StoreProvider } from "@/lib/store";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "Fintrack · Expense tracker",
+  title: "Expense Tracker",
   description:
-    "Track your income and expenses, visualize your money, and discover patterns with AI.",
+    "Track your income and expenses and visualize your money.",
 };
 
 export default function RootLayout({

@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
+import { ChevronDown, Check, type LucideIcon } from "lucide-react";
 
 export interface SelectOption {
   value: string;
   label: string;
-  /** Optional leading glyph (emoji/icon) shown in the trigger and list. */
-  icon?: string;
+  /** Optional leading icon shown in the trigger and list. */
+  icon?: LucideIcon;
 }
 
 interface SelectProps {
@@ -39,6 +40,7 @@ export default function Select({
   const listId = useId();
 
   const selected = options.find((o) => o.value === value) ?? null;
+  const SelectedIcon = selected?.icon;
 
   // Close on click outside.
   useEffect(() => {
@@ -120,25 +122,21 @@ export default function Select({
         aria-label={ariaLabel}
         onClick={() => setOpen((o) => !o)}
         onKeyDown={onKeyDown}
-        className="flex w-full items-center gap-2 rounded-xl border border-ink-600 bg-ink-700
-          px-3 py-2 text-left text-sm text-slate-100 outline-none transition
-          hover:border-ink-600/80 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30"
+        className="flex w-full cursor-pointer items-center gap-2 rounded-xl border border-dark--600
+          bg-dark--700 px-3 py-2 text-left text-sm text-text-primary outline-none transition
+          hover:border-dark--600/80 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30"
       >
-        {selected?.icon && <span className="shrink-0">{selected.icon}</span>}
-        <span className={`flex-1 truncate ${selected ? "" : "text-slate-500"}`}>
+        {SelectedIcon && (
+          <SelectedIcon className="h-4 w-4 shrink-0 text-slate-300" />
+        )}
+        <span className={`flex-1 truncate ${selected ? "" : "text-text-subtle"}`}>
           {selected ? selected.label : placeholder}
         </span>
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          className={`shrink-0 text-slate-400 transition-transform ${open ? "rotate-180" : ""}`}
-        >
-          <path d="m6 9 6 6 6-6" />
-        </svg>
+        <ChevronDown
+          className={`h-4 w-4 shrink-0 text-text-secondary transition-transform ${
+            open ? "rotate-180" : ""
+          }`}
+        />
       </button>
 
       {open && (
@@ -148,11 +146,12 @@ export default function Select({
           role="listbox"
           tabIndex={-1}
           className="absolute z-20 mt-1.5 max-h-64 w-full overflow-auto rounded-xl border
-            border-white/10 bg-ink-800 p-1 shadow-card"
+            border-white/10 bg-dark--800 p-1 shadow-card"
         >
           {options.map((opt, idx) => {
             const isSelected = opt.value === value;
             const isActive = idx === highlight;
+            const OptionIcon = opt.icon;
             return (
               <li
                 key={opt.value}
@@ -161,22 +160,14 @@ export default function Select({
                 onMouseEnter={() => setHighlight(idx)}
                 onClick={() => commit(idx)}
                 className={`flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm transition
-                  ${isActive ? "bg-ink-700 text-slate-100" : "text-slate-300"}`}
+                  ${isActive ? "bg-dark--700 text-text-primary" : "text-slate-300"}`}
               >
-                {opt.icon && <span className="shrink-0">{opt.icon}</span>}
+                {OptionIcon && (
+                  <OptionIcon className="h-4 w-4 shrink-0 text-slate-300" />
+                )}
                 <span className="flex-1 truncate">{opt.label}</span>
                 {isSelected && (
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    className="shrink-0 text-brand-400"
-                  >
-                    <path d="M20 6 9 17l-5-5" />
-                  </svg>
+                  <Check className="h-4 w-4 shrink-0 text-brand-400" />
                 )}
               </li>
             );

@@ -45,7 +45,8 @@ export default function TransactionForm({ onDone }: { onDone?: () => void }) {
       type,
       amount: value,
       category: type === "income" ? "Income" : category,
-      description: description.trim() || (type === "income" ? "Income" : category),
+      description:
+        description.trim() || (type === "income" ? "Income" : category),
       date,
     });
     setAmount("");
@@ -57,18 +58,18 @@ export default function TransactionForm({ onDone }: { onDone?: () => void }) {
   return (
     <form onSubmit={submit} className="space-y-4">
       {/* Type toggle */}
-      <div className="grid grid-cols-2 gap-2 rounded-xl bg-ink-700 p-1">
+      <div className="grid grid-cols-2 gap-2 rounded-xl bg-dark--700 p-1">
         {(["expense", "income"] as TransactionType[]).map((t) => (
           <button
             key={t}
             type="button"
             onClick={() => setType(t)}
-            className={`rounded-lg py-2 text-sm font-semibold transition ${
+            className={`cursor-pointer rounded-lg py-2 text-sm font-semibold transition ${
               type === t
                 ? t === "expense"
                   ? "bg-coral text-white shadow"
                   : "bg-mint text-white shadow"
-                : "text-slate-400 hover:text-slate-200"
+                : "text-text-secondary hover:text-slate-200"
             }`}
           >
             {t === "expense" ? "Expense" : "Income"}
@@ -109,7 +110,9 @@ export default function TransactionForm({ onDone }: { onDone?: () => void }) {
         <label className="stat-label">Description</label>
         <input
           className="input mt-1"
-          placeholder={type === "income" ? "Salary, freelance…" : "e.g. Delivery, Uber…"}
+          placeholder={
+            type === "income" ? "Salary, freelance…" : "e.g. Delivery, Uber…"
+          }
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />

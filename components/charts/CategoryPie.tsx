@@ -11,12 +11,14 @@ import {
 import type { CategorySlice } from "@/lib/analytics";
 import { CATEGORY_META } from "@/lib/types";
 import { formatAmount } from "@/lib/format";
+import { resolveColor, chartColors } from "@/lib/colors";
 
 export default function CategoryPie({ data }: { data: CategorySlice[] }) {
+  const c = chartColors();
   if (data.length === 0) {
     return (
-      <div className="grid h-[280px] place-items-center text-sm text-slate-400">
-        Sin gastos en este período.
+      <div className="grid h-[280px] place-items-center text-sm text-text-secondary">
+        No expenses in this period.
       </div>
     );
   }
@@ -32,11 +34,15 @@ export default function CategoryPie({ data }: { data: CategorySlice[] }) {
           outerRadius={96}
           paddingAngle={2}
           stroke="none"
+          isAnimationActive={false}
         >
           {data.map((slice) => (
             <Cell
               key={slice.category}
-              fill={CATEGORY_META[slice.category as keyof typeof CATEGORY_META]?.color ?? "#94a3b8"}
+              fill={resolveColor(
+                CATEGORY_META[slice.category as keyof typeof CATEGORY_META]?.color ??
+                  "var(--color-cat-other)"
+              )}
             />
           ))}
         </Pie>
@@ -44,19 +50,19 @@ export default function CategoryPie({ data }: { data: CategorySlice[] }) {
           formatter={(value, name) => [formatAmount(Number(value)), name]}
           contentStyle={{
             borderRadius: 12,
-            border: "1px solid #28324d",
-            background: "#0f1626",
-            color: "#f1f5f9",
+            border: `1px solid ${c.border}`,
+            background: c.card,
+            color: c.text,
             fontSize: 13,
           }}
-          itemStyle={{ color: "#f1f5f9" }}
-          labelStyle={{ color: "#94a3b8" }}
+          itemStyle={{ color: c.text }}
+          labelStyle={{ color: c.textMuted }}
         />
         <Legend
           iconType="circle"
           iconSize={9}
           formatter={(value: string) => (
-            <span className="text-xs text-slate-400">{value}</span>
+            <span className="text-xs text-text-secondary">{value}</span>
           )}
         />
       </PieChart>

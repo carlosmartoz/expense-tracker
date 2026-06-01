@@ -1,10 +1,9 @@
-# 💰 Fintrack — Gestión de gastos con IA
+# 💰 Fintrack — Gestión de gastos
 
 App de finanzas personales estilo banco moderno, con **tema oscuro** de punta a
-punta: cargá ingresos y gastos, visualizá tu dinero con gráficos y descubrí
-patrones con IA.
+punta: cargá ingresos y gastos y visualizá tu dinero con gráficos.
 
-Stack: **Next.js 16 (App Router, Turbopack) · React 19 · TypeScript · Tailwind CSS v4 · Recharts 3 · OpenAI API**.
+Stack: **Next.js 16 (App Router, Turbopack) · React 19 · TypeScript · Tailwind CSS v4 · Recharts 3**.
 
 ## Funcionalidades
 
@@ -21,17 +20,6 @@ Stack: **Next.js 16 (App Router, Turbopack) · React 19 · TypeScript · Tailwin
 - **Porcentaje de ahorro** en un medidor radial.
 - Tarjetas con variación porcentual mes contra mes.
 
-### 3. Sección IA
-Detección de patrones del tipo:
-- *"Gastaste 35% más en delivery este mes"*
-- *"Tus suscripciones aumentaron un X%"*
-- *"Si reducís Transporte un 20%, ahorrás $X"*
-
-La detección base es **local y determinista** (no requiere clave). Si configurás
-`OPENAI_API_KEY`, el endpoint `/api/insights` enriquece las observaciones con OpenAI,
-usando los números reales como contexto. Si OpenAI falla, cae automáticamente al
-análisis local.
-
 ## Cómo correrlo
 
 ```bash
@@ -45,36 +33,23 @@ Para build de producción:
 npm run build && npm start
 ```
 
-## IA con OpenAI (opcional)
-
-Copiá `.env.example` a `.env.local` y completá tu clave:
-
-```
-OPENAI_API_KEY=sk-...
-OPENAI_MODEL=gpt-4o-mini
-```
-
-Sin la clave, la app funciona igual con la detección de patrones local.
-
 ## Estructura
 
 ```
 app/
   globals.css           # Tailwind v4 + tema oscuro (tokens en @theme)
   layout.tsx            # Provider global + fuentes
-  page.tsx              # Shell con navegación (Dashboard / Movimientos / IA)
-  api/insights/route.ts # Endpoint IA (OpenAI + fallback local)
+  page.tsx              # Shell con navegación (Dashboard / Movimientos)
 components/
-  Dashboard.tsx, MovementsView.tsx, InsightsPanel.tsx
+  Dashboard.tsx, MovementsView.tsx
   TransactionForm.tsx, TransactionList.tsx, Filters.tsx, StatCard.tsx
   Select.tsx            # Dropdown custom (estilado para el tema oscuro)
   charts/               # CategoryPie, MonthlyTrend, MonthComparison, SavingsGauge
 lib/
   types.ts              # Modelos y categorías
   store.tsx             # Estado global (Context + localStorage)
-  seed.ts               # Datos demo (5 meses, con picos para la IA)
+  seed.ts               # Datos demo (5 meses, con picos en categorías)
   analytics.ts          # Cálculos de resúmenes mensuales
-  insights.ts           # Motor de detección de patrones
   format.ts             # Formato de moneda/fechas (es-AR)
 ```
 
@@ -89,6 +64,6 @@ lib/
   estilar). Es accesible por teclado (flechas / Enter / Esc).
 - La moneda está en ARS (`es-AR`); cambiala en `lib/format.ts`.
 - Los datos demo se generan en `lib/seed.ts` con un pico intencional en delivery y
-  suscripciones en el mes actual para que la IA tenga algo que detectar.
+  suscripciones en el mes actual para que los gráficos tengan algo interesante que mostrar.
 - Usé **Recharts** para todos los gráficos (es nativo de React). Si preferís Chart.js
   en algún gráfico puntual, se puede sumar sin tocar la lógica de datos.
