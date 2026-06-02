@@ -10,6 +10,8 @@ import {
   Trash2,
   type LucideIcon,
 } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { viewTransition } from "@/lib/motion";
 import { useStore } from "@/lib/store";
 import Dashboard from "@/components/Dashboard";
 import MovementsView from "@/components/MovementsView";
@@ -46,16 +48,24 @@ export default function Home() {
         <nav className="space-y-1">
           {TABS.map((t) => {
             const Icon = t.icon;
+            const active = tab === t.id;
             return (
               <button
                 key={t.id}
                 onClick={() => setTab(t.id)}
-                className={`flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
-                  tab === t.id
-                    ? "bg-brand-500/10 text-brand-400"
+                className={`relative flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
+                  active
+                    ? "text-brand-400"
                     : "text-text-secondary hover:bg-dark--700 hover:text-slate-200"
                 }`}
               >
+                {active && (
+                  <motion.span
+                    layoutId="sidebar-active"
+                    className="absolute inset-0 -z-10 rounded-xl bg-brand-500/10"
+                    transition={{ type: "spring", stiffness: 500, damping: 40 }}
+                  />
+                )}
                 <Icon className="h-[18px] w-[18px]" />
                 {t.label}
               </button>
@@ -125,9 +135,19 @@ export default function Home() {
       {/* Main content */}
       <main className="flex-1 p-4 sm:p-6 lg:p-8">
         <div className="mx-auto max-w-6xl">
-          {tab === "dashboard" && <Dashboard />}
-          {tab === "movements" && <MovementsView />}
-          {tab === "categories" && <CategoriesView />}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={tab}
+              variants={viewTransition}
+              initial="hidden"
+              animate="show"
+              exit="exit"
+            >
+              {tab === "dashboard" && <Dashboard />}
+              {tab === "movements" && <MovementsView />}
+              {tab === "categories" && <CategoriesView />}
+            </motion.div>
+          </AnimatePresence>
         </div>
       </main>
 

@@ -15,7 +15,13 @@ import type { MonthSummary } from "@/lib/analytics";
 import { formatAmount, formatMonthKey } from "@/lib/format";
 import { resolveColor, chartColors } from "@/lib/colors";
 
-export default function MonthlyTrend({ data }: { data: MonthSummary[] }) {
+export default function MonthlyTrend({
+  data,
+  animate = false,
+}: {
+  data: MonthSummary[];
+  animate?: boolean;
+}) {
   const c = chartColors();
   const chartData = data.map((m) => ({
     month: formatMonthKey(m.monthKey).replace(/\s\d{4}$/, ""),
@@ -65,7 +71,8 @@ export default function MonthlyTrend({ data }: { data: MonthSummary[] }) {
           fill={resolveColor("var(--color-negative)")}
           radius={[6, 6, 0, 0]}
           maxBarSize={38}
-          isAnimationActive={false}
+          isAnimationActive={animate}
+          animationDuration={900}
         />
         <Line
           dataKey="Income"
@@ -73,7 +80,8 @@ export default function MonthlyTrend({ data }: { data: MonthSummary[] }) {
           strokeWidth={3}
           dot={{ r: 4, fill: resolveColor("var(--color-positive)") }}
           activeDot={{ r: 6 }}
-          isAnimationActive={false}
+          isAnimationActive={animate}
+          animationDuration={900}
         />
       </ComposedChart>
     </ResponsiveContainer>

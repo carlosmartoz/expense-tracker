@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { StoreProvider } from "@/lib/store";
+import MotionProvider from "@/components/MotionProvider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -19,7 +20,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable}>
       <body className="font-sans">
-        <StoreProvider>{children}</StoreProvider>
+        <StoreProvider>
+          <MotionProvider>{children}</MotionProvider>
+        </StoreProvider>
       </body>
     </html>
   );

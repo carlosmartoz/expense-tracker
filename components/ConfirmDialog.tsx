@@ -2,6 +2,8 @@
 
 import { useEffect } from "react";
 import { AlertTriangle } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { backdrop, modalPanel } from "@/lib/motion";
 
 interface Props {
   open: boolean;
@@ -38,19 +40,24 @@ export default function ConfirmDialog({
     return () => document.removeEventListener("keydown", onKey);
   }, [open, onCancel]);
 
-  if (!open) return null;
-
   return (
-    <div
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
-      onClick={onCancel}
-      role="dialog"
-      aria-modal="true"
-    >
-      <div
-        className="card w-full max-w-sm p-5"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+          onClick={onCancel}
+          role="dialog"
+          aria-modal="true"
+          variants={backdrop}
+          initial="hidden"
+          animate="show"
+          exit="exit"
+        >
+          <motion.div
+            className="card w-full max-w-sm p-5"
+            onClick={(e) => e.stopPropagation()}
+            variants={modalPanel}
+          >
         <div className="flex items-start gap-3">
           <span
             className={`grid h-10 w-10 shrink-0 place-items-center rounded-full ${
@@ -82,7 +89,9 @@ export default function ConfirmDialog({
             {confirmLabel}
           </button>
         </div>
-      </div>
-    </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

@@ -13,7 +13,13 @@ import { formatAmount } from "@/lib/format";
 import { resolveColor, chartColors } from "@/lib/colors";
 import { useStore } from "@/lib/store";
 
-export default function CategoryPie({ data }: { data: CategorySlice[] }) {
+export default function CategoryPie({
+  data,
+  animate = false,
+}: {
+  data: CategorySlice[];
+  animate?: boolean;
+}) {
   const c = chartColors();
   const { categoryMap } = useStore();
   const nameOf = (id: string) => categoryMap[id]?.name ?? id;
@@ -36,7 +42,8 @@ export default function CategoryPie({ data }: { data: CategorySlice[] }) {
           outerRadius={96}
           paddingAngle={2}
           stroke="none"
-          isAnimationActive={false}
+          isAnimationActive={animate}
+          animationDuration={900}
         >
           {data.map((slice) => (
             <Cell

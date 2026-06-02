@@ -1,9 +1,13 @@
+"use client";
+
 import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
+import { motion } from "motion/react";
+import { cardItem } from "@/lib/motion";
 
 interface StatCardProps {
   label: string;
-  value: string;
+  value: ReactNode;
   hint?: ReactNode;
   accent?: "brand" | "mint" | "coral" | "neutral" | "violet";
   icon?: LucideIcon;
@@ -25,7 +29,12 @@ export default function StatCard({
   icon: Icon,
 }: StatCardProps) {
   return (
-    <div className="card p-5">
+    <motion.div
+      className="card p-5"
+      variants={cardItem}
+      whileHover={{ y: -3 }}
+      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+    >
       <div className="flex items-start justify-between">
         <span className="stat-label">{label}</span>
         {Icon && (
@@ -36,6 +45,6 @@ export default function StatCard({
       </div>
       <p className="mt-3 text-2xl font-bold tracking-tight">{value}</p>
       {hint && <div className="mt-1 text-sm text-text-subtle">{hint}</div>}
-    </div>
+    </motion.div>
   );
 }

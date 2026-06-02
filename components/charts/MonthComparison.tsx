@@ -18,9 +18,14 @@ import { useStore } from "@/lib/store";
 interface Props {
   current: MonthSummary;
   previous: MonthSummary;
+  animate?: boolean;
 }
 
-export default function MonthComparison({ current, previous }: Props) {
+export default function MonthComparison({
+  current,
+  previous,
+  animate = false,
+}: Props) {
   const c = chartColors();
   const { categoryMap } = useStore();
   const prevLabel = formatMonthKey(previous.monthKey).replace(/\s\d{4}$/, "");
@@ -84,14 +89,16 @@ export default function MonthComparison({ current, previous }: Props) {
           fill={resolveColor("var(--color-dark--600)")}
           radius={[6, 6, 0, 0]}
           maxBarSize={26}
-          isAnimationActive={false}
+          isAnimationActive={animate}
+          animationDuration={900}
         />
         <Bar
           dataKey={currLabel}
           fill={resolveColor("var(--color-brand-500)")}
           radius={[6, 6, 0, 0]}
           maxBarSize={26}
-          isAnimationActive={false}
+          isAnimationActive={animate}
+          animationDuration={900}
         />
       </BarChart>
     </ResponsiveContainer>

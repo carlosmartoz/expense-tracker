@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useStore } from "@/lib/store";
 import {
   summarizeAllMonths,
@@ -8,15 +8,43 @@ import {
   pctChange,
 } from "@/lib/analytics";
 import { Gem, TrendingUp, CreditCard, PiggyBank } from "lucide-react";
+import { motion } from "motion/react";
+import { stagger, cardItem } from "@/lib/motion";
 import { formatAmount, formatMonthKey, formatPercent } from "@/lib/format";
 import StatCard from "./StatCard";
+import CountUp from "./CountUp";
 import CategoryPie from "./charts/CategoryPie";
 import MonthlyTrend from "./charts/MonthlyTrend";
 import MonthComparison from "./charts/MonthComparison";
 import SavingsGauge from "./charts/SavingsGauge";
 
+/**
+ * The dashboard intro (count-up + chart draw) should play only on the first
+ * load of the page, not every time the user returns to the tab. This module-
+ * level flag survives tab switches (the component unmounts) and React 18's
+ * StrictMode double-mount, while resetting on a full page reload.
+ */
+let introState: "pending" | "done" = "pending";
+
+function useDashboardIntro(): boolean {
+  // Derived purely from the module flag so SSR and the client agree, and the
+  // StrictMode remount can't reset it back to false.
+  const [play] = useState(() => introState === "pending");
+  useEffect(() => {
+    if (introState !== "pending") return;
+    // Settle to "done" after the intro has comfortably finished; later mounts
+    // (returning to the tab) then render the final state instantly.
+    const t = setTimeout(() => {
+      introState = "done";
+    }, 2500);
+    return () => clearTimeout(t);
+  }, []);
+  return play;
+}
+
 export default function Dashboard() {
   const { transactions, hydrated } = useStore();
+  const play = useDashboardIntro();
 
   const months = useMemo(
     () => summarizeAllMonths(transactions),
@@ -50,21 +78,31 @@ export default function Dashboard() {
     : null;
 
   return (
-    <div className="space-y-5">
-      <div>
+    <motion.div
+      className="space-y-5"
+      variants={stagger}
+      initial="hidden"
+      animate="show"
+    >
+      <motion.div variants={cardItem}>
         <h1 className="text-2xl font-bold tracking-tight">
           Here's your overview
         </h1>
         <p className="text-sm text-text-subtle">
           {formatMonthKey(current.monthKey)}
         </p>
-      </div>
+      </motion.div>
 
       {/* Top stat cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <motion.div
+        className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+        variants={stagger}
+      >
         <StatCard
           label="Monthly balance"
-          value={formatAmount(current.balance)}
+          value={
+            <CountUp value={current.balance} format={formatAmount} play={play} />
+          }
           accent="brand"
           icon={Gem}
           hint={
@@ -77,13 +115,17 @@ export default function Dashboard() {
         />
         <StatCard
           label="Income"
-          value={formatAmount(current.income)}
+          value={
+            <CountUp value={current.income} format={formatAmount} play={play} />
+          }
           accent="mint"
           icon={TrendingUp}
         />
         <StatCard
           label="Expenses"
-          value={formatAmount(current.expense)}
+          value={
+            <CountUp value={current.expense} format={formatAmount} play={play} />
+          }
           accent="coral"
           icon={CreditCard}
           hint={
@@ -96,31 +138,37 @@ export default function Dashboard() {
         />
         <StatCard
           label="Savings rate"
-          value={`${Math.round(current.savingsRate)}%`}
+          value={
+            <CountUp
+              value={current.savingsRate}
+              format={(n) => `${Math.round(n)}%`}
+              play={play}
+            />
+          }
           accent="violet"
           icon={PiggyBank}
         />
-      </div>
+      </motion.div>
 
       {/* Charts grid */}
-      <div className="grid gap-4 lg:grid-cols-3">
+      <motion.div className="grid gap-4 lg:grid-cols-3" variants={cardItem}>
         <div className="card p-5 lg:col-span-2">
           <h2 className="mb-1 text-sm font-bold text-text-primary">
             Income vs Expenses by month
           </h2>
           <p className="mb-3 text-xs text-text-secondary">Recent months</p>
-          <MonthlyTrend data={months} />
+          <MonthlyTrend data={months} animate={play} />
         </div>
         <div className="card p-5">
           <h2 className="mb-1 text-sm font-bold text-text-primary">
             Monthly savings
           </h2>
           <p className="mb-3 text-xs text-text-secondary">% of income set aside</p>
-          <SavingsGauge rate={current.savingsRate} />
+          <SavingsGauge rate={current.savingsRate} animate={play} />
         </div>
-      </div>
+      </motion.div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <motion.div className="grid gap-4 lg:grid-cols-3" variants={cardItem}>
         <div className="card p-5">
           <h2 className="mb-1 text-sm font-bold text-text-primary">
             Expenses by category
@@ -128,7 +176,7 @@ export default function Dashboard() {
           <p className="mb-3 text-xs text-text-secondary">
             {formatMonthKey(current.monthKey)}
           </p>
-          <CategoryPie data={pie} />
+          <CategoryPie data={pie} animate={play} />
         </div>
         <div className="card p-5 lg:col-span-2">
           <h2 className="mb-1 text-sm font-bold text-text-primary">
@@ -140,14 +188,18 @@ export default function Dashboard() {
               : "Needs at least two months"}
           </p>
           {previous ? (
-            <MonthComparison current={current} previous={previous} />
+            <MonthComparison
+              current={current}
+              previous={previous}
+              animate={play}
+            />
           ) : (
             <div className="grid h-[300px] place-items-center text-sm text-text-secondary">
               Add transactions from another month to compare.
             </div>
           )}
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

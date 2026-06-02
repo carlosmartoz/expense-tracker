@@ -7,8 +7,15 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { resolveColor } from "@/lib/colors";
+import CountUp from "@/components/CountUp";
 
-export default function SavingsGauge({ rate }: { rate: number }) {
+export default function SavingsGauge({
+  rate,
+  animate = false,
+}: {
+  rate: number;
+  animate?: boolean;
+}) {
   const clamped = Math.max(0, Math.min(100, Math.round(rate)));
   // var() for the HTML label (same on server & client -> no hydration mismatch);
   // a resolved value for Recharts, which paints via SVG attributes.
@@ -36,7 +43,8 @@ export default function SavingsGauge({ rate }: { rate: number }) {
             background={{ fill: resolveColor("var(--color-dark--700)") }}
             dataKey="value"
             cornerRadius={20}
-            isAnimationActive={false}
+            isAnimationActive={animate}
+            animationDuration={900}
           />
         </RadialBarChart>
       </ResponsiveContainer>
@@ -45,7 +53,11 @@ export default function SavingsGauge({ rate }: { rate: number }) {
           className="text-4xl font-bold tracking-tight"
           style={{ color: colorVar }}
         >
-          {clamped}%
+          <CountUp
+            value={clamped}
+            format={(n) => `${Math.round(n)}%`}
+            play={animate}
+          />
         </span>
         <span className="text-xs font-medium uppercase tracking-wide text-text-secondary">
           Savings

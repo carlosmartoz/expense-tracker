@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { Check, Pencil, Plus, Trash2, X } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { listItem, stagger } from "@/lib/motion";
 import { useStore } from "@/lib/store";
 import {
   categoryIcon,
@@ -109,21 +111,23 @@ export default function CategoriesView() {
               {CATEGORY_COLORS.map((c) => {
                 const selected = c === color;
                 return (
-                  <button
+                  <motion.button
                     key={c}
                     type="button"
                     onClick={() => setColor(c)}
                     aria-label={`Select color ${c}`}
                     aria-pressed={selected}
                     style={{ backgroundColor: c }}
+                    whileHover={{ scale: 1.12 }}
+                    whileTap={{ scale: 0.92 }}
                     className={`grid h-8 w-8 cursor-pointer place-items-center rounded-full transition ${
                       selected
                         ? "ring-2 ring-white ring-offset-2 ring-offset-dark--800"
-                        : "hover:scale-110"
+                        : ""
                     }`}
                   >
                     {selected && <Check className="h-4 w-4 text-white" />}
-                  </button>
+                  </motion.button>
                 );
               })}
             </div>
@@ -171,24 +175,30 @@ export default function CategoriesView() {
               Use the form to add your first one.
             </div>
           ) : (
-            <ul className="space-y-2">
+            <motion.ul
+              className="space-y-2"
+              variants={stagger}
+              initial="hidden"
+              animate="show"
+            >
+              <AnimatePresence initial={false}>
               {customCategories.map((cat) => {
                 const Icon = categoryIcon(cat.icon);
                 const isEditing = editingId === cat.id;
                 return (
-                  <li
+                  <motion.li
                     key={cat.id}
+                    layout
+                    variants={listItem}
+                    exit="exit"
                     className={`flex items-center gap-3 rounded-xl border p-3 transition ${
                       isEditing
                         ? "border-brand-500/60 bg-brand-500/5"
                         : "border-dark--600 bg-dark--700/40"
                     }`}
                   >
-                    <span
-                      className="grid h-9 w-9 shrink-0 place-items-center rounded-lg"
-                      style={{ backgroundColor: `${cat.color}22`, color: cat.color }}
-                    >
-                      <Icon className="h-5 w-5" />
+                    <span className="shrink-0" style={{ color: cat.color }}>
+                      <Icon className="h-6 w-6" />
                     </span>
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-medium text-text-primary">
@@ -211,10 +221,11 @@ export default function CategoriesView() {
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
-                  </li>
+                  </motion.li>
                 );
               })}
-            </ul>
+              </AnimatePresence>
+            </motion.ul>
           )}
         </div>
       </div>
