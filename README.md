@@ -1,4 +1,4 @@
-# 💰 Fintrack — Expense Tracker
+# Fintrack — Expense Tracker
 
 A personal finance app with a modern-banking feel and an edge-to-edge **dark
 theme**: log income and expenses and visualize your money with charts.
