@@ -19,8 +19,8 @@ export type TransactionType = "income" | "expense";
    ========================================================================= */
 
 export const CURRENCIES = {
-  ARS: { code: "ARS", symbol: "$", label: "Peso argentino" },
-  USD: { code: "USD", symbol: "US$", label: "Dólar" },
+  ARS: { code: "ARS", symbol: "$", label: "Argentine Peso" },
+  USD: { code: "USD", symbol: "US$", label: "Dollar" },
   EUR: { code: "EUR", symbol: "€", label: "Euro" },
 } as const;
 
@@ -80,8 +80,8 @@ export const DEFAULT_CATEGORIES: CategoryDef[] = [
   { id: "Subscriptions", name: "Subscriptions", color: "var(--color-cat-subscriptions)", icon: "Tv", isDefault: true },
   { id: "Gaming", name: "Gaming", color: "var(--color-cat-gaming)", icon: "Gamepad2", isDefault: true },
   { id: "Home", name: "Home", color: "var(--color-cat-home)", icon: "House", isDefault: true },
-  { id: "Servicios", name: "Services", color: "#14b8a6", icon: "Wrench", isDefault: true },
-  { id: "Deudas", name: "Debts", color: "#ef4444", icon: "Landmark", isDefault: true },
+  { id: "Services", name: "Services", color: "#14b8a6", icon: "Wrench", isDefault: true },
+  { id: "Debts", name: "Debts", color: "#ef4444", icon: "Landmark", isDefault: true },
   { id: INCOME_CATEGORY_ID, name: "Income", color: "var(--color-cat-income)", icon: "Wallet", isDefault: true },
   { id: FALLBACK_CATEGORY_ID, name: "Other", color: "var(--color-cat-other)", icon: "Receipt", isDefault: true },
 ];
