@@ -11,9 +11,7 @@ import {
 import type { Transaction, CategoryDef } from "./types";
 import { DEFAULT_CATEGORIES, FALLBACK_CATEGORY_ID } from "./types";
 import { buildSeedData } from "./seed";
-
-const STORAGE_KEY = "expense-tracker:transactions:v2";
-const CATEGORIES_KEY = "expense-tracker:categories:v1";
+import { load, save } from "./storage";
 
 interface StoreValue {
   transactions: Transaction[];
@@ -58,47 +56,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [categories, setCategories] = useState<CategoryDef[]>(DEFAULT_CATEGORIES);
   const [hydrated, setHydrated] = useState(false);
 
-  // Load from localStorage once on mount; seed transactions on first run.
+  // Read the stored copy once on mount; seed transactions on a first visit.
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        setTransactions(JSON.parse(raw));
-      } else {
-        const seed = buildSeedData();
-        setTransactions(seed);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(seed));
-      }
-    } catch {
-      setTransactions(buildSeedData());
-    }
-    try {
-      const rawCats = localStorage.getItem(CATEGORIES_KEY);
-      setCategories(mergeCategories(rawCats ? JSON.parse(rawCats) : null));
-    } catch {
-      setCategories(DEFAULT_CATEGORIES);
-    }
+    const stored = load();
+    setTransactions(stored ? stored.transactions : buildSeedData());
+    setCategories(mergeCategories(stored ? stored.categories : null));
     setHydrated(true);
   }, []);
 
   // Persist on every change (after hydration).
   useEffect(() => {
     if (!hydrated) return;
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
-    } catch {
-      /* storage may be unavailable (private mode); ignore */
-    }
-  }, [transactions, hydrated]);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    try {
-      localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories));
-    } catch {
-      /* ignore */
-    }
-  }, [categories, hydrated]);
+    save({ transactions, categories });
+  }, [transactions, categories, hydrated]);
 
   const categoryMap = useMemo(
     () => Object.fromEntries(categories.map((c) => [c.id, c])),

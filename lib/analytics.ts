@@ -1,4 +1,4 @@
-import type { Transaction, Category } from "./types";
+import type { Transaction } from "./types";
 import { monthKeyOf } from "./format";
 
 export interface MonthSummary {
@@ -76,36 +76,4 @@ export function expenseByCategory(
 export function pctChange(curr: number, prev: number): number | null {
   if (prev === 0) return curr === 0 ? 0 : null;
   return ((curr - prev) / prev) * 100;
-}
-
-export function categoryTotal(
-  transactions: Transaction[],
-  category: Category,
-  monthKey: string
-): number {
-  return transactions
-    .filter(
-      (t) =>
-        t.type === "expense" &&
-        t.category === category &&
-        monthKeyOf(t.date) === monthKey
-    )
-    .reduce((sum, t) => sum + t.amount, 0);
-}
-
-/** Sum of expenses matching a description substring (case-insensitive). */
-export function descTotal(
-  transactions: Transaction[],
-  needle: string,
-  monthKey: string
-): number {
-  const n = needle.toLowerCase();
-  return transactions
-    .filter(
-      (t) =>
-        t.type === "expense" &&
-        monthKeyOf(t.date) === monthKey &&
-        t.description.toLowerCase().includes(n)
-    )
-    .reduce((sum, t) => sum + t.amount, 0);
 }

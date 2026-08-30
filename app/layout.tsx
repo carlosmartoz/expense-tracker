@@ -3,11 +3,12 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { StoreProvider } from "@/lib/store";
 import MotionProvider from "@/components/MotionProvider";
+import { APP_NAME, LOCALE } from "@/lib/config";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "Expense Tracker",
+  title: APP_NAME,
   description:
     "Track your income and expenses and visualize your money.",
 };
@@ -18,7 +19,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang={LOCALE} className={inter.variable}>
       <body className="font-sans">
         <StoreProvider>
           <MotionProvider>{children}</MotionProvider>

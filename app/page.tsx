@@ -13,6 +13,7 @@ import {
 import { AnimatePresence, motion } from "motion/react";
 import { viewTransition } from "@/lib/motion";
 import { useStore } from "@/lib/store";
+import { APP_NAME } from "@/lib/config";
 import Dashboard from "@/components/Dashboard";
 import MovementsView from "@/components/MovementsView";
 import CategoriesView from "@/components/CategoriesView";
@@ -41,7 +42,7 @@ export default function Home() {
           </span>
 
           <span className="text-lg font-bold tracking-tight text-text-primary">
-            Expense Tracker
+            {APP_NAME}
           </span>
         </div>
 
@@ -92,7 +93,7 @@ export default function Home() {
       <div className="sticky top-0 z-10 flex items-center gap-1 border-b border-dark--600 bg-dark--900/90 px-4 py-2 backdrop-blur lg:hidden">
         <span className="mr-auto flex min-w-0 items-center gap-2 font-bold">
           <Wallet className="h-5 w-5 shrink-0 text-brand-400" />
-          <span className="truncate">Expense Tracker</span>
+          <span className="truncate">{APP_NAME}</span>
         </span>
         {TABS.map((t) => {
           const Icon = t.icon;
