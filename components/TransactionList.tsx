@@ -32,7 +32,7 @@ export default function TransactionList({
 
   if (transactions.length === 0) {
     return (
-      <div className="grid place-items-center rounded-2xl border border-dashed border-dark--600 py-12 text-center text-sm text-text-subtle">
+      <div className="grid place-items-center rounded-2xl border border-dashed border-border py-12 text-center text-sm text-text-subtle">
         No transactions match your filters.
       </div>
     );
@@ -60,7 +60,7 @@ export default function TransactionList({
               </div>
               <span
                 className={`mt-0.5 shrink-0 text-sm font-semibold ${
-                  isIncome ? "text-mint" : "text-coral"
+                  isIncome ? "text-positive" : "text-negative"
                 }`}
               >
                 {isIncome ? "+" : "−"}
@@ -70,7 +70,7 @@ export default function TransactionList({
               <div className="mt-0.5 flex shrink-0 items-center gap-0.5 opacity-100 transition sm:opacity-0 sm:group-hover:opacity-100">
                 <button
                   onClick={() => setEditing(t)}
-                  className="cursor-pointer rounded-lg p-1.5 text-slate-300 transition hover:bg-dark--700 hover:text-text-primary"
+                  className="cursor-pointer rounded-lg p-1.5 text-text-secondary transition hover:bg-surface-raised hover:text-text-primary"
                   aria-label="Edit"
                   title="Edit"
                 >
@@ -78,7 +78,7 @@ export default function TransactionList({
                 </button>
                 <button
                   onClick={() => setDeleting(t)}
-                  className="cursor-pointer rounded-lg p-1.5 text-slate-300 transition hover:bg-coral/10 hover:text-coral"
+                  className="cursor-pointer rounded-lg p-1.5 text-text-secondary transition hover:bg-surface-raised hover:text-text-primary"
                   aria-label="Delete"
                   title="Delete"
                 >
@@ -112,7 +112,7 @@ export default function TransactionList({
               <button
                 onClick={() => setEditing(null)}
                 aria-label="Close"
-                className="cursor-pointer rounded-lg p-1.5 text-text-secondary transition hover:bg-dark--700 hover:text-text-primary"
+                className="cursor-pointer rounded-lg p-1.5 text-text-secondary transition hover:bg-surface-raised hover:text-text-primary"
               >
                 <X className="h-5 w-5" />
               </button>

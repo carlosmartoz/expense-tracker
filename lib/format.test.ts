@@ -5,9 +5,9 @@ import {
   formatDate,
   formatMoney,
   formatMonthKey,
-  formatPercent,
   monthKeyOf,
   parseAmount,
+  sortedMonthKeys,
 } from "./format";
 
 /**
@@ -85,12 +85,19 @@ describe("dates", () => {
   });
 });
 
-describe("percentages", () => {
-  it("marks gains with a plus", () => {
-    expect(formatPercent(12.4)).toBe("+12%");
+describe("the months a ledger covers", () => {
+  const rows = [
+    { date: "2026-08-30" },
+    { date: "2026-04-02" },
+    { date: "2026-08-01" },
+    { date: "2026-06-15" },
+  ] as Parameters<typeof sortedMonthKeys>[0];
+
+  it("lists each month once, oldest first", () => {
+    expect(sortedMonthKeys(rows)).toEqual(["2026-04", "2026-06", "2026-08"]);
   });
 
-  it("leaves the minus on losses", () => {
-    expect(formatPercent(-8.6)).toBe("-9%");
+  it("returns nothing for an empty ledger", () => {
+    expect(sortedMonthKeys([])).toEqual([]);
   });
 });

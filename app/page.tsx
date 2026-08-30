@@ -1,38 +1,30 @@
 "use client";
 
 import { useState } from "react";
-import {
-  LayoutDashboard,
-  ArrowRightLeft,
-  Tags,
-  Wallet,
-  type LucideIcon,
-} from "lucide-react";
+import { ArrowRightLeft, Tags, Wallet, type LucideIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { viewTransition } from "@/lib/motion";
 import { APP_NAME } from "@/lib/config";
-import Dashboard from "@/components/Dashboard";
 import MovementsView from "@/components/MovementsView";
 import CategoriesView from "@/components/CategoriesView";
 import DataMenu from "@/components/DataMenu";
 
-type Tab = "dashboard" | "movements" | "categories";
+type Tab = "movements" | "categories";
 
 const TABS: { id: Tab; label: string; icon: LucideIcon }[] = [
-  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { id: "movements", label: "Transactions", icon: ArrowRightLeft },
   { id: "categories", label: "Categories", icon: Tags },
 ];
 
 export default function Home() {
-  const [tab, setTab] = useState<Tab>("dashboard");
+  const [tab, setTab] = useState<Tab>("movements");
 
   return (
     <div className="min-h-screen lg:flex">
       {/* Sidebar */}
-      <aside className="hidden w-60 shrink-0 flex-col border-r border-dark--600 bg-dark--800 p-5 lg:flex lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto">
+      <aside className="hidden w-60 shrink-0 flex-col border-r border-border bg-surface-panel p-5 lg:flex lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto">
         <div className="mb-8 flex items-center gap-2">
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-600 text-text-primary">
+          <span className="grid h-8 w-8 place-items-center rounded-lg bg-accent text-text-primary">
             <Wallet className="h-5 w-5" />
           </span>
 
@@ -51,14 +43,14 @@ export default function Home() {
                 onClick={() => setTab(t.id)}
                 className={`relative flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
                   active
-                    ? "text-brand-400"
-                    : "text-text-secondary hover:bg-dark--700 hover:text-slate-200"
+                    ? "text-text-primary"
+                    : "text-text-secondary hover:bg-surface-raised hover:text-text-primary"
                 }`}
               >
                 {active && (
                   <motion.span
                     layoutId="sidebar-active"
-                    className="absolute inset-0 -z-10 rounded-xl bg-brand-500/10"
+                    className="absolute inset-0 -z-10 rounded-xl bg-surface-raised"
                     transition={{ type: "spring", stiffness: 500, damping: 40 }}
                   />
                 )}
@@ -75,9 +67,9 @@ export default function Home() {
       </aside>
 
       {/* Mobile top nav */}
-      <div className="sticky top-0 z-10 flex items-center gap-1 border-b border-dark--600 bg-dark--900/90 px-4 py-2 backdrop-blur lg:hidden">
+      <div className="sticky top-0 z-10 flex items-center gap-1 border-b border-border bg-surface-base/90 px-4 py-2 backdrop-blur lg:hidden">
         <span className="mr-auto flex min-w-0 items-center gap-2 font-bold">
-          <Wallet className="h-5 w-5 shrink-0 text-brand-400" />
+          <Wallet className="h-5 w-5 shrink-0 text-text-primary" />
           <span className="truncate">{APP_NAME}</span>
         </span>
         {TABS.map((t) => {
@@ -89,7 +81,7 @@ export default function Home() {
               aria-label={t.label}
               className={`cursor-pointer rounded-lg px-3 py-1.5 text-sm font-medium ${
                 tab === t.id
-                  ? "bg-brand-500/10 text-brand-400"
+                  ? "bg-surface-raised text-text-primary"
                   : "text-text-subtle"
               }`}
             >
@@ -99,7 +91,7 @@ export default function Home() {
         })}
 
         {/* Always-reachable data actions */}
-        <span className="mx-1 h-5 w-px bg-dark--600" />
+        <span className="mx-1 h-5 w-px bg-border" />
         <DataMenu compact />
       </div>
 
@@ -114,9 +106,6 @@ export default function Home() {
               animate="show"
               exit="exit"
             >
-              {tab === "dashboard" && (
-                <Dashboard onAddFirst={() => setTab("movements")} />
-              )}
               {tab === "movements" && <MovementsView />}
               {tab === "categories" && <CategoriesView />}
             </motion.div>

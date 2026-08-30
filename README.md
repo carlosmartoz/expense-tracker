@@ -4,7 +4,7 @@ A place to write down what you earn and what you spend, and see where the month
 went. It runs entirely in your browser — there is no account, no server and
 nothing leaves your machine.
 
-**Next.js 16 (App Router, Turbopack) · React 19 · TypeScript · Tailwind CSS v4 · Recharts 3**
+**Next.js 16 (App Router, Turbopack) · React 19 · TypeScript · Tailwind CSS v4**
 
 ## Running it
 
@@ -44,15 +44,13 @@ So export a backup now and then. The sidebar has both:
 asks first and tells you what the file holds. A CSV that names a category you
 don't have creates it.
 
-## The three screens
+## The two screens
 
-- **Dashboard** — pick any month and see the balance, income, expenses and
-  savings rate, the split by category, the trend across months, and how the
-  month compares with the one before it.
-- **Transactions** — add, edit and delete, with filters by month, category,
-  type and free text.
-- **Categories** — one list covering both sides. Rename, recolour or remove any
-  of them.
+- **Transactions** — the ledger. Add, edit and delete, with the running balance
+  for whatever the filters are showing, and filters by month, category, type
+  and free text.
+- **Categories** — one list covering both sides of the book. Rename, retone or
+  remove any of them.
 
 ## How it fits together
 
@@ -62,20 +60,17 @@ app/
   layout.tsx       Fonts and the global provider
   page.tsx         Shell and navigation
 components/
-  Dashboard, MovementsView, CategoriesView       the three screens
-  TransactionForm, TransactionList, Filters      the ledger
-  DataMenu, EmptyState                           import/export and first run
-  Select, DatePicker, ConfirmDialog, CountUp     dark-theme building blocks
-  charts/          CategoryPie, MonthlyTrend, MonthComparison, SavingsGauge
+  MovementsView, CategoriesView              the two screens
+  TransactionForm, TransactionList, Filters  the ledger
+  DataMenu, EmptyState                       import/export and first run
+  Select, DatePicker, ConfirmDialog          dark-theme building blocks
 lib/
   config.ts        app name, locale, currency — start here to re-skin
   types.ts         the whole data model: Transaction and Category
   storage.ts       reading and writing localStorage, and the migration chain
   backup.ts        export and import, JSON and CSV
   store.tsx        state and the operations on it (Context)
-  analytics.ts     monthly summaries and per-category totals
-  format.ts        money, dates and percentages
-  colors.ts        resolving theme tokens for Recharts
+  format.ts        money, dates and the months a ledger covers
   motion.ts        shared animation variants
 ```
 
@@ -86,11 +81,12 @@ English while amounts are grouped the Argentine way (`$ 1.234,56`). Those are
 two separate settings on purpose: `LOCALE` governs text and dates,
 `CURRENCY.locale` governs how numbers are grouped.
 
-**Colours come from `@theme` tokens in `app/globals.css`**, never from hex
-literals in components. Charts resolve them at runtime through `resolveColor()`
-in `lib/colors.ts`, because SVG presentation attributes don't understand
-`var()`. Some `--color-cat-*` tokens name categories the app no longer ships —
-they stay because a browser somewhere still has data pointing at them.
+**The palette is neutral on purpose — there is no hue anywhere.** Meaning is
+carried by position, weight, an icon or a `+`/`−` sign, never by colour. Every
+value lives as an `@theme` token in `app/globals.css`, and components reference
+tokens rather than hex literals. The one exception is `Category.color`, which is
+stored per category and holds one of the six steps in `CATEGORY_TONES`; a tone
+is a nudge, the icon and the name are what tell two categories apart.
 
 **Stored data is versioned.** `lib/storage.ts` keeps one key with a version
 stamp and a chain of migrations; each entry moves a snapshot forward one step.
@@ -105,10 +101,9 @@ type or clean it, never curate it.
 **Native form controls are avoided** so the dark theme holds together: there is
 a custom `Select` and a custom `DatePicker`, both keyboard accessible.
 
-**Animation is subtle and lives in `lib/motion.ts`.** The whole app is wrapped
-in `MotionConfig reducedMotion="user"`, so it respects
-`prefers-reduced-motion`. The dashboard intro plays once per page load, not
-every time you return to the tab.
+**Animation is subtle and lives in `lib/motion.ts`.** Reach for a shared
+variant rather than writing a one-off. The whole app is wrapped in
+`MotionConfig reducedMotion="user"`, so it respects `prefers-reduced-motion`.
 
 **Dark theme only.** There is no light mode, by choice.
 
@@ -118,6 +113,6 @@ every time you return to the tab.
 npm test
 ```
 
-86 tests over `lib/`, which is where a mistake is silent: the migration chain,
-the backup round-trip in both formats, the monthly maths, and the money and
-date formatting. The UI isn't covered — it's checked by using it.
+71 tests over `lib/`, which is where a mistake is silent: the migration chain
+step by step, the backup round-trip in both formats, and the money and date
+formatting. The UI isn't covered — it's checked by using it.

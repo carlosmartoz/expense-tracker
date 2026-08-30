@@ -126,13 +126,13 @@ export default function Select({
         aria-label={ariaLabel}
         onClick={() => (open ? setOpen(false) : openList())}
         onKeyDown={onKeyDown}
-        className="flex w-full cursor-pointer items-center gap-2 rounded-xl border border-dark--600
-          bg-dark--700 px-3 py-2 text-left text-sm text-text-primary outline-none transition
-          hover:border-dark--600/80 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30"
+        className="flex w-full cursor-pointer items-center gap-2 rounded-xl border border-border
+          bg-surface-raised px-3 py-2 text-left text-sm text-text-primary outline-none transition
+          hover:border-border/80 focus:border-border-strong focus:ring-2 focus:ring-text-subtle/40"
       >
         {SelectedIcon && (
           <SelectedIcon
-            className="h-4 w-4 shrink-0 text-slate-300"
+            className="h-4 w-4 shrink-0 text-text-secondary"
             style={selected?.iconColor ? { color: selected.iconColor } : undefined}
           />
         )}
@@ -153,7 +153,7 @@ export default function Select({
           role="listbox"
           tabIndex={-1}
           className="absolute z-20 mt-1.5 max-h-64 w-full overflow-auto rounded-xl border
-            border-white/10 bg-dark--800 p-1 shadow-card"
+            border-white/10 bg-surface-panel p-1 shadow-card"
         >
           {options.map((opt, idx) => {
             const isSelected = opt.value === value;
@@ -167,17 +167,17 @@ export default function Select({
                 onMouseEnter={() => setHighlight(idx)}
                 onClick={() => commit(idx)}
                 className={`flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm transition
-                  ${isActive ? "bg-dark--700 text-text-primary" : "text-slate-300"}`}
+                  ${isActive ? "bg-surface-raised text-text-primary" : "text-text-secondary"}`}
               >
                 {OptionIcon && (
                   <OptionIcon
-                    className="h-4 w-4 shrink-0 text-slate-300"
+                    className="h-4 w-4 shrink-0 text-text-secondary"
                     style={opt.iconColor ? { color: opt.iconColor } : undefined}
                   />
                 )}
                 <span className="flex-1 truncate">{opt.label}</span>
                 {isSelected && (
-                  <Check className="h-4 w-4 shrink-0 text-brand-400" />
+                  <Check className="h-4 w-4 shrink-0 text-text-primary" />
                 )}
               </li>
             );

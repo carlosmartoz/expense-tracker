@@ -62,8 +62,8 @@ export default function ConfirmDialog({
           <span
             className={`grid h-10 w-10 shrink-0 place-items-center rounded-full ${
               variant === "danger"
-                ? "bg-coral/10 text-coral"
-                : "bg-brand-500/10 text-brand-400"
+                ? "bg-surface-raised text-text-primary"
+                : "bg-surface-raised text-text-secondary"
             }`}
           >
             <AlertTriangle className="h-5 w-5" />

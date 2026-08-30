@@ -106,9 +106,9 @@ export default function DatePicker({
         aria-label={ariaLabel}
         onClick={() => (open ? setOpen(false) : openCalendar())}
         onKeyDown={onTriggerKeyDown}
-        className="flex w-full cursor-pointer items-center gap-2 rounded-xl border border-dark--600
-          bg-dark--700 px-3 py-2 text-left text-sm text-text-primary outline-none transition
-          hover:border-dark--600/80 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30"
+        className="flex w-full cursor-pointer items-center gap-2 rounded-xl border border-border
+          bg-surface-raised px-3 py-2 text-left text-sm text-text-primary outline-none transition
+          hover:border-border/80 focus:border-border-strong focus:ring-2 focus:ring-text-subtle/40"
       >
         <CalendarDays className="h-4 w-4 shrink-0 text-text-secondary" />
         <span className={`flex-1 truncate ${selected ? "" : "text-text-subtle"}`}>
@@ -120,7 +120,7 @@ export default function DatePicker({
         <div
           role="dialog"
           className="absolute z-30 mt-1.5 w-[17rem] rounded-xl border border-white/10
-            bg-dark--800 p-3 shadow-card"
+            bg-surface-panel p-3 shadow-card"
         >
           {/* Header */}
           <div className="mb-2 flex items-center justify-between">
@@ -128,7 +128,7 @@ export default function DatePicker({
               type="button"
               onClick={() => shiftMonth(-1)}
               aria-label="Previous month"
-              className="grid h-7 w-7 cursor-pointer place-items-center rounded-lg text-text-secondary transition hover:bg-dark--700 hover:text-text-primary"
+              className="grid h-7 w-7 cursor-pointer place-items-center rounded-lg text-text-secondary transition hover:bg-surface-raised hover:text-text-primary"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
@@ -139,7 +139,7 @@ export default function DatePicker({
               type="button"
               onClick={() => shiftMonth(1)}
               aria-label="Next month"
-              className="grid h-7 w-7 cursor-pointer place-items-center rounded-lg text-text-secondary transition hover:bg-dark--700 hover:text-text-primary"
+              className="grid h-7 w-7 cursor-pointer place-items-center rounded-lg text-text-secondary transition hover:bg-surface-raised hover:text-text-primary"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
@@ -171,10 +171,10 @@ export default function DatePicker({
                   onClick={() => pick(day)}
                   className={`grid h-8 cursor-pointer place-items-center rounded-lg text-sm transition ${
                     isSelected
-                      ? "bg-brand-600 font-semibold text-white"
+                      ? "bg-accent font-semibold text-accent-text"
                       : isToday
-                        ? "text-brand-400 ring-1 ring-brand-500/50 hover:bg-dark--700"
-                        : "text-text-primary hover:bg-dark--700"
+                        ? "text-text-primary ring-1 ring-surface-raised0 hover:bg-surface-raised"
+                        : "text-text-primary hover:bg-surface-raised"
                   }`}
                 >
                   {day}
@@ -184,14 +184,14 @@ export default function DatePicker({
           </div>
 
           {/* Footer */}
-          <div className="mt-2 flex justify-end border-t border-dark--600 pt-2">
+          <div className="mt-2 flex justify-end border-t border-border pt-2">
             <button
               type="button"
               onClick={() => {
                 onChange(todayISO);
                 setOpen(false);
               }}
-              className="cursor-pointer rounded-lg px-2 py-1 text-xs font-medium text-brand-400 transition hover:bg-dark--700"
+              className="cursor-pointer rounded-lg px-2 py-1 text-xs font-medium text-text-primary transition hover:bg-surface-raised"
             >
               Today
             </button>

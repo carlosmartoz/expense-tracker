@@ -2,9 +2,9 @@
 
 import { useMemo, useState } from "react";
 import { useStore } from "@/lib/store";
-import { sortedMonthKeys } from "@/lib/analytics";
-import { monthKeyOf, formatMoney } from "@/lib/format";
+import { monthKeyOf, formatMoney, sortedMonthKeys } from "@/lib/format";
 import type { Filters } from "@/lib/types";
+import EmptyState from "./EmptyState";
 import TransactionForm from "./TransactionForm";
 import TransactionList from "./TransactionList";
 import FiltersBar from "./Filters";
@@ -59,6 +59,9 @@ export default function MovementsView() {
 
       {/* List + filters */}
       <div className="min-w-0 space-y-4">
+        {transactions.length === 0 ? (
+          <EmptyState />
+        ) : (
         <div className="card p-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="text-lg font-bold">History</h2>
@@ -68,13 +71,11 @@ export default function MovementsView() {
           </div>
 
           {/* Prominent balance */}
-          <div className="mt-3 mb-4 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 rounded-2xl bg-dark--700/40 p-4">
+          <div className="mt-3 mb-4 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 rounded-2xl bg-surface-raised/40 p-4">
             <div>
               <p className="stat-label">Balance</p>
               <p
-                className={`text-3xl font-bold tracking-tight ${
-                  totals.balance >= 0 ? "text-mint" : "text-coral"
-                }`}
+                className="text-3xl font-bold tracking-tight text-text-primary"
               >
                 {formatMoney(totals.balance)}
               </p>
@@ -82,13 +83,13 @@ export default function MovementsView() {
             <div className="flex gap-5 text-right">
               <div>
                 <p className="stat-label">Income</p>
-                <p className="text-sm font-semibold text-mint">
+                <p className="text-sm font-semibold text-positive">
                   {formatMoney(totals.income)}
                 </p>
               </div>
               <div>
                 <p className="stat-label">Expenses</p>
-                <p className="text-sm font-semibold text-coral">
+                <p className="text-sm font-semibold text-negative">
                   {formatMoney(totals.expense)}
                 </p>
               </div>
@@ -105,6 +106,7 @@ export default function MovementsView() {
             <TransactionList transactions={filtered} />
           </div>
         </div>
+        )}
       </div>
     </div>
   );

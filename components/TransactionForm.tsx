@@ -96,7 +96,7 @@ export default function TransactionForm({
   return (
     <form onSubmit={submit} className="space-y-4">
       {/* Type toggle */}
-      <div className="grid grid-cols-2 gap-2 rounded-xl bg-dark--700 p-1">
+      <div className="grid grid-cols-2 gap-2 rounded-xl bg-surface-raised p-1">
         {(["expense", "income"] as TransactionType[]).map((t) => (
           <button
             key={t}
@@ -104,10 +104,8 @@ export default function TransactionForm({
             onClick={() => onTypeChange(t)}
             className={`cursor-pointer rounded-lg py-2 text-sm font-semibold transition ${
               type === t
-                ? t === "expense"
-                  ? "bg-coral text-white shadow"
-                  : "bg-mint text-white shadow"
-                : "text-text-secondary hover:text-slate-200"
+                ? "bg-accent text-accent-text shadow"
+                : "text-text-secondary hover:text-text-primary"
             }`}
           >
             {t === "expense" ? "Expense" : "Income"}
@@ -166,7 +164,11 @@ export default function TransactionForm({
         />
       </div>
 
-      {error && <p className="text-sm text-coral">{error}</p>}
+      {error && (
+        <p className="rounded-lg border border-border-strong bg-surface-raised px-3 py-2 text-sm font-medium text-text-primary">
+          {error}
+        </p>
+      )}
 
       <button type="submit" className="btn-primary w-full">
         {isEditing

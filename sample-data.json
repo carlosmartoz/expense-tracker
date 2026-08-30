@@ -1,5 +1,5 @@
 {
-  "version": 4,
+  "version": 5,
   "transactions": [
     {
       "id": "seed-mtgeqgpr-1",
@@ -1022,77 +1022,77 @@
     {
       "id": "Food",
       "name": "Food",
-      "color": "var(--color-cat-food)",
+      "color": "#fafafa",
       "icon": "UtensilsCrossed",
       "type": "expense"
     },
     {
       "id": "Transport",
       "name": "Transport",
-      "color": "var(--color-cat-transport)",
+      "color": "#dcdcdc",
       "icon": "Car",
       "type": "expense"
     },
     {
       "id": "Home",
       "name": "Home",
-      "color": "var(--color-cat-home)",
+      "color": "#bdbdbd",
       "icon": "House",
       "type": "expense"
     },
     {
       "id": "Services",
       "name": "Services",
-      "color": "var(--color-cat-services)",
+      "color": "#9e9e9e",
       "icon": "Wrench",
       "type": "expense"
     },
     {
       "id": "Health",
       "name": "Health",
-      "color": "var(--color-cat-health)",
+      "color": "#808080",
       "icon": "HeartPulse",
       "type": "expense"
     },
     {
       "id": "Entertainment",
       "name": "Entertainment",
-      "color": "var(--color-cat-entertainment)",
+      "color": "#666666",
       "icon": "Clapperboard",
       "type": "expense"
     },
     {
       "id": "Shopping",
       "name": "Shopping",
-      "color": "var(--color-cat-shopping)",
+      "color": "#fafafa",
       "icon": "ShoppingBag",
       "type": "expense"
     },
     {
       "id": "Other",
       "name": "Other",
-      "color": "var(--color-cat-other)",
+      "color": "#dcdcdc",
       "icon": "Receipt",
       "type": "expense"
     },
     {
       "id": "Salary",
       "name": "Salary",
-      "color": "var(--color-cat-salary)",
+      "color": "#bdbdbd",
       "icon": "Wallet",
       "type": "income"
     },
     {
       "id": "Freelance",
       "name": "Freelance",
-      "color": "var(--color-cat-freelance)",
+      "color": "#9e9e9e",
       "icon": "Briefcase",
       "type": "income"
     },
     {
       "id": "OtherIncome",
       "name": "Other",
-      "color": "var(--color-cat-other-income)",
+      "color": "#808080",
       "icon": "PiggyBank",
       "type": "income"
     }

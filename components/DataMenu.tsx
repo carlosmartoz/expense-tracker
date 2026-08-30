@@ -86,7 +86,7 @@ export default function DataMenu({ compact = false }: { compact?: boolean }) {
   }
 
   const buttonClass = compact
-    ? "cursor-pointer rounded-lg px-2.5 py-1.5 text-text-subtle transition hover:bg-dark--700 hover:text-text-primary"
+    ? "cursor-pointer rounded-lg px-2.5 py-1.5 text-text-subtle transition hover:bg-surface-raised hover:text-text-primary"
     : "btn-ghost w-full justify-start text-xs";
 
   return (
@@ -137,8 +137,8 @@ export default function DataMenu({ compact = false }: { compact?: boolean }) {
           disabled={isEmpty}
           className={
             compact
-              ? "cursor-pointer rounded-lg px-2.5 py-1.5 text-text-subtle transition hover:bg-coral/10 hover:text-coral disabled:cursor-not-allowed disabled:opacity-40"
-              : "btn-ghost w-full justify-start text-xs text-coral hover:bg-coral/5 disabled:cursor-not-allowed disabled:opacity-40"
+              ? "cursor-pointer rounded-lg px-2.5 py-1.5 text-text-subtle transition hover:bg-surface-raised hover:text-text-primary disabled:cursor-not-allowed disabled:opacity-40"
+              : "btn-ghost w-full justify-start text-xs disabled:cursor-not-allowed disabled:opacity-40"
           }
           aria-label="Clear all"
           title="Delete every transaction"
@@ -149,10 +149,10 @@ export default function DataMenu({ compact = false }: { compact?: boolean }) {
       </div>
 
       {!compact && error && (
-        <p className="mt-2 text-xs leading-snug text-coral">{error}</p>
+        <p className="mt-2 text-xs font-medium leading-snug text-text-primary">{error}</p>
       )}
       {!compact && note && (
-        <p className="mt-2 text-xs leading-snug text-mint">{note}</p>
+        <p className="mt-2 text-xs leading-snug text-text-secondary">{note}</p>
       )}
 
       <ConfirmDialog

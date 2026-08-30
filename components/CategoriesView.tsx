@@ -7,7 +7,7 @@ import { listItem, stagger } from "@/lib/motion";
 import { useStore } from "@/lib/store";
 import {
   categoryIcon,
-  CATEGORY_COLORS,
+  CATEGORY_TONES,
   MAX_CATEGORY_NAME_LENGTH,
   type Category,
   type TransactionType,
@@ -15,9 +15,9 @@ import {
 import ConfirmDialog from "./ConfirmDialog";
 import Select, { type SelectOption } from "./Select";
 
-const SIDES: { type: TransactionType; label: string; accent: string }[] = [
-  { type: "expense", label: "Expenses", accent: "text-coral" },
-  { type: "income", label: "Income", accent: "text-mint" },
+const SIDES: { type: TransactionType; label: string }[] = [
+  { type: "expense", label: "Expenses" },
+  { type: "income", label: "Income" },
 ];
 
 export default function CategoriesView() {
@@ -25,7 +25,7 @@ export default function CategoriesView() {
     useStore();
 
   const [name, setName] = useState("");
-  const [color, setColor] = useState<string>(CATEGORY_COLORS[0]);
+  const [color, setColor] = useState<string>(CATEGORY_TONES[0]);
   const [type, setType] = useState<TransactionType>("expense");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<Category | null>(null);
@@ -69,7 +69,7 @@ export default function CategoriesView() {
   function resetForm() {
     setEditingId(null);
     setName("");
-    setColor(CATEGORY_COLORS[0]);
+    setColor(CATEGORY_TONES[0]);
     setType("expense");
     setError(null);
   }
@@ -135,8 +135,7 @@ export default function CategoriesView() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Categories</h1>
         <p className="text-sm text-text-subtle">
-          One list for both sides of the book. Rename, recolour or remove any of
-          them.
+          One list for both sides of the book. Rename, retone or remove any of them.
         </p>
       </div>
 
@@ -152,7 +151,7 @@ export default function CategoriesView() {
 
           <div>
             <label className="stat-label">Side</label>
-            <div className="mt-1 grid grid-cols-2 gap-2 rounded-xl bg-dark--700 p-1">
+            <div className="mt-1 grid grid-cols-2 gap-2 rounded-xl bg-surface-raised p-1">
               {SIDES.map((s) => (
                 <button
                   key={s.type}
@@ -163,10 +162,8 @@ export default function CategoriesView() {
                   disabled={Boolean(editing)}
                   className={`cursor-pointer rounded-lg py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-40 ${
                     type === s.type
-                      ? s.type === "expense"
-                        ? "bg-coral text-white shadow"
-                        : "bg-mint text-white shadow"
-                      : "text-text-secondary hover:text-slate-200"
+                      ? "bg-accent text-accent-text shadow"
+                      : "text-text-secondary hover:text-text-primary"
                   }`}
                 >
                   {s.label}
@@ -192,34 +189,38 @@ export default function CategoriesView() {
           </div>
 
           <div>
-            <label className="stat-label">Color</label>
+            <label className="stat-label">Tone</label>
             <div className="mt-2 flex flex-wrap gap-2.5">
-              {CATEGORY_COLORS.map((c) => {
+              {CATEGORY_TONES.map((c) => {
                 const selected = c === color;
                 return (
                   <motion.button
                     key={c}
                     type="button"
                     onClick={() => setColor(c)}
-                    aria-label={`Select color ${c}`}
+                    aria-label={`Select tone ${c}`}
                     aria-pressed={selected}
                     style={{ backgroundColor: c }}
                     whileHover={{ scale: 1.12 }}
                     whileTap={{ scale: 0.92 }}
                     className={`grid h-8 w-8 cursor-pointer place-items-center rounded-full transition ${
                       selected
-                        ? "ring-2 ring-white ring-offset-2 ring-offset-dark--800"
+                        ? "ring-2 ring-text-primary ring-offset-2 ring-offset-surface-panel"
                         : ""
                     }`}
                   >
-                    {selected && <Check className="h-4 w-4 text-white" />}
+                    {selected && <Check className="h-4 w-4 text-surface-base" strokeWidth={3} />}
                   </motion.button>
                 );
               })}
             </div>
           </div>
 
-          {error && <p className="text-sm text-coral">{error}</p>}
+          {error && (
+            <p className="rounded-lg border border-border-strong bg-surface-raised px-3 py-2 text-sm font-medium text-text-primary">
+              {error}
+            </p>
+          )}
 
           <div className="flex gap-2">
             <button type="submit" className="btn-primary flex-1">
@@ -251,14 +252,14 @@ export default function CategoriesView() {
           {grouped.map((group) => (
             <div key={group.type} className="card min-w-0 p-5">
               <h2 className="mb-3 flex items-baseline gap-2 text-lg font-bold">
-                <span className={group.accent}>{group.label}</span>
+                <span>{group.label}</span>
                 <span className="text-sm font-normal text-text-subtle">
                   {group.items.length}
                 </span>
               </h2>
 
               {group.items.length === 0 ? (
-                <div className="grid place-items-center rounded-2xl border border-dashed border-dark--600 py-10 text-center text-sm text-text-subtle">
+                <div className="grid place-items-center rounded-2xl border border-dashed border-border py-10 text-center text-sm text-text-subtle">
                   No {group.label.toLowerCase()} categories yet.
                 </div>
               ) : (
@@ -281,8 +282,8 @@ export default function CategoriesView() {
                           exit="exit"
                           className={`flex items-center gap-3 rounded-xl border p-3 transition ${
                             isEditing
-                              ? "border-brand-500/60 bg-brand-500/5"
-                              : "border-dark--600 bg-dark--700/40"
+                              ? "border-border-strong bg-surface-raised"
+                              : "border-border bg-surface-raised/40"
                           }`}
                         >
                           <span className="shrink-0" style={{ color: cat.color }}>
@@ -300,7 +301,7 @@ export default function CategoriesView() {
                           </div>
                           <button
                             onClick={() => startEdit(cat)}
-                            className="shrink-0 cursor-pointer rounded-lg p-2 text-text-secondary transition hover:bg-dark--600 hover:text-text-primary"
+                            className="shrink-0 cursor-pointer rounded-lg p-2 text-text-secondary transition hover:bg-border hover:text-text-primary"
                             aria-label={`Edit ${cat.name}`}
                             title="Edit"
                           >
@@ -308,7 +309,7 @@ export default function CategoriesView() {
                           </button>
                           <button
                             onClick={() => askRemove(cat)}
-                            className="shrink-0 cursor-pointer rounded-lg p-2 text-text-secondary transition hover:bg-coral/10 hover:text-coral"
+                            className="shrink-0 cursor-pointer rounded-lg p-2 text-text-secondary transition hover:bg-surface-raised hover:text-text-primary"
                             aria-label={`Delete ${cat.name}`}
                             title="Delete"
                           >

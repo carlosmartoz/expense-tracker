@@ -1,4 +1,5 @@
 import { CURRENCY, LOCALE } from "./config";
+import type { Transaction } from "./types";
 
 // Amounts follow the currency's own convention — for ARS that's "2.672.371,00":
 // dot for thousands, comma for the decimal, always two decimals.
@@ -65,6 +66,11 @@ export function monthKeyOf(isoDate: string): string {
   return isoDate.slice(0, 7); // YYYY-MM
 }
 
+/** Every month that has at least one transaction, oldest first. */
+export function sortedMonthKeys(transactions: Transaction[]): string[] {
+  return Array.from(new Set(transactions.map((t) => monthKeyOf(t.date)))).sort();
+}
+
 export function formatDate(isoDate: string): string {
   const d = new Date(isoDate + "T00:00:00");
   return d.toLocaleDateString(LOCALE, {
@@ -72,8 +78,4 @@ export function formatDate(isoDate: string): string {
     month: "short",
     year: "numeric",
   });
-}
-
-export function formatPercent(value: number, digits = 0): string {
-  return `${value >= 0 ? "+" : ""}${value.toFixed(digits)}%`;
 }

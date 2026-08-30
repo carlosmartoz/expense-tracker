@@ -1,5 +1,5 @@
 import type { Category, Transaction, TransactionType } from "./types";
-import { CATEGORY_COLORS } from "./types";
+import { CATEGORY_TONES } from "./types";
 import { migrate, VERSION, type Snapshot } from "./storage";
 import { APP_NAME } from "./config";
 
@@ -196,7 +196,7 @@ export function parseCSV(
       category = {
         id: uid(),
         name: categoryName,
-        color: CATEGORY_COLORS[categories.length % CATEGORY_COLORS.length],
+        color: CATEGORY_TONES[categories.length % CATEGORY_TONES.length],
         icon: "Tag",
         type,
       };

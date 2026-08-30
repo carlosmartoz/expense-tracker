@@ -1,4 +1,5 @@
 import type { Transaction, Category, TransactionType } from "./types";
+import { CATEGORY_TONES } from "./types";
 
 /**
  * Reading and writing the browser's copy of your data. This module owns the
@@ -8,7 +9,7 @@ import type { Transaction, Category, TransactionType } from "./types";
 const KEY = "expense-tracker";
 
 /** Bumped whenever the stored shape changes. See MIGRATIONS below. */
-export const VERSION = 4;
+export const VERSION = 5;
 
 /** The two keys the app wrote to before everything moved under a single one. */
 const LEGACY_TRANSACTIONS_KEY = "expense-tracker:transactions:v2";
@@ -84,6 +85,18 @@ const MIGRATIONS: ((snapshot: Snapshot) => Snapshot)[] = [
       }),
     };
   },
+
+  // 4 -> 5: the palette went neutral, so stored categories still carry hues —
+  // and some carry var(--color-cat-*) tokens that no longer exist. Each one is
+  // mapped onto the tone scale by its position, which is stable for a given
+  // list and keeps neighbours from landing on the same step.
+  (snapshot) => ({
+    ...snapshot,
+    categories: snapshot.categories.map((c, i) => ({
+      ...c,
+      color: CATEGORY_TONES[i % CATEGORY_TONES.length],
+    })),
+  }),
 ];
 
 /**
