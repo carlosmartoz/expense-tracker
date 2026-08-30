@@ -1,24 +1,10 @@
-# 💰 Fintrack — Expense Tracker
+# Expense Tracker
 
-A personal finance app with a modern-banking feel and an edge-to-edge **dark
-theme**: log income and expenses and visualize your money with charts.
+A place to write down what you earn and what you spend, and see where the month
+went. It runs entirely in your browser — there is no account, no server and
+nothing leaves your machine.
 
-Stack: **Next.js 16 (App Router, Turbopack) · React 19 · TypeScript · Tailwind CSS v4 · Recharts 3**.
-
-## Features
-
-### 1. Expense management
-- Add income and expenses with categories (Food, Transport, Subscriptions, Gaming, Home, Other).
-- Monthly balance (income − expenses) and savings rate.
-- Full history with filters by **date (month)**, **category**, **type**, and text search.
-- Local persistence in the browser (`localStorage`) — your data stays on your device.
-
-### 2. Visual dashboard
-- **Pie chart** of expenses by category.
-- **Expenses by month** (expense bars + income line).
-- **Month-over-month comparison** by category.
-- **Savings rate** in a radial gauge.
-- Cards with month-over-month percentage change.
+**Next.js 16 (App Router, Turbopack) · React 19 · TypeScript · Tailwind CSS v4 · Recharts 3**
 
 ## Running it
 
@@ -27,45 +13,111 @@ npm install
 npm run dev      # http://localhost:3000
 ```
 
-For a production build:
+| Script | What it does |
+| --- | --- |
+| `npm run dev` | Development server |
+| `npm run build` / `npm start` | Production build and serve |
+| `npm test` | Run the test suite once |
+| `npm run test:watch` | Re-run tests as you edit |
+| `npm run lint` | ESLint |
 
-```bash
-npm run build && npm start
-```
+The app starts empty. To see it with data in it, use **Import** in the sidebar
+and pick [`sample-data.json`](sample-data.json) — five months of made-up
+transactions.
 
-## Structure
+## Your data lives in this browser only
+
+Everything is kept in `localStorage`. That means it is private, it works
+offline, and it is **gone if you clear your site data** — no copy exists
+anywhere else.
+
+So export a backup now and then. The sidebar has both:
+
+- **Export backup** writes a JSON file that restores everything exactly,
+  categories included. It is also the format to keep: a backup taken by an
+  older version of the app still imports, because it goes through the same
+  migration chain as stored data.
+- **Export CSV** writes the transactions for a spreadsheet, with category names
+  rather than internal ids.
+
+**Import** accepts either. It replaces what is currently in the browser, so it
+asks first and tells you what the file holds. A CSV that names a category you
+don't have creates it.
+
+## The three screens
+
+- **Dashboard** — pick any month and see the balance, income, expenses and
+  savings rate, the split by category, the trend across months, and how the
+  month compares with the one before it.
+- **Transactions** — add, edit and delete, with filters by month, category,
+  type and free text.
+- **Categories** — one list covering both sides. Rename, recolour or remove any
+  of them.
+
+## How it fits together
 
 ```
 app/
-  globals.css           # Tailwind v4 + dark theme (tokens in @theme)
-  layout.tsx            # Global provider + fonts
-  page.tsx              # Shell with navigation (Dashboard / Transactions)
+  globals.css      Tailwind v4 and the dark theme (tokens in @theme)
+  layout.tsx       Fonts and the global provider
+  page.tsx         Shell and navigation
 components/
-  Dashboard.tsx, MovementsView.tsx
-  TransactionForm.tsx, TransactionList.tsx, Filters.tsx, StatCard.tsx
-  Select.tsx            # Custom dropdown (styled for the dark theme)
-  charts/               # CategoryPie, MonthlyTrend, MonthComparison, SavingsGauge
+  Dashboard, MovementsView, CategoriesView       the three screens
+  TransactionForm, TransactionList, Filters      the ledger
+  DataMenu, EmptyState                           import/export and first run
+  Select, DatePicker, ConfirmDialog, CountUp     dark-theme building blocks
+  charts/          CategoryPie, MonthlyTrend, MonthComparison, SavingsGauge
 lib/
-  types.ts              # Models and categories
-  store.tsx             # Global state (Context + localStorage)
-  seed.ts               # Demo data (5 months, with spikes in categories)
-  analytics.ts          # Monthly summary calculations
-  format.ts             # Currency/date formatting (es-AR)
+  config.ts        app name, locale, currency — start here to re-skin
+  types.ts         the whole data model: Transaction and Category
+  storage.ts       reading and writing localStorage, and the migration chain
+  backup.ts        export and import, JSON and CSV
+  store.tsx        state and the operations on it (Context)
+  analytics.ts     monthly summaries and per-category totals
+  format.ts        money, dates and percentages
+  colors.ts        resolving theme tokens for Recharts
+  motion.ts        shared animation variants
 ```
 
-## Notes
-- **Dark theme only** (no light mode). The palette is defined as CSS tokens in
-  the `@theme` block of `app/globals.css` — change the base colors there.
-- The theme uses Tailwind **v4** (no `tailwind.config.js`): the configuration
-  lives in CSS. `next.config.mjs` sets `turbopack.root` so the dev PostCSS worker
-  resolves the plugin correctly.
-- The `<select>` elements use a custom `Select` component (`components/Select.tsx`)
-  so the dropdown matches the rest of the UI (native popups can't be styled). It's
-  keyboard accessible (arrows / Enter / Esc).
-- The currency is ARS (`es-AR`); change it in `lib/format.ts`.
-- Demo data is generated in `lib/seed.ts` with an intentional spike in delivery and
-  subscriptions in the current month so the charts have something interesting to show.
-- I used **Recharts** for all charts (it's React-native). If you prefer Chart.js for
-  a specific chart, it can be added without touching the data logic.
-</content>
-</invoke>
+### Things worth knowing before you change anything
+
+**Everything configurable is in `lib/config.ts`.** The interface reads in
+English while amounts are grouped the Argentine way (`$ 1.234,56`). Those are
+two separate settings on purpose: `LOCALE` governs text and dates,
+`CURRENCY.locale` governs how numbers are grouped.
+
+**Colours come from `@theme` tokens in `app/globals.css`**, never from hex
+literals in components. Charts resolve them at runtime through `resolveColor()`
+in `lib/colors.ts`, because SVG presentation attributes don't understand
+`var()`. Some `--color-cat-*` tokens name categories the app no longer ships —
+they stay because a browser somewhere still has data pointing at them.
+
+**Stored data is versioned.** `lib/storage.ts` keeps one key with a version
+stamp and a chain of migrations; each entry moves a snapshot forward one step.
+When you change the shape of stored data, append a step rather than editing an
+old one, and add a test — this is the only place a mistake destroys something
+that can't be recovered.
+
+**Categories belong to the user.** `DEFAULT_CATEGORIES` only seeds a browser
+that has never held data. After that the list is theirs, and a migration should
+type or clean it, never curate it.
+
+**Native form controls are avoided** so the dark theme holds together: there is
+a custom `Select` and a custom `DatePicker`, both keyboard accessible.
+
+**Animation is subtle and lives in `lib/motion.ts`.** The whole app is wrapped
+in `MotionConfig reducedMotion="user"`, so it respects
+`prefers-reduced-motion`. The dashboard intro plays once per page load, not
+every time you return to the tab.
+
+**Dark theme only.** There is no light mode, by choice.
+
+## Tests
+
+```bash
+npm test
+```
+
+86 tests over `lib/`, which is where a mistake is silent: the migration chain,
+the backup round-trip in both formats, the monthly maths, and the money and
+date formatting. The UI isn't covered — it's checked by using it.

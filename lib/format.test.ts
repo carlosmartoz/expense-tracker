@@ -1,0 +1,96 @@
+import { describe, expect, it } from "vitest";
+import {
+  formatAmount,
+  formatAmountInput,
+  formatDate,
+  formatMoney,
+  formatMonthKey,
+  formatPercent,
+  monthKeyOf,
+  parseAmount,
+} from "./format";
+
+/**
+ * The app reads in English and counts money the Argentine way. That pairing is
+ * deliberate, so it's worth a test that would fail if either half drifted.
+ */
+
+describe("money", () => {
+  it.each([
+    [0, "$ 0,00"],
+    [1234.5, "$ 1.234,50"],
+    [2672371, "$ 2.672.371,00"],
+    [950000, "$ 950.000,00"],
+  ])("formats %d as %s", (input, expected) => {
+    expect(formatMoney(input)).toBe(expected);
+  });
+
+  it("puts the minus sign ahead of the symbol", () => {
+    expect(formatMoney(-38000)).toBe("-$ 38.000,00");
+  });
+
+  it("falls back to zero rather than printing NaN", () => {
+    expect(formatMoney(Number.NaN)).toBe("$ 0,00");
+    expect(formatAmount(Number.POSITIVE_INFINITY)).toBe("0,00");
+  });
+});
+
+describe("reading what was typed", () => {
+  it.each([
+    ["2.672.371,00", 2672371],
+    ["1.234,50", 1234.5],
+    ["950000", 950000],
+  ])("parses %s", (input, expected) => {
+    expect(parseAmount(input)).toBe(expected);
+  });
+
+  it("round-trips through the display format", () => {
+    for (const value of [0.5, 12, 1234.56, 2672371]) {
+      expect(parseAmount(formatAmount(value))).toBeCloseTo(value, 2);
+    }
+  });
+
+  it("returns NaN for an empty field", () => {
+    expect(parseAmount("")).toBeNaN();
+  });
+
+  it.each([
+    ["2672371", "2.672.371"],
+    ["2672371,5", "2.672.371,5"],
+    ["0012", "12"],
+    ["1,239", "1,23"],
+    ["12,3,4", "12,34"],
+    ["abc", ""],
+  ])("groups %s into %s as it is typed", (raw, expected) => {
+    expect(formatAmountInput(raw)).toBe(expected);
+  });
+});
+
+describe("dates", () => {
+  it("labels a month in English", () => {
+    expect(formatMonthKey("2026-08")).toBe("August 2026");
+  });
+
+  it("writes a date in English", () => {
+    expect(formatDate("2026-08-30")).toBe("Aug 30, 2026");
+  });
+
+  it("reads the month key off an ISO date", () => {
+    expect(monthKeyOf("2026-08-30")).toBe("2026-08");
+  });
+
+  it("doesn't slip to the previous day across time zones", () => {
+    // Parsing "2026-01-01" as UTC would render as Dec 31 west of Greenwich.
+    expect(formatDate("2026-01-01")).toBe("Jan 01, 2026");
+  });
+});
+
+describe("percentages", () => {
+  it("marks gains with a plus", () => {
+    expect(formatPercent(12.4)).toBe("+12%");
+  });
+
+  it("leaves the minus on losses", () => {
+    expect(formatPercent(-8.6)).toBe("-9%");
+  });
+});

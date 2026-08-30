@@ -47,13 +47,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   // Read the stored copy once on mount. A browser that has never held any data
   // starts empty — with the default categories ready, but no transactions:
   // this is your ledger, not a demo.
+  //
+  // This is the one place setState in an effect is the right tool: localStorage
+  // doesn't exist while the page is rendered on the server, so the first paint
+  // has to be the empty state and the stored data can only arrive afterwards.
   useEffect(() => {
     const stored = load();
+    /* eslint-disable react-hooks/set-state-in-effect */
     setTransactions(stored ? stored.transactions : []);
     setCategories(
       stored && stored.categories.length ? stored.categories : DEFAULT_CATEGORIES
     );
     setHydrated(true);
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
 
   // Persist on every change (after hydration).

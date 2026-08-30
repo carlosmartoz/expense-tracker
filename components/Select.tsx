@@ -56,14 +56,6 @@ export default function Select({
     return () => document.removeEventListener("pointerdown", onPointerDown);
   }, [open]);
 
-  // When opening, highlight the current selection and scroll it into view.
-  useEffect(() => {
-    if (open) {
-      const idx = options.findIndex((o) => o.value === value);
-      setHighlight(idx >= 0 ? idx : 0);
-    }
-  }, [open, value, options]);
-
   useEffect(() => {
     if (!open || !listRef.current) return;
     const el = listRef.current.children[highlight] as HTMLElement | undefined;
@@ -76,16 +68,26 @@ export default function Select({
     setOpen(false);
   }
 
+  /**
+   * Opening puts the highlight on whatever is currently selected. Done here
+   * rather than in an effect so both land in the same render.
+   */
+  function openList() {
+    const idx = options.findIndex((o) => o.value === value);
+    setHighlight(idx >= 0 ? idx : 0);
+    setOpen(true);
+  }
+
   function onKeyDown(e: React.KeyboardEvent) {
     switch (e.key) {
       case "ArrowDown":
         e.preventDefault();
-        if (!open) setOpen(true);
+        if (!open) openList();
         else setHighlight((h) => Math.min(h + 1, options.length - 1));
         break;
       case "ArrowUp":
         e.preventDefault();
-        if (!open) setOpen(true);
+        if (!open) openList();
         else setHighlight((h) => Math.max(h - 1, 0));
         break;
       case "Home":
@@ -104,7 +106,7 @@ export default function Select({
       case " ":
         e.preventDefault();
         if (open) commit(highlight);
-        else setOpen(true);
+        else openList();
         break;
       case "Escape":
         setOpen(false);
@@ -122,7 +124,7 @@ export default function Select({
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={ariaLabel}
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => (open ? setOpen(false) : openList())}
         onKeyDown={onKeyDown}
         className="flex w-full cursor-pointer items-center gap-2 rounded-xl border border-dark--600
           bg-dark--700 px-3 py-2 text-left text-sm text-text-primary outline-none transition

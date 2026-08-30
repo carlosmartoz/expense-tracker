@@ -44,10 +44,11 @@ export default function DatePicker({
     return { y: base.y, m: base.m };
   });
 
-  // When opening, jump the calendar to the selected month.
-  useEffect(() => {
-    if (open && selected) setView({ y: selected.y, m: selected.m });
-  }, [open, selected]);
+  /** Opening jumps the calendar to the selected month, in the same render. */
+  function openCalendar() {
+    if (selected) setView({ y: selected.y, m: selected.m });
+    setOpen(true);
+  }
 
   // Close on click outside.
   useEffect(() => {
@@ -90,7 +91,7 @@ export default function DatePicker({
   function onTriggerKeyDown(e: React.KeyboardEvent) {
     if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
       e.preventDefault();
-      setOpen(true);
+      openCalendar();
     } else if (e.key === "Escape") {
       setOpen(false);
     }
@@ -103,7 +104,7 @@ export default function DatePicker({
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-label={ariaLabel}
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => (open ? setOpen(false) : openCalendar())}
         onKeyDown={onTriggerKeyDown}
         className="flex w-full cursor-pointer items-center gap-2 rounded-xl border border-dark--600
           bg-dark--700 px-3 py-2 text-left text-sm text-text-primary outline-none transition
