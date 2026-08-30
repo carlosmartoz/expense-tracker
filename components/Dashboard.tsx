@@ -13,6 +13,7 @@ import { stagger, cardItem } from "@/lib/motion";
 import { formatMoney, formatMonthKey, formatPercent } from "@/lib/format";
 import StatCard from "./StatCard";
 import CountUp from "./CountUp";
+import EmptyState from "./EmptyState";
 import CategoryPie from "./charts/CategoryPie";
 import MonthlyTrend from "./charts/MonthlyTrend";
 import MonthComparison from "./charts/MonthComparison";
@@ -42,7 +43,12 @@ function useDashboardIntro(): boolean {
   return play;
 }
 
-export default function Dashboard() {
+export default function Dashboard({
+  onAddFirst,
+}: {
+  /** Sends the reader to the Transactions tab from the empty state. */
+  onAddFirst: () => void;
+}) {
   const { transactions, hydrated } = useStore();
   const play = useDashboardIntro();
 
@@ -63,11 +69,7 @@ export default function Dashboard() {
   }
 
   if (!current) {
-    return (
-      <div className="card grid place-items-center p-12 text-center text-text-secondary">
-        No data yet. Add your first transaction.
-      </div>
-    );
+    return <EmptyState onAddFirst={onAddFirst} />;
   }
 
   const expenseChange = previous

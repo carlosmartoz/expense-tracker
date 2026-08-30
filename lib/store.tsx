@@ -10,7 +10,6 @@ import {
 } from "react";
 import type { Transaction, Category, TransactionType } from "./types";
 import { DEFAULT_CATEGORIES } from "./types";
-import { buildSeedData } from "./seed";
 import { load, save } from "./storage";
 
 interface StoreValue {
@@ -22,8 +21,9 @@ interface StoreValue {
   addTransaction: (t: Omit<Transaction, "id">) => void;
   updateTransaction: (id: string, patch: Omit<Transaction, "id">) => void;
   deleteTransaction: (id: string) => void;
-  resetToSeed: () => void;
   clearAll: () => void;
+  /** Swaps in an imported backup, replacing everything currently held. */
+  replaceAll: (next: { transactions: Transaction[]; categories: Category[] }) => void;
   addCategory: (c: { name: string; color: string; type: TransactionType }) => void;
   updateCategory: (id: string, patch: { name?: string; color?: string }) => void;
   /** Removes a category, moving every transaction that used it to `moveToId`. */
@@ -45,11 +45,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [hydrated, setHydrated] = useState(false);
 
   // Read the stored copy once on mount. A browser that has never held any data
-  // is seeded — with the default categories, and for now with demo
-  // transactions too (phase 5 replaces those with an empty start).
+  // starts empty — with the default categories ready, but no transactions:
+  // this is your ledger, not a demo.
   useEffect(() => {
     const stored = load();
-    setTransactions(stored ? stored.transactions : buildSeedData());
+    setTransactions(stored ? stored.transactions : []);
     setCategories(
       stored && stored.categories.length ? stored.categories : DEFAULT_CATEGORIES
     );
@@ -87,8 +87,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         ),
       deleteTransaction: (id) =>
         setTransactions((prev) => prev.filter((t) => t.id !== id)),
-      resetToSeed: () => setTransactions(buildSeedData()),
       clearAll: () => setTransactions([]),
+      replaceAll: ({ transactions: nextTx, categories: nextCats }) => {
+        setTransactions(
+          [...nextTx].sort((a, b) => (a.date < b.date ? 1 : -1))
+        );
+        if (nextCats.length) setCategories(nextCats);
+      },
       addCategory: ({ name, color, type }) =>
         setCategories((prev) => {
           const trimmed = name.trim();

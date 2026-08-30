@@ -1,0 +1,1100 @@
+{
+  "version": 4,
+  "transactions": [
+    {
+      "id": "seed-mtgeqgpr-1",
+      "type": "income",
+      "amount": 950000,
+      "categoryId": "Salary",
+      "description": "Salary",
+      "date": "2026-04-03"
+    },
+    {
+      "id": "seed-mtgeqgpr-2",
+      "type": "expense",
+      "amount": 6500,
+      "categoryId": "Food",
+      "description": "Supermarket",
+      "date": "2026-04-02"
+    },
+    {
+      "id": "seed-mtgeqgpr-3",
+      "type": "expense",
+      "amount": 8000,
+      "categoryId": "Food",
+      "description": "Delivery",
+      "date": "2026-04-05"
+    },
+    {
+      "id": "seed-mtgeqgpr-4",
+      "type": "expense",
+      "amount": 9500,
+      "categoryId": "Food",
+      "description": "Supermarket",
+      "date": "2026-04-08"
+    },
+    {
+      "id": "seed-mtgeqgpr-5",
+      "type": "expense",
+      "amount": 6500,
+      "categoryId": "Food",
+      "description": "Delivery",
+      "date": "2026-04-11"
+    },
+    {
+      "id": "seed-mtgeqgpr-6",
+      "type": "expense",
+      "amount": 8000,
+      "categoryId": "Food",
+      "description": "Supermarket",
+      "date": "2026-04-14"
+    },
+    {
+      "id": "seed-mtgeqgpr-7",
+      "type": "expense",
+      "amount": 9500,
+      "categoryId": "Food",
+      "description": "Delivery",
+      "date": "2026-04-17"
+    },
+    {
+      "id": "seed-mtgeqgpr-8",
+      "type": "expense",
+      "amount": 2800,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-04-01"
+    },
+    {
+      "id": "seed-mtgeqgpr-9",
+      "type": "expense",
+      "amount": 3400,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-04-03"
+    },
+    {
+      "id": "seed-mtgeqgpr-10",
+      "type": "expense",
+      "amount": 4000,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-04-05"
+    },
+    {
+      "id": "seed-mtgeqgpr-11",
+      "type": "expense",
+      "amount": 4600,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-04-07"
+    },
+    {
+      "id": "seed-mtgeqgpr-12",
+      "type": "expense",
+      "amount": 2800,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-04-09"
+    },
+    {
+      "id": "seed-mtgeqgpr-13",
+      "type": "expense",
+      "amount": 3400,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-04-11"
+    },
+    {
+      "id": "seed-mtgeqgpr-14",
+      "type": "expense",
+      "amount": 4000,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-04-13"
+    },
+    {
+      "id": "seed-mtgeqgpr-15",
+      "type": "expense",
+      "amount": 4600,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-04-15"
+    },
+    {
+      "id": "seed-mtgeqgpr-16",
+      "type": "expense",
+      "amount": 2800,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-04-17"
+    },
+    {
+      "id": "seed-mtgeqgpr-17",
+      "type": "expense",
+      "amount": 4990,
+      "categoryId": "Entertainment",
+      "description": "Netflix",
+      "date": "2026-04-05"
+    },
+    {
+      "id": "seed-mtgeqgpr-18",
+      "type": "expense",
+      "amount": 3490,
+      "categoryId": "Entertainment",
+      "description": "Spotify",
+      "date": "2026-04-07"
+    },
+    {
+      "id": "seed-mtgeqgpr-19",
+      "type": "expense",
+      "amount": 12000,
+      "categoryId": "Entertainment",
+      "description": "Steam",
+      "date": "2026-04-14"
+    },
+    {
+      "id": "seed-mtgeqgpr-20",
+      "type": "expense",
+      "amount": 38000,
+      "categoryId": "Home",
+      "description": "Rent / Fees",
+      "date": "2026-04-10"
+    },
+    {
+      "id": "seed-mtgeqgpr-21",
+      "type": "expense",
+      "amount": 9500,
+      "categoryId": "Services",
+      "description": "Power and gas",
+      "date": "2026-04-12"
+    },
+    {
+      "id": "seed-mtgeqgpr-22",
+      "type": "expense",
+      "amount": 6200,
+      "categoryId": "Services",
+      "description": "Internet",
+      "date": "2026-04-13"
+    },
+    {
+      "id": "seed-mtgeqgpr-23",
+      "type": "expense",
+      "amount": 22000,
+      "categoryId": "Shopping",
+      "description": "Clothes",
+      "date": "2026-04-16"
+    },
+    {
+      "id": "seed-mtgeqgpr-24",
+      "type": "income",
+      "amount": 950000,
+      "categoryId": "Salary",
+      "description": "Salary",
+      "date": "2026-05-03"
+    },
+    {
+      "id": "seed-mtgeqgpr-25",
+      "type": "expense",
+      "amount": 6500,
+      "categoryId": "Food",
+      "description": "Supermarket",
+      "date": "2026-05-02"
+    },
+    {
+      "id": "seed-mtgeqgpr-26",
+      "type": "expense",
+      "amount": 8000,
+      "categoryId": "Food",
+      "description": "Delivery",
+      "date": "2026-05-05"
+    },
+    {
+      "id": "seed-mtgeqgpr-27",
+      "type": "expense",
+      "amount": 9500,
+      "categoryId": "Food",
+      "description": "Supermarket",
+      "date": "2026-05-08"
+    },
+    {
+      "id": "seed-mtgeqgpr-28",
+      "type": "expense",
+      "amount": 6500,
+      "categoryId": "Food",
+      "description": "Delivery",
+      "date": "2026-05-11"
+    },
+    {
+      "id": "seed-mtgeqgpr-29",
+      "type": "expense",
+      "amount": 8000,
+      "categoryId": "Food",
+      "description": "Supermarket",
+      "date": "2026-05-14"
+    },
+    {
+      "id": "seed-mtgeqgpr-30",
+      "type": "expense",
+      "amount": 9500,
+      "categoryId": "Food",
+      "description": "Delivery",
+      "date": "2026-05-17"
+    },
+    {
+      "id": "seed-mtgeqgpr-31",
+      "type": "expense",
+      "amount": 2800,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-05-01"
+    },
+    {
+      "id": "seed-mtgeqgpr-32",
+      "type": "expense",
+      "amount": 3400,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-05-03"
+    },
+    {
+      "id": "seed-mtgeqgpr-33",
+      "type": "expense",
+      "amount": 4000,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-05-05"
+    },
+    {
+      "id": "seed-mtgeqgpr-34",
+      "type": "expense",
+      "amount": 4600,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-05-07"
+    },
+    {
+      "id": "seed-mtgeqgpr-35",
+      "type": "expense",
+      "amount": 2800,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-05-09"
+    },
+    {
+      "id": "seed-mtgeqgpr-36",
+      "type": "expense",
+      "amount": 3400,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-05-11"
+    },
+    {
+      "id": "seed-mtgeqgpr-37",
+      "type": "expense",
+      "amount": 4000,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-05-13"
+    },
+    {
+      "id": "seed-mtgeqgpr-38",
+      "type": "expense",
+      "amount": 4600,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-05-15"
+    },
+    {
+      "id": "seed-mtgeqgpr-39",
+      "type": "expense",
+      "amount": 2800,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-05-17"
+    },
+    {
+      "id": "seed-mtgeqgpr-40",
+      "type": "expense",
+      "amount": 4990,
+      "categoryId": "Entertainment",
+      "description": "Netflix",
+      "date": "2026-05-05"
+    },
+    {
+      "id": "seed-mtgeqgpr-41",
+      "type": "expense",
+      "amount": 3490,
+      "categoryId": "Entertainment",
+      "description": "Spotify",
+      "date": "2026-05-07"
+    },
+    {
+      "id": "seed-mtgeqgpr-42",
+      "type": "expense",
+      "amount": 38000,
+      "categoryId": "Home",
+      "description": "Rent / Fees",
+      "date": "2026-05-10"
+    },
+    {
+      "id": "seed-mtgeqgpr-43",
+      "type": "expense",
+      "amount": 9500,
+      "categoryId": "Services",
+      "description": "Power and gas",
+      "date": "2026-05-12"
+    },
+    {
+      "id": "seed-mtgeqgpr-44",
+      "type": "expense",
+      "amount": 6200,
+      "categoryId": "Services",
+      "description": "Internet",
+      "date": "2026-05-13"
+    },
+    {
+      "id": "seed-mtgeqgpr-45",
+      "type": "expense",
+      "amount": 15000,
+      "categoryId": "Health",
+      "description": "Dentist",
+      "date": "2026-05-20"
+    },
+    {
+      "id": "seed-mtgeqgpr-46",
+      "type": "expense",
+      "amount": 22000,
+      "categoryId": "Shopping",
+      "description": "Clothes",
+      "date": "2026-05-16"
+    },
+    {
+      "id": "seed-mtgeqgpr-47",
+      "type": "income",
+      "amount": 950000,
+      "categoryId": "Salary",
+      "description": "Salary",
+      "date": "2026-06-03"
+    },
+    {
+      "id": "seed-mtgeqgpr-48",
+      "type": "expense",
+      "amount": 6500,
+      "categoryId": "Food",
+      "description": "Supermarket",
+      "date": "2026-06-02"
+    },
+    {
+      "id": "seed-mtgeqgpr-49",
+      "type": "expense",
+      "amount": 8000,
+      "categoryId": "Food",
+      "description": "Delivery",
+      "date": "2026-06-05"
+    },
+    {
+      "id": "seed-mtgeqgpr-50",
+      "type": "expense",
+      "amount": 9500,
+      "categoryId": "Food",
+      "description": "Supermarket",
+      "date": "2026-06-08"
+    },
+    {
+      "id": "seed-mtgeqgpr-51",
+      "type": "expense",
+      "amount": 6500,
+      "categoryId": "Food",
+      "description": "Delivery",
+      "date": "2026-06-11"
+    },
+    {
+      "id": "seed-mtgeqgpr-52",
+      "type": "expense",
+      "amount": 8000,
+      "categoryId": "Food",
+      "description": "Supermarket",
+      "date": "2026-06-14"
+    },
+    {
+      "id": "seed-mtgeqgpr-53",
+      "type": "expense",
+      "amount": 9500,
+      "categoryId": "Food",
+      "description": "Delivery",
+      "date": "2026-06-17"
+    },
+    {
+      "id": "seed-mtgeqgpr-54",
+      "type": "expense",
+      "amount": 2800,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-06-01"
+    },
+    {
+      "id": "seed-mtgeqgpr-55",
+      "type": "expense",
+      "amount": 3400,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-06-03"
+    },
+    {
+      "id": "seed-mtgeqgpr-56",
+      "type": "expense",
+      "amount": 4000,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-06-05"
+    },
+    {
+      "id": "seed-mtgeqgpr-57",
+      "type": "expense",
+      "amount": 4600,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-06-07"
+    },
+    {
+      "id": "seed-mtgeqgpr-58",
+      "type": "expense",
+      "amount": 2800,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-06-09"
+    },
+    {
+      "id": "seed-mtgeqgpr-59",
+      "type": "expense",
+      "amount": 3400,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-06-11"
+    },
+    {
+      "id": "seed-mtgeqgpr-60",
+      "type": "expense",
+      "amount": 4000,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-06-13"
+    },
+    {
+      "id": "seed-mtgeqgpr-61",
+      "type": "expense",
+      "amount": 4600,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-06-15"
+    },
+    {
+      "id": "seed-mtgeqgpr-62",
+      "type": "expense",
+      "amount": 2800,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-06-17"
+    },
+    {
+      "id": "seed-mtgeqgpr-63",
+      "type": "expense",
+      "amount": 4990,
+      "categoryId": "Entertainment",
+      "description": "Netflix",
+      "date": "2026-06-05"
+    },
+    {
+      "id": "seed-mtgeqgpr-64",
+      "type": "expense",
+      "amount": 3490,
+      "categoryId": "Entertainment",
+      "description": "Spotify",
+      "date": "2026-06-07"
+    },
+    {
+      "id": "seed-mtgeqgpr-65",
+      "type": "expense",
+      "amount": 12000,
+      "categoryId": "Entertainment",
+      "description": "Steam",
+      "date": "2026-06-14"
+    },
+    {
+      "id": "seed-mtgeqgpr-66",
+      "type": "expense",
+      "amount": 38000,
+      "categoryId": "Home",
+      "description": "Rent / Fees",
+      "date": "2026-06-10"
+    },
+    {
+      "id": "seed-mtgeqgpr-67",
+      "type": "expense",
+      "amount": 9500,
+      "categoryId": "Services",
+      "description": "Power and gas",
+      "date": "2026-06-12"
+    },
+    {
+      "id": "seed-mtgeqgpr-68",
+      "type": "expense",
+      "amount": 6200,
+      "categoryId": "Services",
+      "description": "Internet",
+      "date": "2026-06-13"
+    },
+    {
+      "id": "seed-mtgeqgpr-69",
+      "type": "expense",
+      "amount": 22000,
+      "categoryId": "Shopping",
+      "description": "Clothes",
+      "date": "2026-06-16"
+    },
+    {
+      "id": "seed-mtgeqgpr-70",
+      "type": "income",
+      "amount": 950000,
+      "categoryId": "Salary",
+      "description": "Salary",
+      "date": "2026-07-03"
+    },
+    {
+      "id": "seed-mtgeqgpr-71",
+      "type": "income",
+      "amount": 120000,
+      "categoryId": "Freelance",
+      "description": "Freelance",
+      "date": "2026-07-18"
+    },
+    {
+      "id": "seed-mtgeqgpr-72",
+      "type": "expense",
+      "amount": 6500,
+      "categoryId": "Food",
+      "description": "Supermarket",
+      "date": "2026-07-02"
+    },
+    {
+      "id": "seed-mtgeqgpr-73",
+      "type": "expense",
+      "amount": 8000,
+      "categoryId": "Food",
+      "description": "Delivery",
+      "date": "2026-07-05"
+    },
+    {
+      "id": "seed-mtgeqgpr-74",
+      "type": "expense",
+      "amount": 9500,
+      "categoryId": "Food",
+      "description": "Supermarket",
+      "date": "2026-07-08"
+    },
+    {
+      "id": "seed-mtgeqgpr-75",
+      "type": "expense",
+      "amount": 6500,
+      "categoryId": "Food",
+      "description": "Delivery",
+      "date": "2026-07-11"
+    },
+    {
+      "id": "seed-mtgeqgpr-76",
+      "type": "expense",
+      "amount": 8000,
+      "categoryId": "Food",
+      "description": "Supermarket",
+      "date": "2026-07-14"
+    },
+    {
+      "id": "seed-mtgeqgpr-77",
+      "type": "expense",
+      "amount": 9500,
+      "categoryId": "Food",
+      "description": "Delivery",
+      "date": "2026-07-17"
+    },
+    {
+      "id": "seed-mtgeqgpr-78",
+      "type": "expense",
+      "amount": 2800,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-07-01"
+    },
+    {
+      "id": "seed-mtgeqgpr-79",
+      "type": "expense",
+      "amount": 3400,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-07-03"
+    },
+    {
+      "id": "seed-mtgeqgpr-80",
+      "type": "expense",
+      "amount": 4000,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-07-05"
+    },
+    {
+      "id": "seed-mtgeqgpr-81",
+      "type": "expense",
+      "amount": 4600,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-07-07"
+    },
+    {
+      "id": "seed-mtgeqgpr-82",
+      "type": "expense",
+      "amount": 2800,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-07-09"
+    },
+    {
+      "id": "seed-mtgeqgpr-83",
+      "type": "expense",
+      "amount": 3400,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-07-11"
+    },
+    {
+      "id": "seed-mtgeqgpr-84",
+      "type": "expense",
+      "amount": 4000,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-07-13"
+    },
+    {
+      "id": "seed-mtgeqgpr-85",
+      "type": "expense",
+      "amount": 4600,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-07-15"
+    },
+    {
+      "id": "seed-mtgeqgpr-86",
+      "type": "expense",
+      "amount": 2800,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-07-17"
+    },
+    {
+      "id": "seed-mtgeqgpr-87",
+      "type": "expense",
+      "amount": 4990,
+      "categoryId": "Entertainment",
+      "description": "Netflix",
+      "date": "2026-07-05"
+    },
+    {
+      "id": "seed-mtgeqgpr-88",
+      "type": "expense",
+      "amount": 3490,
+      "categoryId": "Entertainment",
+      "description": "Spotify",
+      "date": "2026-07-07"
+    },
+    {
+      "id": "seed-mtgeqgpr-89",
+      "type": "expense",
+      "amount": 7990,
+      "categoryId": "Entertainment",
+      "description": "HBO Max",
+      "date": "2026-07-08"
+    },
+    {
+      "id": "seed-mtgeqgpr-90",
+      "type": "expense",
+      "amount": 38000,
+      "categoryId": "Home",
+      "description": "Rent / Fees",
+      "date": "2026-07-10"
+    },
+    {
+      "id": "seed-mtgeqgpr-91",
+      "type": "expense",
+      "amount": 9500,
+      "categoryId": "Services",
+      "description": "Power and gas",
+      "date": "2026-07-12"
+    },
+    {
+      "id": "seed-mtgeqgpr-92",
+      "type": "expense",
+      "amount": 6200,
+      "categoryId": "Services",
+      "description": "Internet",
+      "date": "2026-07-13"
+    },
+    {
+      "id": "seed-mtgeqgpr-93",
+      "type": "expense",
+      "amount": 15000,
+      "categoryId": "Health",
+      "description": "Dentist",
+      "date": "2026-07-20"
+    },
+    {
+      "id": "seed-mtgeqgpr-94",
+      "type": "expense",
+      "amount": 22000,
+      "categoryId": "Shopping",
+      "description": "Clothes",
+      "date": "2026-07-16"
+    },
+    {
+      "id": "seed-mtgeqgpr-95",
+      "type": "income",
+      "amount": 950000,
+      "categoryId": "Salary",
+      "description": "Salary",
+      "date": "2026-08-03"
+    },
+    {
+      "id": "seed-mtgeqgpr-96",
+      "type": "income",
+      "amount": 120000,
+      "categoryId": "Freelance",
+      "description": "Freelance",
+      "date": "2026-08-18"
+    },
+    {
+      "id": "seed-mtgeqgpr-97",
+      "type": "expense",
+      "amount": 6500,
+      "categoryId": "Food",
+      "description": "Supermarket",
+      "date": "2026-08-02"
+    },
+    {
+      "id": "seed-mtgeqgpr-98",
+      "type": "expense",
+      "amount": 8000,
+      "categoryId": "Food",
+      "description": "Delivery",
+      "date": "2026-08-05"
+    },
+    {
+      "id": "seed-mtgeqgpr-99",
+      "type": "expense",
+      "amount": 9500,
+      "categoryId": "Food",
+      "description": "Supermarket",
+      "date": "2026-08-08"
+    },
+    {
+      "id": "seed-mtgeqgpr-100",
+      "type": "expense",
+      "amount": 6500,
+      "categoryId": "Food",
+      "description": "Delivery",
+      "date": "2026-08-11"
+    },
+    {
+      "id": "seed-mtgeqgpr-101",
+      "type": "expense",
+      "amount": 8000,
+      "categoryId": "Food",
+      "description": "Supermarket",
+      "date": "2026-08-14"
+    },
+    {
+      "id": "seed-mtgeqgpr-102",
+      "type": "expense",
+      "amount": 9500,
+      "categoryId": "Food",
+      "description": "Delivery",
+      "date": "2026-08-17"
+    },
+    {
+      "id": "seed-mtgeqgpr-103",
+      "type": "expense",
+      "amount": 6500,
+      "categoryId": "Food",
+      "description": "Supermarket",
+      "date": "2026-08-20"
+    },
+    {
+      "id": "seed-mtgeqgpr-104",
+      "type": "expense",
+      "amount": 8000,
+      "categoryId": "Food",
+      "description": "Delivery",
+      "date": "2026-08-23"
+    },
+    {
+      "id": "seed-mtgeqgpr-105",
+      "type": "expense",
+      "amount": 9500,
+      "categoryId": "Food",
+      "description": "Supermarket",
+      "date": "2026-08-26"
+    },
+    {
+      "id": "seed-mtgeqgpr-106",
+      "type": "expense",
+      "amount": 2800,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-08-01"
+    },
+    {
+      "id": "seed-mtgeqgpr-107",
+      "type": "expense",
+      "amount": 3400,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-08-03"
+    },
+    {
+      "id": "seed-mtgeqgpr-108",
+      "type": "expense",
+      "amount": 4000,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-08-05"
+    },
+    {
+      "id": "seed-mtgeqgpr-109",
+      "type": "expense",
+      "amount": 4600,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-08-07"
+    },
+    {
+      "id": "seed-mtgeqgpr-110",
+      "type": "expense",
+      "amount": 2800,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-08-09"
+    },
+    {
+      "id": "seed-mtgeqgpr-111",
+      "type": "expense",
+      "amount": 3400,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-08-11"
+    },
+    {
+      "id": "seed-mtgeqgpr-112",
+      "type": "expense",
+      "amount": 4000,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-08-13"
+    },
+    {
+      "id": "seed-mtgeqgpr-113",
+      "type": "expense",
+      "amount": 4600,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-08-15"
+    },
+    {
+      "id": "seed-mtgeqgpr-114",
+      "type": "expense",
+      "amount": 2800,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-08-17"
+    },
+    {
+      "id": "seed-mtgeqgpr-115",
+      "type": "expense",
+      "amount": 3400,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-08-19"
+    },
+    {
+      "id": "seed-mtgeqgpr-116",
+      "type": "expense",
+      "amount": 4000,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-08-21"
+    },
+    {
+      "id": "seed-mtgeqgpr-117",
+      "type": "expense",
+      "amount": 4600,
+      "categoryId": "Transport",
+      "description": "Uber",
+      "date": "2026-08-23"
+    },
+    {
+      "id": "seed-mtgeqgpr-118",
+      "type": "expense",
+      "amount": 4990,
+      "categoryId": "Entertainment",
+      "description": "Netflix",
+      "date": "2026-08-05"
+    },
+    {
+      "id": "seed-mtgeqgpr-119",
+      "type": "expense",
+      "amount": 3490,
+      "categoryId": "Entertainment",
+      "description": "Spotify",
+      "date": "2026-08-07"
+    },
+    {
+      "id": "seed-mtgeqgpr-120",
+      "type": "expense",
+      "amount": 7990,
+      "categoryId": "Entertainment",
+      "description": "HBO Max",
+      "date": "2026-08-08"
+    },
+    {
+      "id": "seed-mtgeqgpr-121",
+      "type": "expense",
+      "amount": 5990,
+      "categoryId": "Entertainment",
+      "description": "Cinema",
+      "date": "2026-08-09"
+    },
+    {
+      "id": "seed-mtgeqgpr-122",
+      "type": "expense",
+      "amount": 12000,
+      "categoryId": "Entertainment",
+      "description": "Steam",
+      "date": "2026-08-14"
+    },
+    {
+      "id": "seed-mtgeqgpr-123",
+      "type": "expense",
+      "amount": 38000,
+      "categoryId": "Home",
+      "description": "Rent / Fees",
+      "date": "2026-08-10"
+    },
+    {
+      "id": "seed-mtgeqgpr-124",
+      "type": "expense",
+      "amount": 9500,
+      "categoryId": "Services",
+      "description": "Power and gas",
+      "date": "2026-08-12"
+    },
+    {
+      "id": "seed-mtgeqgpr-125",
+      "type": "expense",
+      "amount": 6200,
+      "categoryId": "Services",
+      "description": "Internet",
+      "date": "2026-08-13"
+    },
+    {
+      "id": "seed-mtgeqgpr-126",
+      "type": "expense",
+      "amount": 22000,
+      "categoryId": "Shopping",
+      "description": "Sneakers",
+      "date": "2026-08-16"
+    },
+    {
+      "id": "seed-mtgeqgpr-127",
+      "type": "expense",
+      "amount": 3800,
+      "categoryId": "Other",
+      "description": "Misc",
+      "date": "2026-08-22"
+    }
+  ],
+  "categories": [
+    {
+      "id": "Food",
+      "name": "Food",
+      "color": "var(--color-cat-food)",
+      "icon": "UtensilsCrossed",
+      "type": "expense"
+    },
+    {
+      "id": "Transport",
+      "name": "Transport",
+      "color": "var(--color-cat-transport)",
+      "icon": "Car",
+      "type": "expense"
+    },
+    {
+      "id": "Home",
+      "name": "Home",
+      "color": "var(--color-cat-home)",
+      "icon": "House",
+      "type": "expense"
+    },
+    {
+      "id": "Services",
+      "name": "Services",
+      "color": "var(--color-cat-services)",
+      "icon": "Wrench",
+      "type": "expense"
+    },
+    {
+      "id": "Health",
+      "name": "Health",
+      "color": "var(--color-cat-health)",
+      "icon": "HeartPulse",
+      "type": "expense"
+    },
+    {
+      "id": "Entertainment",
+      "name": "Entertainment",
+      "color": "var(--color-cat-entertainment)",
+      "icon": "Clapperboard",
+      "type": "expense"
+    },
+    {
+      "id": "Shopping",
+      "name": "Shopping",
+      "color": "var(--color-cat-shopping)",
+      "icon": "ShoppingBag",
+      "type": "expense"
+    },
+    {
+      "id": "Other",
+      "name": "Other",
+      "color": "var(--color-cat-other)",
+      "icon": "Receipt",
+      "type": "expense"
+    },
+    {
+      "id": "Salary",
+      "name": "Salary",
+      "color": "var(--color-cat-salary)",
+      "icon": "Wallet",
+      "type": "income"
+    },
+    {
+      "id": "Freelance",
+      "name": "Freelance",
+      "color": "var(--color-cat-freelance)",
+      "icon": "Briefcase",
+      "type": "income"
+    },
+    {
+      "id": "OtherIncome",
+      "name": "Other",
+      "color": "var(--color-cat-other-income)",
+      "icon": "PiggyBank",
+      "type": "income"
+    }
+  ]
+}

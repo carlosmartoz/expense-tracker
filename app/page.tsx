@@ -6,18 +6,15 @@ import {
   ArrowRightLeft,
   Tags,
   Wallet,
-  RotateCcw,
-  Trash2,
   type LucideIcon,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { viewTransition } from "@/lib/motion";
-import { useStore } from "@/lib/store";
 import { APP_NAME } from "@/lib/config";
 import Dashboard from "@/components/Dashboard";
 import MovementsView from "@/components/MovementsView";
 import CategoriesView from "@/components/CategoriesView";
-import ConfirmDialog from "@/components/ConfirmDialog";
+import DataMenu from "@/components/DataMenu";
 
 type Tab = "dashboard" | "movements" | "categories";
 
@@ -29,8 +26,6 @@ const TABS: { id: Tab; label: string; icon: LucideIcon }[] = [
 
 export default function Home() {
   const [tab, setTab] = useState<Tab>("dashboard");
-  const [confirmClear, setConfirmClear] = useState(false);
-  const { resetToSeed, clearAll } = useStore();
 
   return (
     <div className="min-h-screen lg:flex">
@@ -73,19 +68,9 @@ export default function Home() {
             );
           })}
         </nav>
-        <div className="mt-auto space-y-2 pt-6">
-          <button
-            onClick={resetToSeed}
-            className="btn-ghost w-full justify-start text-xs"
-          >
-            <RotateCcw className="h-4 w-4" /> Restore demo
-          </button>
-          <button
-            onClick={() => setConfirmClear(true)}
-            className="btn-ghost w-full justify-start text-xs text-coral hover:bg-coral/5"
-          >
-            <Trash2 className="h-4 w-4" /> Clear all
-          </button>
+        <div className="mt-auto pt-6">
+          <p className="stat-label mb-2">Your data</p>
+          <DataMenu />
         </div>
       </aside>
 
@@ -115,22 +100,7 @@ export default function Home() {
 
         {/* Always-reachable data actions */}
         <span className="mx-1 h-5 w-px bg-dark--600" />
-        <button
-          onClick={resetToSeed}
-          aria-label="Restore demo"
-          title="Restore demo"
-          className="cursor-pointer rounded-lg px-2.5 py-1.5 text-text-subtle transition hover:bg-dark--700 hover:text-text-primary"
-        >
-          <RotateCcw className="h-[18px] w-[18px]" />
-        </button>
-        <button
-          onClick={() => setConfirmClear(true)}
-          aria-label="Clear all"
-          title="Clear all"
-          className="cursor-pointer rounded-lg px-2.5 py-1.5 text-text-subtle transition hover:bg-coral/10 hover:text-coral"
-        >
-          <Trash2 className="h-[18px] w-[18px]" />
-        </button>
+        <DataMenu compact />
       </div>
 
       {/* Main content */}
@@ -144,25 +114,15 @@ export default function Home() {
               animate="show"
               exit="exit"
             >
-              {tab === "dashboard" && <Dashboard />}
+              {tab === "dashboard" && (
+                <Dashboard onAddFirst={() => setTab("movements")} />
+              )}
               {tab === "movements" && <MovementsView />}
               {tab === "categories" && <CategoriesView />}
             </motion.div>
           </AnimatePresence>
         </div>
       </main>
-
-      <ConfirmDialog
-        open={confirmClear}
-        title="Clear all transactions"
-        message="This permanently removes every transaction. This can't be undone."
-        confirmLabel="Clear all"
-        onConfirm={() => {
-          clearAll();
-          setConfirmClear(false);
-        }}
-        onCancel={() => setConfirmClear(false)}
-      />
     </div>
   );
 }

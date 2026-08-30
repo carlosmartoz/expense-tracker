@@ -86,7 +86,12 @@ const MIGRATIONS: ((snapshot: Snapshot) => Snapshot)[] = [
   },
 ];
 
-function migrate(snapshot: Snapshot): Snapshot {
+/**
+ * Brings a snapshot up to VERSION. Exported so an exported backup file — which
+ * may have been written by an older version of the app — can be imported
+ * through exactly the same path as data read from the browser.
+ */
+export function migrate(snapshot: Snapshot): Snapshot {
   let out = snapshot;
   for (let v = out.version; v < VERSION; v++) {
     const step = MIGRATIONS[v - 1];
