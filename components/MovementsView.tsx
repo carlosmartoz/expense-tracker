@@ -13,7 +13,6 @@ const DEFAULT_FILTERS: Filters = {
   category: "all",
   type: "all",
   month: "all",
-  tag: "all",
   search: "",
 };
 
@@ -26,12 +25,6 @@ export default function MovementsView() {
     [transactions]
   );
 
-  const tags = useMemo(() => {
-    const set = new Set<string>();
-    for (const t of transactions) t.tags?.forEach((tag) => set.add(tag));
-    return Array.from(set).sort((a, b) => a.localeCompare(b));
-  }, [transactions]);
-
   const filtered = useMemo(() => {
     const needle = filters.search.trim().toLowerCase();
     return transactions
@@ -39,7 +32,6 @@ export default function MovementsView() {
         if (filters.category !== "all" && t.category !== filters.category) return false;
         if (filters.type !== "all" && t.type !== filters.type) return false;
         if (filters.month !== "all" && monthKeyOf(t.date) !== filters.month) return false;
-        if (filters.tag !== "all" && !t.tags?.includes(filters.tag)) return false;
         if (needle && !t.description.toLowerCase().includes(needle)) return false;
         return true;
       })
@@ -106,7 +98,6 @@ export default function MovementsView() {
           <FiltersBar
             filters={filters}
             months={months}
-            tags={tags}
             onChange={setFilters}
             onClear={() => setFilters(DEFAULT_FILTERS)}
           />

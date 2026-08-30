@@ -58,18 +58,6 @@ export default function TransactionList({
                 <p className="mt-0.5 truncate text-xs text-text-secondary">
                   {meta?.name ?? t.category} · {formatDate(t.date)}
                 </p>
-                {t.tags && t.tags.length > 0 && (
-                  <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                    {t.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="rounded-md bg-dark--600 px-1.5 py-0.5 text-[0.6875rem] font-medium leading-tight text-text-secondary"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
               </div>
               <span
                 className={`mt-0.5 shrink-0 text-sm font-semibold ${

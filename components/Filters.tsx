@@ -9,7 +9,6 @@ import Select, { type SelectOption } from "./Select";
 interface Props {
   filters: Filters;
   months: string[];
-  tags: string[];
   onChange: (next: Filters) => void;
   onClear: () => void;
 }
@@ -17,7 +16,6 @@ interface Props {
 export default function FiltersBar({
   filters,
   months,
-  tags,
   onChange,
   onClear,
 }: Props) {
@@ -31,7 +29,6 @@ export default function FiltersBar({
     filters.category !== "all" ||
     filters.type !== "all" ||
     filters.month !== "all" ||
-    filters.tag !== "all" ||
     filters.search.trim() !== "";
 
   const monthOptions: SelectOption[] = [
@@ -59,11 +56,6 @@ export default function FiltersBar({
     { value: "all", label: "All" },
     { value: "expense", label: "Expenses" },
     { value: "income", label: "Income" },
-  ];
-
-  const tagOptions: SelectOption[] = [
-    { value: "all", label: "All tags" },
-    ...tags.map((t) => ({ value: t, label: t })),
   ];
 
   return (
@@ -107,16 +99,6 @@ export default function FiltersBar({
           patch({ type: next, ...(resetCategory ? { category: "all" } : {}) });
         }}
       />
-
-      {tags.length > 0 && (
-        <Select
-          className="w-full sm:w-[150px]"
-          ariaLabel="Filter by tag"
-          value={filters.tag}
-          options={tagOptions}
-          onChange={(v) => patch({ tag: v })}
-        />
-      )}
 
       {hasActiveFilters && (
         <button

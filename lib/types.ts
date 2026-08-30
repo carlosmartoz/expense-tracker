@@ -93,10 +93,6 @@ export const CATEGORY_COLORS = [
   "#94a3b8", // slate
 ];
 
-/** Max number of tags allowed per transaction (keeps the row UI from breaking). */
-export const MAX_TAGS = 3;
-/** Max characters per tag. */
-export const MAX_TAG_LENGTH = 16;
 /** Max characters for a category name. */
 export const MAX_CATEGORY_NAME_LENGTH = 24;
 
@@ -107,8 +103,6 @@ export interface Transaction {
   category: Category; // category id
   description: string;
   date: string; // ISO date string (YYYY-MM-DD)
-  /** Optional short labels for extra context, e.g. "Credit card", "Work". */
-  tags?: string[];
 }
 
 export interface Filters {
@@ -117,7 +111,5 @@ export interface Filters {
   type: TransactionType | "all";
   /** YYYY-MM (month key) or "all" */
   month: string;
-  /** A specific tag name, or "all" */
-  tag: string;
   search: string;
 }

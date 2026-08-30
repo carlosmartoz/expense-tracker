@@ -1,13 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { X } from "lucide-react";
 import { useStore } from "@/lib/store";
 import {
   categoryIcon,
   INCOME_CATEGORY_ID,
-  MAX_TAGS,
-  MAX_TAG_LENGTH,
   type Category,
   type Transaction,
   type TransactionType,
@@ -42,8 +39,6 @@ export default function TransactionForm({
   );
   const [description, setDescription] = useState(initial?.description ?? "");
   const [date, setDate] = useState(initial?.date ?? todayISO());
-  const [tags, setTags] = useState<string[]>(initial?.tags ?? []);
-  const [tagInput, setTagInput] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   function onAmountChange(raw: string) {
@@ -56,46 +51,12 @@ export default function TransactionForm({
     if (Number.isFinite(value)) setAmount(formatAmount(value));
   }
 
-  function addTag(raw: string) {
-    const v = raw.trim().slice(0, MAX_TAG_LENGTH);
-    setTagInput("");
-    if (!v) return;
-    setTags((prev) => {
-      if (prev.length >= MAX_TAGS) return prev;
-      if (prev.some((t) => t.toLowerCase() === v.toLowerCase())) return prev;
-      return [...prev, v];
-    });
-  }
-
-  function removeTag(tag: string) {
-    setTags((prev) => prev.filter((t) => t !== tag));
-  }
-
-  function onTagKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "Enter" || e.key === ",") {
-      e.preventDefault();
-      addTag(tagInput);
-    } else if (e.key === "Backspace" && !tagInput && tags.length) {
-      setTags((prev) => prev.slice(0, -1));
-    }
-  }
-
   function submit(e: React.FormEvent) {
     e.preventDefault();
     const value = parseAmount(amount);
     if (!value || value <= 0) {
       setError("Enter a valid amount greater than 0.");
       return;
-    }
-    // Fold any tag still sitting in the input that wasn't committed with Enter.
-    const pending = tagInput.trim().slice(0, MAX_TAG_LENGTH);
-    const finalTags = [...tags];
-    if (
-      pending &&
-      finalTags.length < MAX_TAGS &&
-      !finalTags.some((t) => t.toLowerCase() === pending.toLowerCase())
-    ) {
-      finalTags.push(pending);
     }
     const categoryName =
       categories.find((c) => c.id === category)?.name ?? category;
@@ -105,7 +66,6 @@ export default function TransactionForm({
       category: type === "income" ? INCOME_CATEGORY_ID : category,
       description: description.trim() || (type === "income" ? "Income" : categoryName),
       date,
-      tags: finalTags.length ? finalTags : undefined,
     };
     if (initial) {
       updateTransaction(initial.id, payload);
@@ -114,9 +74,7 @@ export default function TransactionForm({
       // Reset the form for the next entry (only when creating).
       setAmount("");
       setDescription("");
-      setTags([]);
     }
-    setTagInput("");
     setError(null);
     onDone?.();
   }
@@ -183,48 +141,6 @@ export default function TransactionForm({
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
-      </div>
-
-      <div>
-        <label className="stat-label">
-          Tags <span className="normal-case text-text-subtle">· optional</span>
-        </label>
-        <div
-          className="mt-1 flex flex-wrap items-center gap-1.5 rounded-xl border border-dark--600
-            bg-dark--700 px-2.5 py-2 transition focus-within:border-brand-500
-            focus-within:ring-2 focus-within:ring-brand-500/30"
-        >
-          {tags.map((tag) => (
-            <span
-              key={tag}
-              className="inline-flex items-center gap-1 rounded-md bg-dark--600 px-2 py-0.5 text-xs font-medium text-text-secondary"
-            >
-              {tag}
-              <button
-                type="button"
-                onClick={() => removeTag(tag)}
-                aria-label={`Remove ${tag}`}
-                className="cursor-pointer text-text-subtle transition hover:text-coral"
-              >
-                <X className="h-3 w-3" strokeWidth={3} />
-              </button>
-            </span>
-          ))}
-          {tags.length < MAX_TAGS && (
-            <input
-              className="min-w-[8ch] flex-1 bg-transparent text-sm text-text-primary outline-none placeholder:text-text-subtle"
-              placeholder={tags.length ? "Add another…" : "e.g. Credit card, Work…"}
-              value={tagInput}
-              maxLength={MAX_TAG_LENGTH}
-              onChange={(e) => setTagInput(e.target.value)}
-              onKeyDown={onTagKeyDown}
-              onBlur={() => addTag(tagInput)}
-            />
-          )}
-        </div>
-        <p className="mt-1 text-xs text-text-subtle">
-          Press Enter to add · up to {MAX_TAGS} tags
-        </p>
       </div>
 
       <div>

@@ -8,7 +8,7 @@ import type { Transaction, CategoryDef } from "./types";
 const KEY = "expense-tracker";
 
 /** Bumped whenever the stored shape changes. See MIGRATIONS below. */
-export const VERSION = 2;
+export const VERSION = 3;
 
 /** The two keys the app wrote to before everything moved under a single one. */
 const LEGACY_TRANSACTIONS_KEY = "expense-tracker:transactions:v2";
@@ -36,6 +36,17 @@ const MIGRATIONS: ((snapshot: Snapshot) => Snapshot)[] = [
     transactions: snapshot.transactions.map((t) => {
       const { currency, ...rest } = t as Transaction & { currency?: string };
       void currency;
+      return rest;
+    }),
+  }),
+
+  // 2 -> 3: tags are gone. Categories cover the same ground now that any of
+  // them can be renamed, so the second way of labelling a transaction goes.
+  (snapshot) => ({
+    ...snapshot,
+    transactions: snapshot.transactions.map((t) => {
+      const { tags, ...rest } = t as Transaction & { tags?: string[] };
+      void tags;
       return rest;
     }),
   }),
