@@ -77,7 +77,7 @@ export default function TransactionList({
                 }`}
               >
                 {isIncome ? "+" : "−"}
-                {formatMoney(t.amount, t.currency)}
+                {formatMoney(t.amount)}
               </span>
               {/* Actions: always visible on touch, hover-reveal on desktop. */}
               <div className="mt-0.5 flex shrink-0 items-center gap-0.5 opacity-100 transition sm:opacity-0 sm:group-hover:opacity-100">

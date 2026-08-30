@@ -15,20 +15,6 @@ import {
 export type TransactionType = "income" | "expense";
 
 /* =========================================================================
-   CURRENCIES
-   ========================================================================= */
-
-export const CURRENCIES = {
-  ARS: { code: "ARS", symbol: "$", label: "Argentine Peso" },
-  USD: { code: "USD", symbol: "US$", label: "Dollar" },
-  EUR: { code: "EUR", symbol: "€", label: "Euro" },
-} as const;
-
-export type CurrencyCode = keyof typeof CURRENCIES;
-export const CURRENCY_LIST = Object.values(CURRENCIES);
-export const DEFAULT_CURRENCY: CurrencyCode = "ARS";
-
-/* =========================================================================
    CATEGORIES
 
    A category is referenced by a stable `id`. Default categories use their
@@ -119,8 +105,6 @@ export interface Transaction {
   type: TransactionType;
   amount: number; // always positive; sign is derived from `type`
   category: Category; // category id
-  /** Currency of this transaction. Missing ⇒ DEFAULT_CURRENCY (legacy data). */
-  currency?: CurrencyCode;
   description: string;
   date: string; // ISO date string (YYYY-MM-DD)
   /** Optional short labels for extra context, e.g. "Credit card", "Work". */

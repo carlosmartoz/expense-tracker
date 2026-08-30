@@ -4,12 +4,7 @@ import { useMemo, useState } from "react";
 import { useStore } from "@/lib/store";
 import { sortedMonthKeys } from "@/lib/analytics";
 import { monthKeyOf, formatMoney } from "@/lib/format";
-import {
-  CURRENCIES,
-  DEFAULT_CURRENCY,
-  type CurrencyCode,
-  type Filters,
-} from "@/lib/types";
+import type { Filters } from "@/lib/types";
 import TransactionForm from "./TransactionForm";
 import TransactionList from "./TransactionList";
 import FiltersBar from "./Filters";
@@ -21,13 +16,6 @@ const DEFAULT_FILTERS: Filters = {
   tag: "all",
   search: "",
 };
-
-interface CurrencyBalance {
-  currency: CurrencyCode;
-  income: number;
-  expense: number;
-  balance: number;
-}
 
 export default function MovementsView() {
   const { transactions } = useStore();
@@ -58,33 +46,16 @@ export default function MovementsView() {
       .sort((a, b) => (a.date < b.date ? 1 : -1));
   }, [transactions, filters]);
 
-  // Balances are grouped by currency so amounts in different currencies are
-  // never summed together.
-  const balances = useMemo<CurrencyBalance[]>(() => {
-    const byCurrency = new Map<CurrencyCode, { income: number; expense: number }>();
+  // Totals for whatever the filters are currently showing.
+  const totals = useMemo(() => {
+    let income = 0;
+    let expense = 0;
     for (const t of filtered) {
-      const cur = t.currency ?? DEFAULT_CURRENCY;
-      const entry = byCurrency.get(cur) ?? { income: 0, expense: 0 };
-      if (t.type === "income") entry.income += t.amount;
-      else entry.expense += t.amount;
-      byCurrency.set(cur, entry);
+      if (t.type === "income") income += t.amount;
+      else expense += t.amount;
     }
-    const order = Object.keys(CURRENCIES) as CurrencyCode[];
-    return Array.from(byCurrency.entries())
-      .map(([currency, v]) => ({
-        currency,
-        income: v.income,
-        expense: v.expense,
-        balance: v.income - v.expense,
-      }))
-      .sort((a, b) => order.indexOf(a.currency) - order.indexOf(b.currency));
+    return { income, expense, balance: income - expense };
   }, [filtered]);
-
-  const shownBalances: CurrencyBalance[] =
-    balances.length > 0
-      ? balances
-      : [{ currency: DEFAULT_CURRENCY, income: 0, expense: 0, balance: 0 }];
-  const multiCurrency = shownBalances.length > 1;
 
   return (
     <div className="grid grid-cols-1 gap-5 lg:grid-cols-[340px_1fr]">
@@ -104,43 +75,32 @@ export default function MovementsView() {
             </p>
           </div>
 
-          {/* Prominent balance, per currency */}
-          <div className="mt-3 mb-4 space-y-3 rounded-2xl bg-dark--700/40 p-4">
-            {shownBalances.map((b, i) => (
-              <div
-                key={b.currency}
-                className={`flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 ${
-                  i > 0 ? "border-t border-dark--600 pt-3" : ""
+          {/* Prominent balance */}
+          <div className="mt-3 mb-4 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 rounded-2xl bg-dark--700/40 p-4">
+            <div>
+              <p className="stat-label">Balance</p>
+              <p
+                className={`text-3xl font-bold tracking-tight ${
+                  totals.balance >= 0 ? "text-mint" : "text-coral"
                 }`}
               >
-                <div>
-                  <p className="stat-label">
-                    Balance{multiCurrency ? ` · ${CURRENCIES[b.currency].code}` : ""}
-                  </p>
-                  <p
-                    className={`text-3xl font-bold tracking-tight ${
-                      b.balance >= 0 ? "text-mint" : "text-coral"
-                    }`}
-                  >
-                    {formatMoney(b.balance, b.currency)}
-                  </p>
-                </div>
-                <div className="flex gap-5 text-right">
-                  <div>
-                    <p className="stat-label">Income</p>
-                    <p className="text-sm font-semibold text-mint">
-                      {formatMoney(b.income, b.currency)}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="stat-label">Expenses</p>
-                    <p className="text-sm font-semibold text-coral">
-                      {formatMoney(b.expense, b.currency)}
-                    </p>
-                  </div>
-                </div>
+                {formatMoney(totals.balance)}
+              </p>
+            </div>
+            <div className="flex gap-5 text-right">
+              <div>
+                <p className="stat-label">Income</p>
+                <p className="text-sm font-semibold text-mint">
+                  {formatMoney(totals.income)}
+                </p>
               </div>
-            ))}
+              <div>
+                <p className="stat-label">Expenses</p>
+                <p className="text-sm font-semibold text-coral">
+                  {formatMoney(totals.expense)}
+                </p>
+              </div>
+            </div>
           </div>
 
           <FiltersBar

@@ -11,7 +11,7 @@ import {
   Legend,
 } from "recharts";
 import type { MonthSummary } from "@/lib/analytics";
-import { formatAmount, formatMonthKey } from "@/lib/format";
+import { formatMoney, formatMonthKey } from "@/lib/format";
 import { resolveColor, chartColors } from "@/lib/colors";
 import { useStore } from "@/lib/store";
 
@@ -66,7 +66,7 @@ export default function MonthComparison({
         />
         <Tooltip
           cursor={{ fill: "rgba(255,255,255,0.04)" }}
-          formatter={(value, name) => [formatAmount(Number(value)), name]}
+          formatter={(value, name) => [formatMoney(Number(value)), name]}
           contentStyle={{
             borderRadius: 12,
             border: `1px solid ${c.border}`,

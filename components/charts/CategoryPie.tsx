@@ -9,7 +9,7 @@ import {
   Legend,
 } from "recharts";
 import type { CategorySlice } from "@/lib/analytics";
-import { formatAmount } from "@/lib/format";
+import { formatMoney } from "@/lib/format";
 import { resolveColor, chartColors } from "@/lib/colors";
 import { useStore } from "@/lib/store";
 
@@ -55,7 +55,7 @@ export default function CategoryPie({
           ))}
         </Pie>
         <Tooltip
-          formatter={(value, name) => [formatAmount(Number(value)), nameOf(String(name))]}
+          formatter={(value, name) => [formatMoney(Number(value)), nameOf(String(name))]}
           contentStyle={{
             borderRadius: 12,
             border: `1px solid ${c.border}`,

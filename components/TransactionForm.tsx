@@ -5,13 +5,10 @@ import { X } from "lucide-react";
 import { useStore } from "@/lib/store";
 import {
   categoryIcon,
-  CURRENCY_LIST,
-  DEFAULT_CURRENCY,
   INCOME_CATEGORY_ID,
   MAX_TAGS,
   MAX_TAG_LENGTH,
   type Category,
-  type CurrencyCode,
   type Transaction,
   type TransactionType,
 } from "@/lib/types";
@@ -36,17 +33,10 @@ export default function TransactionForm({
   const expenseCategories = categories.filter(
     (c) => c.id !== INCOME_CATEGORY_ID
   );
-  const currencyOptions: SelectOption[] = CURRENCY_LIST.map((c) => ({
-    value: c.code,
-    label: `${c.symbol} ${c.code}`,
-  }));
   const [type, setType] = useState<TransactionType>(initial?.type ?? "expense");
   const [amount, setAmount] = useState(
     initial ? formatAmount(initial.amount) : ""
   ); // formatted display string, e.g. "2.672.371,00"
-  const [currency, setCurrency] = useState<CurrencyCode>(
-    initial?.currency ?? DEFAULT_CURRENCY
-  );
   const [category, setCategory] = useState<Category>(
     initial && initial.type === "expense" ? initial.category : "Food"
   );
@@ -58,12 +48,6 @@ export default function TransactionForm({
 
   function onAmountChange(raw: string) {
     setAmount(formatAmountInput(raw));
-  }
-
-  function onCurrencyChange(next: CurrencyCode) {
-    setCurrency(next);
-    // Switching currency clears the amount so values aren't mixed up.
-    setAmount("");
   }
 
   function onAmountBlur() {
@@ -118,7 +102,6 @@ export default function TransactionForm({
     const payload = {
       type,
       amount: value,
-      currency,
       category: type === "income" ? INCOME_CATEGORY_ID : category,
       description: description.trim() || (type === "income" ? "Income" : categoryName),
       date,
@@ -162,22 +145,14 @@ export default function TransactionForm({
 
       <div>
         <label className="stat-label">Amount</label>
-        <div className="mt-1 grid grid-cols-[1fr_7rem] gap-2">
-          <input
-            inputMode="decimal"
-            className="input"
-            placeholder="0,00"
-            value={amount}
-            onChange={(e) => onAmountChange(e.target.value)}
-            onBlur={onAmountBlur}
-          />
-          <Select
-            ariaLabel="Currency"
-            value={currency}
-            options={currencyOptions}
-            onChange={(v) => onCurrencyChange(v as CurrencyCode)}
-          />
-        </div>
+        <input
+          inputMode="decimal"
+          className="input mt-1"
+          placeholder="0,00"
+          value={amount}
+          onChange={(e) => onAmountChange(e.target.value)}
+          onBlur={onAmountBlur}
+        />
       </div>
 
       {type === "expense" && (

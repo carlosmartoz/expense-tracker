@@ -1,8 +1,8 @@
-import { CURRENCIES, DEFAULT_CURRENCY, type CurrencyCode } from "./types";
+import { CURRENCY } from "./config";
 
-// Amounts use the "2.672.371,00" convention: dot for thousands, comma for the
-// decimal, always two decimals. (es-AR / de-DE style.)
-const amountFormatter = new Intl.NumberFormat("es-AR", {
+// Amounts follow the currency's own convention — for ARS that's "2.672.371,00":
+// dot for thousands, comma for the decimal, always two decimals.
+const amountFormatter = new Intl.NumberFormat(CURRENCY.locale, {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 });
@@ -11,13 +11,15 @@ export function formatAmount(value: number): string {
   return amountFormatter.format(Number.isFinite(value) ? value : 0);
 }
 
-/** Like formatAmount but prefixed with the currency symbol, e.g. "US$ 1.200,00". */
-export function formatMoney(
-  value: number,
-  currency: CurrencyCode = DEFAULT_CURRENCY
-): string {
-  const symbol = CURRENCIES[currency]?.symbol ?? "";
-  return `${symbol} ${formatAmount(value)}`.trim();
+/**
+ * Like formatAmount but prefixed with the currency symbol, e.g. "$ 1.200,00".
+ * A negative value keeps its sign ahead of the symbol ("-$ 1.200,00"), which is
+ * how a balance in the red is normally written.
+ */
+export function formatMoney(value: number): string {
+  const n = Number.isFinite(value) ? value : 0;
+  const sign = n < 0 ? "-" : "";
+  return `${sign}${CURRENCY.symbol} ${formatAmount(Math.abs(n))}`;
 }
 
 /** Parse a display string like "2.672.371,00" back into a number. */

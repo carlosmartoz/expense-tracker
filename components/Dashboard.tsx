@@ -10,7 +10,7 @@ import {
 import { Gem, TrendingUp, CreditCard, PiggyBank } from "lucide-react";
 import { motion } from "motion/react";
 import { stagger, cardItem } from "@/lib/motion";
-import { formatAmount, formatMonthKey, formatPercent } from "@/lib/format";
+import { formatMoney, formatMonthKey, formatPercent } from "@/lib/format";
 import StatCard from "./StatCard";
 import CountUp from "./CountUp";
 import CategoryPie from "./charts/CategoryPie";
@@ -101,7 +101,7 @@ export default function Dashboard() {
         <StatCard
           label="Monthly balance"
           value={
-            <CountUp value={current.balance} format={formatAmount} play={play} />
+            <CountUp value={current.balance} format={formatMoney} play={play} />
           }
           accent="brand"
           icon={Gem}
@@ -116,7 +116,7 @@ export default function Dashboard() {
         <StatCard
           label="Income"
           value={
-            <CountUp value={current.income} format={formatAmount} play={play} />
+            <CountUp value={current.income} format={formatMoney} play={play} />
           }
           accent="mint"
           icon={TrendingUp}
@@ -124,7 +124,7 @@ export default function Dashboard() {
         <StatCard
           label="Expenses"
           value={
-            <CountUp value={current.expense} format={formatAmount} play={play} />
+            <CountUp value={current.expense} format={formatMoney} play={play} />
           }
           accent="coral"
           icon={CreditCard}

@@ -8,7 +8,7 @@ import type { Transaction, CategoryDef } from "./types";
 const KEY = "expense-tracker";
 
 /** Bumped whenever the stored shape changes. See MIGRATIONS below. */
-export const VERSION = 1;
+export const VERSION = 2;
 
 /** The two keys the app wrote to before everything moved under a single one. */
 const LEGACY_TRANSACTIONS_KEY = "expense-tracker:transactions:v2";
@@ -26,7 +26,20 @@ export interface Snapshot {
  * chain one step at a time, so however old a browser's copy is, it arrives at
  * VERSION without losing anything.
  */
-const MIGRATIONS: ((snapshot: Snapshot) => Snapshot)[] = [];
+const MIGRATIONS: ((snapshot: Snapshot) => Snapshot)[] = [
+  // 1 -> 2: the app went back to a single currency, so the per-transaction
+  // `currency` field is dropped. Amounts are left untouched — they were always
+  // stored as plain numbers, and anything entered in another currency stays at
+  // its face value for you to correct by hand.
+  (snapshot) => ({
+    ...snapshot,
+    transactions: snapshot.transactions.map((t) => {
+      const { currency, ...rest } = t as Transaction & { currency?: string };
+      void currency;
+      return rest;
+    }),
+  }),
+];
 
 function migrate(snapshot: Snapshot): Snapshot {
   let out = snapshot;
