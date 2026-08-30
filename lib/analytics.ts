@@ -29,7 +29,7 @@ export function summarizeMonth(
       income += t.amount;
     } else {
       expense += t.amount;
-      byCategory[t.category] = (byCategory[t.category] ?? 0) + t.amount;
+      byCategory[t.categoryId] = (byCategory[t.categoryId] ?? 0) + t.amount;
     }
   }
 
@@ -44,7 +44,7 @@ export function summarizeAllMonths(transactions: Transaction[]): MonthSummary[] 
 }
 
 export interface CategorySlice {
-  category: string;
+  categoryId: string;
   amount: number;
   percent: number;
 }
@@ -60,12 +60,12 @@ export function expenseByCategory(
   let total = 0;
   for (const t of filtered) {
     if (t.type !== "expense") continue;
-    totals[t.category] = (totals[t.category] ?? 0) + t.amount;
+    totals[t.categoryId] = (totals[t.categoryId] ?? 0) + t.amount;
     total += t.amount;
   }
   return Object.entries(totals)
-    .map(([category, amount]) => ({
-      category,
+    .map(([categoryId, amount]) => ({
+      categoryId,
       amount,
       percent: total > 0 ? (amount / total) * 100 : 0,
     }))

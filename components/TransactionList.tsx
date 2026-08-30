@@ -5,7 +5,7 @@ import { Pencil, Trash2, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { backdrop, modalPanel } from "@/lib/motion";
 import type { Transaction } from "@/lib/types";
-import { categoryIcon, FALLBACK_CATEGORY_ID } from "@/lib/types";
+import { categoryIcon } from "@/lib/types";
 import { formatMoney, formatDate } from "@/lib/format";
 import { useStore } from "@/lib/store";
 import TransactionForm from "./TransactionForm";
@@ -42,8 +42,7 @@ export default function TransactionList({
     <>
       <ul className="divide-y divide-white/[0.06]">
         {transactions.map((t) => {
-          const meta =
-            categoryMap[t.category] ?? categoryMap[FALLBACK_CATEGORY_ID];
+          const meta = categoryMap[t.categoryId];
           const Icon = categoryIcon(meta?.icon);
           const isIncome = t.type === "income";
           return (
@@ -56,7 +55,7 @@ export default function TransactionList({
                   {t.description}
                 </p>
                 <p className="mt-0.5 truncate text-xs text-text-secondary">
-                  {meta?.name ?? t.category} · {formatDate(t.date)}
+                  {meta?.name ?? "Uncategorised"} · {formatDate(t.date)}
                 </p>
               </div>
               <span

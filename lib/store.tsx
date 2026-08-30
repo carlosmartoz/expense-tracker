@@ -8,25 +8,26 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { Transaction, CategoryDef } from "./types";
-import { DEFAULT_CATEGORIES, FALLBACK_CATEGORY_ID } from "./types";
+import type { Transaction, Category, TransactionType } from "./types";
+import { DEFAULT_CATEGORIES } from "./types";
 import { buildSeedData } from "./seed";
 import { load, save } from "./storage";
 
 interface StoreValue {
   transactions: Transaction[];
-  categories: CategoryDef[];
+  categories: Category[];
   /** id -> category, for quick lookups in render. */
-  categoryMap: Record<string, CategoryDef>;
+  categoryMap: Record<string, Category>;
   hydrated: boolean;
   addTransaction: (t: Omit<Transaction, "id">) => void;
   updateTransaction: (id: string, patch: Omit<Transaction, "id">) => void;
   deleteTransaction: (id: string) => void;
   resetToSeed: () => void;
   clearAll: () => void;
-  addCategory: (c: { name: string; color: string }) => void;
+  addCategory: (c: { name: string; color: string; type: TransactionType }) => void;
   updateCategory: (id: string, patch: { name?: string; color?: string }) => void;
-  deleteCategory: (id: string) => void;
+  /** Removes a category, moving every transaction that used it to `moveToId`. */
+  deleteCategory: (id: string, moveToId: string) => void;
 }
 
 const StoreContext = createContext<StoreValue | null>(null);
@@ -38,29 +39,20 @@ function uid(): string {
   return `id-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
-/**
- * Defaults are not user-editable, so they always come straight from code (this
- * keeps name/color/icon changes propagating to everyone). Only the user's custom
- * categories are read back from storage and appended.
- */
-function mergeCategories(stored: CategoryDef[] | null): CategoryDef[] {
-  if (!stored || !Array.isArray(stored)) return DEFAULT_CATEGORIES;
-  const customs = stored
-    .filter((s) => !DEFAULT_CATEGORIES.some((d) => d.id === s.id))
-    .map((s) => ({ ...s, isDefault: false }));
-  return [...DEFAULT_CATEGORIES, ...customs];
-}
-
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [categories, setCategories] = useState<CategoryDef[]>(DEFAULT_CATEGORIES);
+  const [categories, setCategories] = useState<Category[]>(DEFAULT_CATEGORIES);
   const [hydrated, setHydrated] = useState(false);
 
-  // Read the stored copy once on mount; seed transactions on a first visit.
+  // Read the stored copy once on mount. A browser that has never held any data
+  // is seeded — with the default categories, and for now with demo
+  // transactions too (phase 5 replaces those with an empty start).
   useEffect(() => {
     const stored = load();
     setTransactions(stored ? stored.transactions : buildSeedData());
-    setCategories(mergeCategories(stored ? stored.categories : null));
+    setCategories(
+      stored && stored.categories.length ? stored.categories : DEFAULT_CATEGORIES
+    );
     setHydrated(true);
   }, []);
 
@@ -97,16 +89,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setTransactions((prev) => prev.filter((t) => t.id !== id)),
       resetToSeed: () => setTransactions(buildSeedData()),
       clearAll: () => setTransactions([]),
-      addCategory: ({ name, color }) =>
+      addCategory: ({ name, color, type }) =>
         setCategories((prev) => {
           const trimmed = name.trim();
           if (!trimmed) return prev;
-          if (prev.some((c) => c.name.toLowerCase() === trimmed.toLowerCase())) {
-            return prev;
-          }
+          // Names only have to be unique within their own side of the book.
+          const clash = prev.some(
+            (c) =>
+              c.type === type && c.name.toLowerCase() === trimmed.toLowerCase()
+          );
+          if (clash) return prev;
           return [
             ...prev,
-            { id: uid(), name: trimmed, color, icon: "Tag", isDefault: false },
+            { id: uid(), name: trimmed, color, icon: "Tag", type },
           ];
         }),
       updateCategory: (id, patch) =>
@@ -121,15 +116,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             };
           })
         ),
-      deleteCategory: (id) => {
+      deleteCategory: (id, moveToId) => {
         const target = categories.find((c) => c.id === id);
-        if (!target || target.isDefault) return;
+        const destination = categories.find((c) => c.id === moveToId);
+        if (!target || !destination || destination.id === target.id) return;
+        // Never leave a side of the book without a category to pick.
+        const remaining = categories.filter(
+          (c) => c.type === target.type && c.id !== id
+        );
+        if (remaining.length === 0) return;
         setCategories((prev) => prev.filter((c) => c.id !== id));
-        // Reassign any transactions using the removed category to the fallback.
         setTransactions((prev) =>
-          prev.map((t) =>
-            t.category === id ? { ...t, category: FALLBACK_CATEGORY_ID } : t
-          )
+          prev.map((t) => (t.categoryId === id ? { ...t, categoryId: moveToId } : t))
         );
       },
     }),

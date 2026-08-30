@@ -36,13 +36,26 @@
   --color-coral: #fb7185; /* alias used across the UI */
 
   /* ----- Category colors (each one distinct from the others) ----- */
+  /* Expenses */
   --color-cat-food: #f59e0b; /* amber */
   --color-cat-transport: #8b5cf6; /* violet */
-  --color-cat-subscriptions: #d946ef; /* fuchsia */
-  --color-cat-gaming: #06b6d4; /* cyan */
   --color-cat-home: #22c55e; /* green */
-  --color-cat-income: #ec4899; /* pink */
+  --color-cat-services: #14b8a6; /* teal */
+  --color-cat-health: #0ea5e9; /* sky */
+  --color-cat-entertainment: #d946ef; /* fuchsia */
+  --color-cat-shopping: #f97316; /* orange */
   --color-cat-other: #94a3b8; /* slate */
+  /* Income */
+  --color-cat-salary: #ec4899; /* pink */
+  --color-cat-freelance: #84cc16; /* lime */
+  --color-cat-other-income: #a855f7; /* purple */
+
+  /* Retired defaults. Categories are stored in the browser, so data saved
+     before these were dropped still points at them — keep the tokens so those
+     categories keep their colour instead of rendering as an invalid value. */
+  --color-cat-subscriptions: #d946ef;
+  --color-cat-gaming: #06b6d4;
+  --color-cat-income: #ec4899;
 
   /* ----- Effects ----- */
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.45), 0 16px 40px rgba(0, 0, 0, 0.35);

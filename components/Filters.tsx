@@ -1,7 +1,7 @@
 "use client";
 
 import { FilterX } from "lucide-react";
-import { categoryIcon, INCOME_CATEGORY_ID, type Filters } from "@/lib/types";
+import { categoryIcon, type Filters } from "@/lib/types";
 import { formatMonthKey } from "@/lib/format";
 import { useStore } from "@/lib/store";
 import Select, { type SelectOption } from "./Select";
@@ -26,7 +26,7 @@ export default function FiltersBar({
   }
 
   const hasActiveFilters =
-    filters.category !== "all" ||
+    filters.categoryId !== "all" ||
     filters.type !== "all" ||
     filters.month !== "all" ||
     filters.search.trim() !== "";
@@ -36,14 +36,11 @@ export default function FiltersBar({
     ...months.map((m) => ({ value: m, label: formatMonthKey(m) })),
   ];
 
-  // Income transactions only ever use the "Income" category, so when filtering
-  // by expenses we drop it from the category options.
+  // When a type is selected, only that side's categories are worth offering.
   const categoryOptions: SelectOption[] = [
     { value: "all", label: "All categories" },
     ...categories
-      .filter(
-        (c) => filters.type !== "expense" || c.id !== INCOME_CATEGORY_ID
-      )
+      .filter((c) => filters.type === "all" || c.type === filters.type)
       .map((c) => ({
         value: c.id,
         label: c.name,
@@ -75,15 +72,13 @@ export default function FiltersBar({
         onChange={(v) => patch({ month: v })}
       />
 
-      {filters.type !== "income" && (
-        <Select
-          className="w-full sm:w-[190px]"
-          ariaLabel="Filter by category"
-          value={filters.category}
-          options={categoryOptions}
-          onChange={(v) => patch({ category: v })}
-        />
-      )}
+      <Select
+        className="w-full sm:w-[190px]"
+        ariaLabel="Filter by category"
+        value={filters.categoryId}
+        options={categoryOptions}
+        onChange={(v) => patch({ categoryId: v })}
+      />
 
       <Select
         className="w-full sm:w-[130px]"
@@ -92,11 +87,10 @@ export default function FiltersBar({
         options={typeOptions}
         onChange={(v) => {
           const next = v as Filters["type"];
-          // Keep the category filter coherent with the chosen type.
-          const resetCategory =
-            next === "income" ||
-            (next === "expense" && filters.category === INCOME_CATEGORY_ID);
-          patch({ type: next, ...(resetCategory ? { category: "all" } : {}) });
+          // Drop the category filter if it belongs to the other side now.
+          const chosen = categories.find((c) => c.id === filters.categoryId);
+          const orphaned = next !== "all" && chosen && chosen.type !== next;
+          patch({ type: next, ...(orphaned ? { categoryId: "all" } : {}) });
         }}
       />
 

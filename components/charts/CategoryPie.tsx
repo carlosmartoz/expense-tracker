@@ -37,7 +37,7 @@ export default function CategoryPie({
         <Pie
           data={data}
           dataKey="amount"
-          nameKey="category"
+          nameKey="categoryId"
           innerRadius={62}
           outerRadius={96}
           paddingAngle={2}
@@ -47,9 +47,9 @@ export default function CategoryPie({
         >
           {data.map((slice) => (
             <Cell
-              key={slice.category}
+              key={slice.categoryId}
               fill={resolveColor(
-                categoryMap[slice.category]?.color ?? "var(--color-cat-other)"
+                categoryMap[slice.categoryId]?.color ?? "var(--color-cat-other)"
               )}
             />
           ))}

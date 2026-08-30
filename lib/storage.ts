@@ -1,4 +1,4 @@
-import type { Transaction, CategoryDef } from "./types";
+import type { Transaction, Category, TransactionType } from "./types";
 
 /**
  * Reading and writing the browser's copy of your data. This module owns the
@@ -8,7 +8,7 @@ import type { Transaction, CategoryDef } from "./types";
 const KEY = "expense-tracker";
 
 /** Bumped whenever the stored shape changes. See MIGRATIONS below. */
-export const VERSION = 3;
+export const VERSION = 4;
 
 /** The two keys the app wrote to before everything moved under a single one. */
 const LEGACY_TRANSACTIONS_KEY = "expense-tracker:transactions:v2";
@@ -17,7 +17,7 @@ const LEGACY_CATEGORIES_KEY = "expense-tracker:categories:v1";
 export interface Snapshot {
   version: number;
   transactions: Transaction[];
-  categories: CategoryDef[];
+  categories: Category[];
 }
 
 /**
@@ -50,6 +50,40 @@ const MIGRATIONS: ((snapshot: Snapshot) => Snapshot)[] = [
       return rest;
     }),
   }),
+
+  // 3 -> 4: categories became one flat, fully editable list.
+  //
+  // `category` is renamed to `categoryId`, which is what it always held. Every
+  // stored category gains a `type` and loses `isDefault`: income used to be a
+  // single hard-coded bucket, so the one category with that id lands on the
+  // income side and everything else on the expense side.
+  //
+  // The user's list is typed and cleaned, never curated: categories that no
+  // longer ship as defaults (Subscriptions, Gaming, Debts) are kept, because
+  // transactions point at them. New defaults aren't injected either — the list
+  // belongs to whoever has been using the app.
+  (snapshot) => {
+    const LEGACY_INCOME_ID = "Income";
+    const legacy = snapshot.categories as (Category & {
+      isDefault?: boolean;
+      type?: TransactionType;
+    })[];
+
+    const categories: Category[] = legacy.map((c) => {
+      const { isDefault, ...rest } = c;
+      void isDefault;
+      return { ...rest, type: rest.type ?? (c.id === LEGACY_INCOME_ID ? "income" : "expense") };
+    });
+
+    return {
+      ...snapshot,
+      categories,
+      transactions: snapshot.transactions.map((t) => {
+        const { category, ...rest } = t as Transaction & { category?: string };
+        return { ...rest, categoryId: rest.categoryId ?? category ?? "" };
+      }),
+    };
+  },
 ];
 
 function migrate(snapshot: Snapshot): Snapshot {
@@ -78,7 +112,7 @@ function readJSON<T>(key: string): T | null {
  */
 function readLegacy(): Snapshot | null {
   const transactions = readJSON<Transaction[]>(LEGACY_TRANSACTIONS_KEY);
-  const categories = readJSON<CategoryDef[]>(LEGACY_CATEGORIES_KEY);
+  const categories = readJSON<Category[]>(LEGACY_CATEGORIES_KEY);
   if (!transactions && !categories) return null;
   return {
     version: 1,

@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useStore } from "@/lib/store";
 import {
   categoryIcon,
-  INCOME_CATEGORY_ID,
-  type Category,
   type Transaction,
   type TransactionType,
 } from "@/lib/types";
@@ -27,19 +25,32 @@ export default function TransactionForm({
 }) {
   const { addTransaction, updateTransaction, categories } = useStore();
   const isEditing = Boolean(initial);
-  const expenseCategories = categories.filter(
-    (c) => c.id !== INCOME_CATEGORY_ID
-  );
   const [type, setType] = useState<TransactionType>(initial?.type ?? "expense");
   const [amount, setAmount] = useState(
     initial ? formatAmount(initial.amount) : ""
   ); // formatted display string, e.g. "2.672.371,00"
-  const [category, setCategory] = useState<Category>(
-    initial && initial.type === "expense" ? initial.category : "Food"
-  );
+  const [categoryId, setCategoryId] = useState(initial?.categoryId ?? "");
   const [description, setDescription] = useState(initial?.description ?? "");
   const [date, setDate] = useState(initial?.date ?? todayISO());
   const [error, setError] = useState<string | null>(null);
+
+  // Only the categories on the chosen side of the book are offered.
+  const available = useMemo(
+    () => categories.filter((c) => c.type === type),
+    [categories, type]
+  );
+  // Falls back to the first available whenever the current pick doesn't belong
+  // to this side — which happens right after flipping the type toggle.
+  const selected =
+    available.some((c) => c.id === categoryId) ? categoryId : available[0]?.id ?? "";
+
+  function onTypeChange(next: TransactionType) {
+    setType(next);
+    const stillValid = categories.some(
+      (c) => c.id === categoryId && c.type === next
+    );
+    if (!stillValid) setCategoryId("");
+  }
 
   function onAmountChange(raw: string) {
     setAmount(formatAmountInput(raw));
@@ -58,13 +69,16 @@ export default function TransactionForm({
       setError("Enter a valid amount greater than 0.");
       return;
     }
-    const categoryName =
-      categories.find((c) => c.id === category)?.name ?? category;
+    if (!selected) {
+      setError(`Create an ${type} category first.`);
+      return;
+    }
+    const categoryName = categories.find((c) => c.id === selected)?.name ?? "";
     const payload = {
       type,
       amount: value,
-      category: type === "income" ? INCOME_CATEGORY_ID : category,
-      description: description.trim() || (type === "income" ? "Income" : categoryName),
+      categoryId: selected,
+      description: description.trim() || categoryName,
       date,
     };
     if (initial) {
@@ -87,7 +101,7 @@ export default function TransactionForm({
           <button
             key={t}
             type="button"
-            onClick={() => setType(t)}
+            onClick={() => onTypeChange(t)}
             className={`cursor-pointer rounded-lg py-2 text-sm font-semibold transition ${
               type === t
                 ? t === "expense"
@@ -113,30 +127,29 @@ export default function TransactionForm({
         />
       </div>
 
-      {type === "expense" && (
-        <div>
-          <label className="stat-label">Category</label>
-          <Select
-            className="mt-1"
-            ariaLabel="Category"
-            value={category}
-            onChange={(v) => setCategory(v as Category)}
-            options={expenseCategories.map((c) => ({
-              value: c.id,
-              label: c.name,
-              icon: categoryIcon(c.icon),
-              iconColor: c.color,
-            }))}
-          />
-        </div>
-      )}
+      <div>
+        <label className="stat-label">Category</label>
+        <Select
+          className="mt-1"
+          ariaLabel="Category"
+          value={selected}
+          placeholder="No categories yet"
+          onChange={setCategoryId}
+          options={available.map((c) => ({
+            value: c.id,
+            label: c.name,
+            icon: categoryIcon(c.icon),
+            iconColor: c.color,
+          }))}
+        />
+      </div>
 
       <div>
         <label className="stat-label">Description</label>
         <input
           className="input mt-1"
           placeholder={
-            type === "income" ? "Salary, freelance…" : "e.g. Delivery, Uber…"
+            type === "income" ? "e.g. May salary…" : "e.g. Delivery, Uber…"
           }
           value={description}
           onChange={(e) => setDescription(e.target.value)}

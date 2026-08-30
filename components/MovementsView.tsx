@@ -10,7 +10,7 @@ import TransactionList from "./TransactionList";
 import FiltersBar from "./Filters";
 
 const DEFAULT_FILTERS: Filters = {
-  category: "all",
+  categoryId: "all",
   type: "all",
   month: "all",
   search: "",
@@ -29,7 +29,7 @@ export default function MovementsView() {
     const needle = filters.search.trim().toLowerCase();
     return transactions
       .filter((t) => {
-        if (filters.category !== "all" && t.category !== filters.category) return false;
+        if (filters.categoryId !== "all" && t.categoryId !== filters.categoryId) return false;
         if (filters.type !== "all" && t.type !== filters.type) return false;
         if (filters.month !== "all" && monthKeyOf(t.date) !== filters.month) return false;
         if (needle && !t.description.toLowerCase().includes(needle)) return false;

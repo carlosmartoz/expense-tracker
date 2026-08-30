@@ -1,4 +1,4 @@
-import type { Transaction, Category, TransactionType } from "./types";
+import type { Transaction, TransactionType } from "./types";
 
 let counter = 0;
 function id(): string {
@@ -9,11 +9,11 @@ function id(): string {
 function tx(
   type: TransactionType,
   amount: number,
-  category: Category,
+  categoryId: string,
   description: string,
   date: string
 ): Transaction {
-  return { id: id(), type, amount, category, description, date };
+  return { id: id(), type, amount, categoryId, description, date };
 }
 
 /**
@@ -37,9 +37,9 @@ export function buildSeedData(reference = new Date()): Transaction[] {
     const isPrev = back === 1;
 
     // Salary income
-    out.push(tx("income", 950000, "Income", "Salary", day(3)));
+    out.push(tx("income", 950000, "Salary", "Salary", day(3)));
     if (isCurrent || isPrev) {
-      out.push(tx("income", 120000, "Income", "Freelance", day(18)));
+      out.push(tx("income", 120000, "Freelance", "Freelance", day(18)));
     }
 
     // Food + delivery (spike in current month)
@@ -62,24 +62,32 @@ export function buildSeedData(reference = new Date()): Transaction[] {
       out.push(tx("expense", 2800 + (i % 4) * 600, "Transport", "Uber", day(1 + i * 2)));
     }
 
-    // Subscriptions (grows in the last month)
-    out.push(tx("expense", 4990, "Subscriptions", "Netflix", day(5)));
-    out.push(tx("expense", 3490, "Subscriptions", "Spotify", day(7)));
+    // Entertainment: subscriptions and games (grows in the last month)
+    out.push(tx("expense", 4990, "Entertainment", "Netflix", day(5)));
+    out.push(tx("expense", 3490, "Entertainment", "Spotify", day(7)));
     if (isCurrent) {
-      out.push(tx("expense", 7990, "Subscriptions", "HBO Max", day(8)));
-      out.push(tx("expense", 5990, "Subscriptions", "ChatGPT Plus", day(9)));
+      out.push(tx("expense", 7990, "Entertainment", "HBO Max", day(8)));
+      out.push(tx("expense", 5990, "Entertainment", "Cinema", day(9)));
     } else if (isPrev) {
-      out.push(tx("expense", 7990, "Subscriptions", "HBO Max", day(8)));
+      out.push(tx("expense", 7990, "Entertainment", "HBO Max", day(8)));
     }
-
-    // Gaming
     if (back % 2 === 0) {
-      out.push(tx("expense", 12000, "Gaming", "Steam", day(14)));
+      out.push(tx("expense", 12000, "Entertainment", "Steam", day(14)));
     }
 
-    // Home
+    // Home and the bills that come with it
     out.push(tx("expense", 38000, "Home", "Rent / Fees", day(10)));
-    out.push(tx("expense", 9500, "Home", "Utilities (power/gas)", day(12)));
+    out.push(tx("expense", 9500, "Services", "Power and gas", day(12)));
+    out.push(tx("expense", 6200, "Services", "Internet", day(13)));
+
+    // Health and shopping, so every default category shows up somewhere
+    if (back % 2 === 1) {
+      out.push(tx("expense", 15000, "Health", "Dentist", day(20)));
+    }
+    out.push(tx("expense", 22000, "Shopping", isCurrent ? "Sneakers" : "Clothes", day(16)));
+    if (isCurrent) {
+      out.push(tx("expense", 3800, "Other", "Misc", day(22)));
+    }
   }
 
   return out;

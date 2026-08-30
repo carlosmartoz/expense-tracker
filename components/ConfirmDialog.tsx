@@ -71,7 +71,7 @@ export default function ConfirmDialog({
           <div className="min-w-0">
             <h2 className="text-lg font-bold text-text-primary">{title}</h2>
             {message && (
-              <p className="mt-1 text-sm text-text-secondary">{message}</p>
+              <div className="mt-1 text-sm text-text-secondary">{message}</div>
             )}
           </div>
         </div>
