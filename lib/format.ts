@@ -1,4 +1,4 @@
-import { CURRENCY } from "./config";
+import { CURRENCY, LOCALE } from "./config";
 
 // Amounts follow the currency's own convention — for ARS that's "2.672.371,00":
 // dot for thousands, comma for the decimal, always two decimals.
@@ -58,7 +58,7 @@ export function formatMonthKey(monthKey: string): string {
   // monthKey: "YYYY-MM"
   const [year, month] = monthKey.split("-").map(Number);
   const d = new Date(year, month - 1, 1);
-  return d.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  return d.toLocaleDateString(LOCALE, { month: "long", year: "numeric" });
 }
 
 export function monthKeyOf(isoDate: string): string {
@@ -67,7 +67,7 @@ export function monthKeyOf(isoDate: string): string {
 
 export function formatDate(isoDate: string): string {
   const d = new Date(isoDate + "T00:00:00");
-  return d.toLocaleDateString("en-US", {
+  return d.toLocaleDateString(LOCALE, {
     day: "2-digit",
     month: "short",
     year: "numeric",

@@ -10,7 +10,8 @@ import {
 import { Gem, TrendingUp, CreditCard, PiggyBank } from "lucide-react";
 import { motion } from "motion/react";
 import { stagger, cardItem } from "@/lib/motion";
-import { formatMoney, formatMonthKey, formatPercent } from "@/lib/format";
+import { formatMoney, formatMonthKey, formatPercent, monthKeyOf } from "@/lib/format";
+import Select, { type SelectOption } from "./Select";
 import StatCard from "./StatCard";
 import CountUp from "./CountUp";
 import EmptyState from "./EmptyState";
@@ -51,13 +52,37 @@ export default function Dashboard({
 }) {
   const { transactions, hydrated } = useStore();
   const play = useDashboardIntro();
+  const [picked, setPicked] = useState<string | null>(null);
 
   const months = useMemo(
     () => summarizeAllMonths(transactions),
     [transactions],
   );
-  const current = months[months.length - 1];
-  const previous = months.length > 1 ? months[months.length - 2] : null;
+
+  // Open on this month when there's something in it, otherwise on the most
+  // recent month that has anything — an empty page helps nobody.
+  const defaultMonthKey = useMemo(() => {
+    if (months.length === 0) return null;
+    const thisMonth = monthKeyOf(new Date().toISOString().slice(0, 10));
+    return months.some((m) => m.monthKey === thisMonth)
+      ? thisMonth
+      : months[months.length - 1].monthKey;
+  }, [months]);
+
+  // A month picked by hand wins, until the data stops having it.
+  const activeKey =
+    picked && months.some((m) => m.monthKey === picked) ? picked : defaultMonthKey;
+  const index = months.findIndex((m) => m.monthKey === activeKey);
+  const current = index >= 0 ? months[index] : undefined;
+  const previous = index > 0 ? months[index - 1] : null;
+
+  const monthOptions: SelectOption[] = useMemo(
+    () =>
+      [...months]
+        .reverse()
+        .map((m) => ({ value: m.monthKey, label: formatMonthKey(m.monthKey) })),
+    [months],
+  );
 
   const pie = useMemo(
     () => (current ? expenseByCategory(transactions, current.monthKey) : []),
@@ -86,13 +111,27 @@ export default function Dashboard({
       initial="hidden"
       animate="show"
     >
-      <motion.div variants={cardItem}>
-        <h1 className="text-2xl font-bold tracking-tight">
-          Here's your overview
-        </h1>
-        <p className="text-sm text-text-subtle">
-          {formatMonthKey(current.monthKey)}
-        </p>
+      <motion.div
+        className="flex flex-wrap items-end justify-between gap-3"
+        variants={cardItem}
+      >
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">
+            Here&apos;s your overview
+          </h1>
+          <p className="text-sm text-text-subtle">
+            {months.length === 1
+              ? "Your only month so far"
+              : `${months.length} months on record`}
+          </p>
+        </div>
+        <Select
+          className="w-[190px]"
+          ariaLabel="Month shown"
+          value={current.monthKey}
+          options={monthOptions}
+          onChange={setPicked}
+        />
       </motion.div>
 
       {/* Top stat cards */}
@@ -110,7 +149,7 @@ export default function Dashboard({
           hint={
             balanceChange !== null && (
               <span className={balanceChange >= 0 ? "text-mint" : "text-coral"}>
-                {formatPercent(balanceChange)} vs last month
+                {formatPercent(balanceChange)} vs previous month
               </span>
             )
           }
@@ -133,7 +172,7 @@ export default function Dashboard({
           hint={
             expenseChange !== null && (
               <span className={expenseChange <= 0 ? "text-mint" : "text-coral"}>
-                {formatPercent(expenseChange)} vs last month
+                {formatPercent(expenseChange)} vs previous month
               </span>
             )
           }
@@ -187,7 +226,7 @@ export default function Dashboard({
           <p className="mb-3 text-xs text-text-secondary">
             {previous
               ? `${formatMonthKey(previous.monthKey)} vs ${formatMonthKey(current.monthKey)}`
-              : "Needs at least two months"}
+              : "Nothing recorded before this month"}
           </p>
           {previous ? (
             <MonthComparison
@@ -196,8 +235,9 @@ export default function Dashboard({
               animate={play}
             />
           ) : (
-            <div className="grid h-[300px] place-items-center text-sm text-text-secondary">
-              Add transactions from another month to compare.
+            <div className="grid h-[300px] place-items-center px-6 text-center text-sm text-text-secondary">
+              This is your earliest month, so there is nothing to compare it
+              against yet.
             </div>
           )}
         </div>

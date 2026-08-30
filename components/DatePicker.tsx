@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
 import { formatDate } from "@/lib/format";
+import { LOCALE } from "@/lib/config";
 
 interface DatePickerProps {
   /** ISO date string, YYYY-MM-DD. */
@@ -64,7 +65,7 @@ export default function DatePicker({
 
   const firstWeekday = new Date(view.y, view.m, 1).getDay();
   const daysInMonth = new Date(view.y, view.m + 1, 0).getDate();
-  const monthLabel = new Date(view.y, view.m, 1).toLocaleDateString("en-US", {
+  const monthLabel = new Date(view.y, view.m, 1).toLocaleDateString(LOCALE, {
     month: "long",
     year: "numeric",
   });
