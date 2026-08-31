@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { load, save, migrate, VERSION, type Snapshot } from "./storage";
-import { CATEGORY_COLORS, DEFAULT_CATEGORIES } from "./types";
+import { CATEGORY_COLOR_VALUES, DEFAULT_CATEGORIES } from "./types";
 import type { Category, Transaction } from "./types";
 
 /**
@@ -93,7 +93,7 @@ describe("adopting the two old keys", () => {
 });
 
 describe("climbing the migration chain", () => {
-  it.each([1, 2, 3, 4, 5, 6, 7, 8])("reaches the current version starting from v%i", (from) => {
+  it.each([1, 2, 3, 4, 5, 6, 7, 8, 9])("reaches the current version starting from v%i", (from) => {
     localStorage.setItem(KEY, JSON.stringify(asSnapshot(from)));
     expect(load()?.version).toBe(VERSION);
   });
@@ -164,7 +164,7 @@ describe("climbing the migration chain", () => {
 
   it("puts every category on a colour from the current palette", () => {
     const out = migrate(asSnapshot(1));
-    const palette: string[] = [...CATEGORY_COLORS];
+    const palette = CATEGORY_COLOR_VALUES;
     expect(out.categories.every((c) => palette.includes(c.color))).toBe(true);
   });
 

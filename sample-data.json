@@ -1,5 +1,5 @@
 {
-  "version": 8,
+  "version": 9,
   "transactions": [
     {
       "id": "seed-mtgeqgpr-1",
@@ -1044,7 +1044,7 @@
       "id": "Services",
       "name": "Services",
       "color": "#ec4899",
-      "icon": "Wrench",
+      "icon": "Wifi",
       "type": "expense"
     },
     {

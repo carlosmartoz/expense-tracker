@@ -1,5 +1,5 @@
 import type { Transaction, Category, TransactionType } from "./types";
-import { CATEGORY_COLORS, DEFAULT_CATEGORIES } from "./types";
+import { CATEGORY_COLOR_VALUES, DEFAULT_CATEGORIES } from "./types";
 
 /**
  * Reading and writing the browser's copy of your data. This module owns the
@@ -9,7 +9,7 @@ import { CATEGORY_COLORS, DEFAULT_CATEGORIES } from "./types";
 const KEY = "expense-tracker";
 
 /** Bumped whenever the stored shape changes. See MIGRATIONS below. */
-export const VERSION = 8;
+export const VERSION = 9;
 
 /** The two keys the app wrote to before everything moved under a single one. */
 const LEGACY_TRANSACTIONS_KEY = "expense-tracker:transactions:v2";
@@ -104,8 +104,12 @@ const MIGRATIONS: ((snapshot: Snapshot) => Snapshot)[] = [
   (snapshot) => restoreDefaults(snapshot),
 
   // 7 -> 8: the palette was picked by hand rather than borrowed, so the
-  // shipped categories move again. Same rule as the step before it, which is
-  // why they share an implementation.
+  // shipped categories move again.
+  (snapshot) => restoreDefaults(snapshot),
+
+  // 8 -> 9: Services swaps its spanner for a wifi mark. Same step again —
+  // now that a default can't be edited, code is the only source for its
+  // colour and icon, and a stored copy that disagrees has to be corrected.
   (snapshot) => restoreDefaults(snapshot),
 ];
 
@@ -129,7 +133,7 @@ function recolour(snapshot: Snapshot): Snapshot {
     ...snapshot,
     categories: snapshot.categories.map((c, i) => ({
       ...c,
-      color: CATEGORY_COLORS[i % CATEGORY_COLORS.length],
+      color: CATEGORY_COLOR_VALUES[i % CATEGORY_COLOR_VALUES.length],
     })),
   };
 }

@@ -25,6 +25,7 @@ interface StoreValue {
   /** Swaps in an imported backup, replacing everything currently held. */
   replaceAll: (next: { transactions: Transaction[]; categories: Category[] }) => void;
   addCategory: (c: { name: string; color: string; type: TransactionType }) => void;
+  /** Renames or recolours a category. Refuses on a default: those are fixed. */
   updateCategory: (id: string, patch: { name?: string; color?: string }) => void;
   /** Adds any category from DEFAULT_CATEGORIES this ledger doesn't have yet. */
   addMissingDefaults: () => void;
@@ -127,7 +128,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           );
           return missing.length ? [...prev, ...missing] : prev;
         }),
-      updateCategory: (id, patch) =>
+      updateCategory: (id, patch) => {
+        if (isDefaultCategory(id)) return;
         setCategories((prev) =>
           prev.map((c) => {
             if (c.id !== id) return c;
@@ -138,7 +140,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
               ...(patch.color ? { color: patch.color } : {}),
             };
           })
-        ),
+        );
+      },
       deleteCategory: (id, moveToId) => {
         if (isDefaultCategory(id)) return;
         const target = categories.find((c) => c.id === id);

@@ -33,7 +33,7 @@ export default function CategoriesView() {
   } = useStore();
 
   const [name, setName] = useState("");
-  const [color, setColor] = useState<string>(CATEGORY_COLORS[0]);
+  const [color, setColor] = useState<string>(CATEGORY_COLORS[0].value);
   const [type, setType] = useState<TransactionType>("expense");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<Category | null>(null);
@@ -92,12 +92,14 @@ export default function CategoriesView() {
   function resetForm() {
     setEditingId(null);
     setName("");
-    setColor(CATEGORY_COLORS[0]);
+    setColor(CATEGORY_COLORS[0].value);
     setType("expense");
     setError(null);
   }
 
   function startEdit(cat: Category) {
+    // The button isn't rendered for a default; this only catches a stray call.
+    if (isDefaultCategory(cat.id)) return;
     setEditingId(cat.id);
     setName(cat.name);
     setColor(cat.color);
@@ -236,33 +238,46 @@ export default function CategoriesView() {
             <label className="stat-label">Colour</label>
             <div className="mt-2 flex flex-wrap gap-2.5">
               {CATEGORY_COLORS.map((c) => {
-                const selected = c === color;
+                const selected = c.value === color;
                 return (
-                  <motion.button
-                    key={c}
-                    type="button"
-                    onClick={() => {
-                      clearError();
-                      setColor(c);
-                    }}
-                    aria-label={`Select colour ${c}`}
-                    aria-pressed={selected}
-                    style={{ backgroundColor: c }}
-                    whileHover={{ scale: 1.12 }}
-                    whileTap={{ scale: 0.92 }}
-                    className={`grid h-8 w-8 cursor-pointer place-items-center rounded-full transition ${
-                      selected
-                        ? "ring-2 ring-text-primary ring-offset-2 ring-offset-surface-panel"
-                        : ""
-                    }`}
-                  >
-                    {selected && (
-                      <Check
-                        className="h-4 w-4 text-surface-base"
-                        strokeWidth={3}
-                      />
-                    )}
-                  </motion.button>
+                  <div key={c.value} className="group relative">
+                    <motion.button
+                      type="button"
+                      onClick={() => {
+                        clearError();
+                        setColor(c.value);
+                      }}
+                      aria-label={c.name}
+                      aria-pressed={selected}
+                      style={{ backgroundColor: c.value }}
+                      whileHover={{ scale: 1.12 }}
+                      whileTap={{ scale: 0.92 }}
+                      className={`grid h-8 w-8 cursor-pointer place-items-center rounded-full transition ${
+                        selected
+                          ? "ring-2 ring-text-primary ring-offset-2 ring-offset-surface-panel"
+                          : ""
+                      }`}
+                    >
+                      {selected && (
+                        <Check
+                          className="h-4 w-4 text-surface-base"
+                          strokeWidth={3}
+                        />
+                      )}
+                    </motion.button>
+                    {/* The swatch alone can't say which red it is. Shown on
+                        hover and on keyboard focus, and out of the layout so
+                        it can't nudge the grid. */}
+                    <span
+                      role="tooltip"
+                      className="pointer-events-none absolute -top-7 left-1/2 z-10 -translate-x-1/2
+                        whitespace-nowrap rounded-md border border-border bg-surface-raised px-2
+                        py-0.5 text-xs text-text-primary opacity-0 transition-opacity
+                        group-hover:opacity-100 group-focus-within:opacity-100"
+                    >
+                      {c.name}
+                    </span>
+                  </div>
                 );
               })}
             </div>
@@ -360,17 +375,20 @@ export default function CategoriesView() {
                                 : `${used} transaction${used === 1 ? "" : "s"}`}
                             </p>
                           </div>
-                          <button
-                            onClick={() => startEdit(cat)}
-                            className="shrink-0 cursor-pointer rounded-lg p-2 text-text-secondary transition hover:bg-border hover:text-text-primary"
-                            aria-label={`Edit ${cat.name}`}
-                            title="Edit"
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </button>
-                          {/* A default has no delete button rather than a
-                              disabled one: an affordance that never works is
-                              worse than none. */}
+                          {/* A default carries no buttons rather than
+                              disabled ones: an affordance that never works is
+                              worse than none. It is fixed — the app's own
+                              vocabulary, not a starting point to edit. */}
+                          {!isDefaultCategory(cat.id) && (
+                            <button
+                              onClick={() => startEdit(cat)}
+                              className="shrink-0 cursor-pointer rounded-lg p-2 text-text-secondary transition hover:bg-border hover:text-text-primary"
+                              aria-label={`Edit ${cat.name}`}
+                              title="Edit"
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </button>
+                          )}
                           {!isDefaultCategory(cat.id) && (
                             <button
                               onClick={() => askRemove(cat)}

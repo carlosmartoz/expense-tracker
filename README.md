@@ -113,14 +113,21 @@ When you change the shape of stored data, append a step rather than editing an
 old one, and add a test — this is the only place a mistake destroys something
 that can't be recovered.
 
-**Categories belong to the user, with a floor.** `DEFAULT_CATEGORIES` only
-seeds a browser that has never held data, and after that the list is theirs to
-rename and recolour. What they can't do is delete a default: a ledger always
-needs somewhere to put a transaction, and the "Other" buckets are what the
-delete dialog falls back to. Membership is decided by id against that list
-rather than a stored flag, so there's no second copy of the truth to drift —
-and a category retired from the defaults stops being protected, which is
-correct.
+**Defaults are fixed; everything else belongs to the user.** A category in
+`DEFAULT_CATEGORIES` can't be renamed, recoloured or deleted — it is the app's
+own vocabulary, and a ledger always needs somewhere to put a transaction, with
+the "Other" buckets as the floor the delete dialog falls back to. A default
+carries no edit or delete button at all rather than disabled ones. Everything
+the reader creates stays fully theirs.
+
+Membership is decided by id against that list rather than a stored flag, so
+there's no second copy of the truth to drift — and a category retired from the
+defaults stops being protected, which is correct.
+
+Because a default can't be edited, code is the only source for its colour and
+icon, and a stored copy that disagrees is stale. That is what `restoreDefaults`
+in the migration chain is for: change a default in `lib/types.ts` and append a
+step that calls it.
 
 A migration should type or clean the list, never curate it — a category
 someone deleted shouldn't reappear because the app shipped an update.
@@ -151,7 +158,7 @@ variant rather than writing a one-off. The whole app is wrapped in
 npm test
 ```
 
-83 tests, mostly over `lib/`, which is where a mistake is silent: the
+88 tests, mostly over `lib/`, which is where a mistake is silent: the
 migration chain step by step, the backup round-trip, the ceiling on an amount,
 and the money and date formatting. `components/Portal.test.tsx` is the
 exception — it pins down that overlays render into `<body>`, which is

@@ -3,7 +3,7 @@ import {
   UtensilsCrossed,
   ShoppingCart,
   Car,
-  Wrench,
+  Wifi,
   HeartPulse,
   Clapperboard,
   ShoppingBag,
@@ -12,6 +12,7 @@ import {
   Wallet,
   PiggyBank,
   Tag,
+  Wrench,
   Briefcase,
   Receipt,
   House,
@@ -50,8 +51,8 @@ const ICON_MAP: Record<string, LucideIcon> = {
   UtensilsCrossed,
   ShoppingCart,
   Car,
-  Wrench,
   HeartPulse,
+  Wifi,
   Clapperboard,
   Gamepad2,
   ShoppingBag,
@@ -60,6 +61,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
   PiggyBank,
   Tag,
   // Behind categories that shipped with older versions.
+  Wrench,
   Briefcase,
   Receipt,
   House,
@@ -84,17 +86,22 @@ export function categoryIcon(icon: string | undefined): LucideIcon {
  * offering. `defaultColoursAreUnique` in the tests holds the invariant.
  */
 export const CATEGORY_COLORS = [
-  "#ffffff", // white — the catch-all, on both sides
-  "#ef4444", // red
-  "#f97316", // orange
-  "#eab308", // yellow
-  "#22c55e", // green
-  "#06b6d4", // cyan
-  "#3b82f6", // blue
-  "#8b5cf6", // violet
-  "#d946ef", // fuchsia
-  "#ec4899", // pink
+  { value: "#ffffff", name: "White" },
+  { value: "#ef4444", name: "Red" },
+  { value: "#f97316", name: "Orange" },
+  { value: "#eab308", name: "Yellow" },
+  { value: "#22c55e", name: "Green" },
+  { value: "#06b6d4", name: "Cyan" },
+  { value: "#3b82f6", name: "Blue" },
+  { value: "#8b5cf6", name: "Violet" },
+  { value: "#d946ef", name: "Fuchsia" },
+  { value: "#ec4899", name: "Pink" },
 ] as const;
+
+/** The hex values on their own, for anything that only needs to check one. */
+export const CATEGORY_COLOR_VALUES: readonly string[] = CATEGORY_COLORS.map(
+  (c) => c.value
+);
 
 /**
  * The categories the app ships with. They can be renamed and recoloured like
@@ -111,7 +118,7 @@ export const DEFAULT_CATEGORIES: Category[] = [
   { id: "Food", name: "Food", color: "#ef4444", icon: "UtensilsCrossed", type: "expense" },
   { id: "Supermarket", name: "Supermarket", color: "#eab308", icon: "ShoppingCart", type: "expense" },
   { id: "Transport", name: "Transport", color: "#06b6d4", icon: "Car", type: "expense" },
-  { id: "Services", name: "Services", color: "#ec4899", icon: "Wrench", type: "expense" },
+  { id: "Services", name: "Services", color: "#ec4899", icon: "Wifi", type: "expense" },
   { id: "Health", name: "Health", color: "#22c55e", icon: "HeartPulse", type: "expense" },
   { id: "Entertainment", name: "Entertainment", color: "#d946ef", icon: "Clapperboard", type: "expense" },
   { id: "Gaming", name: "Gaming", color: "#8b5cf6", icon: "Gamepad2", type: "expense" },
