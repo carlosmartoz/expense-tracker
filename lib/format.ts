@@ -1,5 +1,6 @@
 import { CURRENCY, LOCALE } from "./config";
 import type { Transaction } from "./types";
+import { MAX_AMOUNT_INTEGER_DIGITS } from "./types";
 
 // Amounts follow the currency's own convention — for ARS that's "2.672.371,00":
 // dot for thousands, comma for the decimal, always two decimals.
@@ -33,9 +34,13 @@ export function parseAmount(input: string): number {
   return Number(normalized);
 }
 
+/** The largest amount the form accepts, e.g. 9999999.99. */
+export const MAX_AMOUNT = Number(`${"9".repeat(MAX_AMOUNT_INTEGER_DIGITS)}.99`);
+
 /**
- * Live-format what the user types into the amount field:
- * group the integer part with dots and allow up to two decimals after a comma.
+ * Live-format what the user types into the amount field: group the integer
+ * part with dots, allow at most two decimals after a comma, and refuse digits
+ * past MAX_AMOUNT_INTEGER_DIGITS so the field can't run away.
  * e.g. "2672371" -> "2.672.371", "2672371,5" -> "2.672.371,5".
  */
 export function formatAmountInput(raw: string): string {
@@ -49,6 +54,7 @@ export function formatAmountInput(raw: string): string {
   }
   let [intPart, decPart] = cleaned.split(",");
   intPart = intPart.replace(/^0+(?=\d)/, ""); // strip leading zeros
+  intPart = intPart.slice(0, MAX_AMOUNT_INTEGER_DIGITS); // and cap the length
   if (intPart === "") intPart = decPart !== undefined ? "0" : "";
   const grouped = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   if (decPart !== undefined) return `${grouped},${decPart.slice(0, 2)}`;

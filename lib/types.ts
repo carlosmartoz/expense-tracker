@@ -99,6 +99,14 @@ export const DEFAULT_CATEGORIES: Category[] = [
 /** Max characters for a category name. */
 export const MAX_CATEGORY_NAME_LENGTH = 24;
 
+/**
+ * How many digits an amount may have before the decimal comma. Seven covers
+ * anything up to 9.999.999,99, which is roomy for a personal ledger and short
+ * enough that a slipped keypress can't turn 30.000 into 30.000.000. Decimals
+ * are always the two after the comma. Raise it here and nowhere else.
+ */
+export const MAX_AMOUNT_INTEGER_DIGITS = 7;
+
 export interface Transaction {
   id: string;
   type: TransactionType;

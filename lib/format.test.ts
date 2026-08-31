@@ -5,10 +5,12 @@ import {
   formatDate,
   formatMoney,
   formatMonthKey,
+  MAX_AMOUNT,
   monthKeyOf,
   parseAmount,
   sortedMonthKeys,
 } from "./format";
+import { MAX_AMOUNT_INTEGER_DIGITS } from "./types";
 
 /**
  * The app reads in English and counts money the Argentine way. That pairing is
@@ -63,6 +65,45 @@ describe("reading what was typed", () => {
     ["abc", ""],
   ])("groups %s into %s as it is typed", (raw, expected) => {
     expect(formatAmountInput(raw)).toBe(expected);
+  });
+});
+
+describe("the ceiling on an amount", () => {
+  it("is nine nines with two decimals", () => {
+    expect(MAX_AMOUNT).toBe(9999999.99);
+    expect(formatMoney(MAX_AMOUNT)).toBe("$ 9.999.999,99");
+  });
+
+  it("comfortably clears a seven-figure amount", () => {
+    expect(formatAmountInput("3000000")).toBe("3.000.000");
+    expect(parseAmount("3.000.000,00")).toBeLessThan(MAX_AMOUNT);
+  });
+
+  it.each([
+    ["30000000", "3.000.000"],
+    ["999999999999", "9.999.999"],
+    ["12345678,999", "1.234.567,99"],
+    ["99999999,99", "9.999.999,99"],
+  ])("refuses the digits past the cap: %s becomes %s", (raw, expected) => {
+    expect(formatAmountInput(raw)).toBe(expected);
+  });
+
+  it("never lets the field exceed the ceiling, whatever is typed", () => {
+    for (const raw of ["9".repeat(20), "9".repeat(20) + ",99", "123456789012345,67"]) {
+      expect(parseAmount(formatAmountInput(raw))).toBeLessThanOrEqual(MAX_AMOUNT);
+    }
+  });
+
+  it("counts only the digits before the comma", () => {
+    const digits = formatAmountInput("9".repeat(20) + ",99")
+      .split(",")[0]
+      .replace(/\./g, "").length;
+    expect(digits).toBe(MAX_AMOUNT_INTEGER_DIGITS);
+  });
+
+  it("leaves short amounts completely alone", () => {
+    expect(formatAmountInput("6500")).toBe("6.500");
+    expect(formatAmountInput("12,5")).toBe("12,5");
   });
 });
 

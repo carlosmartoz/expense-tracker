@@ -4,10 +4,17 @@ import { useMemo, useState } from "react";
 import { useStore } from "@/lib/store";
 import {
   categoryIcon,
+  MAX_AMOUNT_INTEGER_DIGITS,
   type Transaction,
   type TransactionType,
 } from "@/lib/types";
-import { formatAmount, formatAmountInput, parseAmount } from "@/lib/format";
+import {
+  formatAmount,
+  formatAmountInput,
+  formatMoney,
+  MAX_AMOUNT,
+  parseAmount,
+} from "@/lib/format";
 import Select, { type SelectOption } from "./Select";
 import DatePicker from "./DatePicker";
 
@@ -33,6 +40,7 @@ export default function TransactionForm({
   const [description, setDescription] = useState(initial?.description ?? "");
   const [date, setDate] = useState(initial?.date ?? todayISO());
   const [error, setError] = useState<string | null>(null);
+  const [atLimit, setAtLimit] = useState(false);
 
   // Only the categories on the chosen side of the book are offered.
   const available = useMemo(
@@ -53,6 +61,10 @@ export default function TransactionForm({
   }
 
   function onAmountChange(raw: string) {
+    // Digits past the cap are dropped on the way in. Say so, or the field
+    // just looks like it stopped responding.
+    const typed = raw.replace(/[^\d,]/g, "").split(",")[0].replace(/^0+(?=\d)/, "");
+    setAtLimit(typed.length > MAX_AMOUNT_INTEGER_DIGITS);
     setAmount(formatAmountInput(raw));
   }
 
@@ -67,6 +79,12 @@ export default function TransactionForm({
     const value = parseAmount(amount);
     if (!value || value <= 0) {
       setError("Enter a valid amount greater than 0.");
+      return;
+    }
+    // The field caps what can be typed, but an amount that arrived by import
+    // can be over it and reach here through the edit form.
+    if (value > MAX_AMOUNT) {
+      setError(`The most you can enter is ${formatMoney(MAX_AMOUNT)}.`);
       return;
     }
     if (!selected) {
@@ -89,6 +107,7 @@ export default function TransactionForm({
       setAmount("");
       setDescription("");
     }
+    setAtLimit(false);
     setError(null);
     onDone?.();
   }
@@ -122,7 +141,13 @@ export default function TransactionForm({
           value={amount}
           onChange={(e) => onAmountChange(e.target.value)}
           onBlur={onAmountBlur}
+          aria-describedby={atLimit ? "amount-limit" : undefined}
         />
+        {atLimit && (
+          <p id="amount-limit" className="mt-1 text-xs text-text-secondary">
+            {formatMoney(MAX_AMOUNT)} is the most you can enter.
+          </p>
+        )}
       </div>
 
       <div>
