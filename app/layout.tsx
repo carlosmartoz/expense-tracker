@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { StoreProvider } from "@/lib/store";
-import MotionProvider from "@/components/MotionProvider";
+import MotionProvider from "@/components/shell/MotionProvider";
 import { APP_NAME, LOCALE } from "@/lib/config";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });

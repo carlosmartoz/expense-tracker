@@ -7,7 +7,7 @@ import { viewTransition } from "@/lib/motion";
 import { APP_NAME } from "@/lib/config";
 import TransactionsView from "@/components/transactions/TransactionsView";
 import CategoriesView from "@/components/categories/CategoriesView";
-import DataMenu from "@/components/DataMenu";
+import DataMenu from "@/components/shell/DataMenu";
 
 type Tab = "movements" | "categories";
 

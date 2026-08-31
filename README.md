@@ -58,22 +58,26 @@ worth having.
 
 ```
 app/
-  globals.css      Tailwind v4 and the dark theme (tokens in @theme)
-  layout.tsx       Fonts and the global provider
-  page.tsx         Shell and navigation
+  globals.css       Tailwind v4 and the dark theme (tokens in @theme)
+  layout.tsx        fonts and the global providers
+  page.tsx          navigation between the two screens
 components/
-  transactions/  TransactionsView and the ledger: form, list, filters, empty state
-  categories/    CategoriesView
-  ui/            Select, DatePicker, ConfirmDialog, Portal — generic pieces
-  DataMenu, MotionProvider                   app shell
+  shell/            DataMenu, MotionProvider — the app frame
+  transactions/     TransactionsView, and the ledger it is made of
+  categories/       CategoriesView
+  ui/               Select, DatePicker, ConfirmDialog, Portal — generic pieces
 lib/
-  config.ts        app name, locale, currency — start here to re-skin
-  types.ts         the whole data model: Transaction and Category
-  storage.ts       reading and writing localStorage, and the migration chain
-  backup.ts        the JSON backup, out and back in
-  store.tsx        state and the operations on it (Context)
-  format.ts        money, dates and the months a ledger covers
-  motion.ts        shared animation variants
+  config.ts         app name, locale, currency — start here to re-skin
+  types.ts          the data model: Transaction and Category
+  storage.ts        localStorage and the migration chain
+  backup.ts         the JSON backup, out and back in
+  store.tsx         state and the operations on it (Context)
+  format.ts         money, dates and the months a ledger covers
+  motion.ts         shared animation variants
+tests/              mirrors the tree above
+  setup.ts          an in-memory localStorage the suite controls
+  lib/              storage, backup, format, types
+  components/ui/    Portal
 ```
 
 ### Things worth knowing before you change anything
@@ -164,7 +168,7 @@ npm test
 
 92 tests, mostly over `lib/`, which is where a mistake is silent: the
 migration chain step by step, the backup round-trip, the ceiling on an amount,
-and the money and date formatting. `components/Portal.test.tsx` is the
+and the money and date formatting. `tests/components/ui/Portal.test.tsx` is the
 exception — it pins down that overlays render into `<body>`, which is
 structural and can't be eyeballed. The rest of the UI isn't covered; it's
 checked by using it.

@@ -4,7 +4,7 @@ import {
   CATEGORY_COLOR_VALUES,
   DEFAULT_CATEGORIES,
   isDefaultCategory,
-} from "./types";
+} from "@/lib/types";
 
 // Rules a hand edit could break silently: a colour reused, an entry dangling.
 

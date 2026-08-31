@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
-import { BackupError, backupFilename, parseJSON, toJSON } from "./backup";
-import { VERSION } from "./storage";
-import type { Category, Transaction } from "./types";
+import { BackupError, backupFilename, parseJSON, toJSON } from "@/lib/backup";
+import { VERSION } from "@/lib/storage";
+import type { Category, Transaction } from "@/lib/types";
 
 /** The demo file the repo ships, used as a realistic fixture. */
 const SAMPLE = JSON.parse(

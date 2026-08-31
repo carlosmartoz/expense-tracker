@@ -9,8 +9,8 @@ import {
   monthKeyOf,
   parseAmount,
   sortedMonthKeys,
-} from "./format";
-import { MAX_AMOUNT_INTEGER_DIGITS } from "./types";
+} from "@/lib/format";
+import { MAX_AMOUNT_INTEGER_DIGITS } from "@/lib/types";
 
 // English text, Argentine money: a deliberate pairing worth pinning down.
 
