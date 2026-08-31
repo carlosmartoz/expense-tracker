@@ -51,8 +51,9 @@ worth having.
 - **Transactions** — the ledger. Add, edit and delete, with the running balance
   for whatever the filters are showing, and filters by month, category, type
   and free text.
-- **Categories** — one list covering both sides of the book. Rename, recolour
-  or remove any of them.
+- **Categories** — one list covering both sides of the book. The ones the app
+  ships with are fixed; anything you add is yours to rename, recolour and
+  remove.
 
 ## How it fits together
 
@@ -61,11 +62,15 @@ app/
   globals.css       Tailwind v4 and the dark theme (tokens in @theme)
   layout.tsx        fonts and the global providers
   page.tsx          navigation between the two screens
-components/
+components/         JSX only; the logic lives in hooks/
   shell/            DataMenu, MotionProvider — the app frame
   transactions/     TransactionsView, and the ledger it is made of
-  categories/       CategoriesView
-  ui/               Select, DatePicker, ConfirmDialog, Portal — generic pieces
+  categories/       CategoriesView, and the pieces it is made of
+  ui/               Select, DatePicker, Modal, ConfirmDialog, Portal,
+                    SegmentedToggle, ColorPicker, Field, ErrorText,
+                    IconButton, CategoryIcon — no app knowledge
+hooks/              a screen's behaviour, testable without rendering it
+  useTransactionForm, useTransactionFilters, useCategories, useBackup
 lib/
   config.ts         app name, locale, currency — start here to re-skin
   types.ts          the data model: Transaction and Category
@@ -108,7 +113,7 @@ Colour is rationed to two jobs, and both earn it:
   two of them collide, plus white shared by the two "Other" buckets, which are
   the same idea on opposite sides of the book. A category you create has to
   reuse one of those eleven; that is the trade for a list short enough to pick
-  from. `lib/types.test.ts` holds the invariant.
+  from. `tests/lib/types.test.ts` holds the invariant.
 
 A useful check when changing any of this: build, then grep the compiled
 stylesheet for hex values whose R, G and B are more than a few points apart.
@@ -145,6 +150,11 @@ sees it, so the Categories screen offers the gap explicitly: when the defaults
 contain something the list doesn't, a button appears to add it. Adding a
 default is then the reader's decision rather than something that happened to
 them.
+
+**A component renders; a hook decides.** Anything with state or rules lives in
+`hooks/`, and the component under it is close to plain JSX. Nothing in
+`components/ui` reads the store or holds app state — it takes props and gives
+back events. A piece there importing `lib/store` is in the wrong folder.
 
 **Native form controls are avoided** so the dark theme holds together: there is
 a custom `Select` and a custom `DatePicker`, both keyboard accessible.
