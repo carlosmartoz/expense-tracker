@@ -143,11 +143,18 @@ export default function TransactionForm({
           onBlur={onAmountBlur}
           aria-describedby={atLimit ? "amount-limit" : undefined}
         />
-        {atLimit && (
-          <p id="amount-limit" className="mt-1 text-xs text-text-secondary">
-            {formatMoney(MAX_AMOUNT)} is the most you can enter.
-          </p>
-        )}
+        {/* Always in the layout, only sometimes visible: rendering it
+            conditionally made the panel jump the moment the cap was hit,
+            which is a lot of movement for a line of guidance. */}
+        <p
+          id="amount-limit"
+          aria-hidden={!atLimit}
+          className={`mt-1 text-xs text-text-secondary ${
+            atLimit ? "" : "invisible"
+          }`}
+        >
+          {formatMoney(MAX_AMOUNT)} is the most you can enter.
+        </p>
       </div>
 
       <div>
