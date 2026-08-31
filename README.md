@@ -63,7 +63,7 @@ components/
   MovementsView, CategoriesView              the two screens
   TransactionForm, TransactionList, Filters  the ledger
   DataMenu, EmptyState                       import/export and first run
-  Select, DatePicker, ConfirmDialog          dark-theme building blocks
+  Select, DatePicker, ConfirmDialog, Portal  dark-theme building blocks
 lib/
   config.ts        app name, locale, currency — start here to re-skin
   types.ts         the whole data model: Transaction and Category
@@ -101,6 +101,11 @@ type or clean it, never curate it.
 **Native form controls are avoided** so the dark theme holds together: there is
 a custom `Select` and a custom `DatePicker`, both keyboard accessible.
 
+**Overlays go through `Portal`.** The sidebar and the new-transaction card are
+both `position: sticky`, which makes each one a stacking context, so a `fixed`
+dialog rendered inside either is trapped there and later siblings paint over
+it. Rendering into `<body>` is the fix; raising the z-index is not.
+
 **Animation is subtle and lives in `lib/motion.ts`.** Reach for a shared
 variant rather than writing a one-off. The whole app is wrapped in
 `MotionConfig reducedMotion="user"`, so it respects `prefers-reduced-motion`.
@@ -113,6 +118,8 @@ variant rather than writing a one-off. The whole app is wrapped in
 npm test
 ```
 
-71 tests over `lib/`, which is where a mistake is silent: the migration chain
-step by step, the backup round-trip in both formats, and the money and date
-formatting. The UI isn't covered — it's checked by using it.
+74 tests, mostly over `lib/`, which is where a mistake is silent: the
+migration chain step by step, the backup round-trip in both formats, and the
+money and date formatting. `components/Portal.test.tsx` is the exception — it
+pins down that overlays render into `<body>`, which is structural and can't be
+eyeballed. The rest of the UI isn't covered; it's checked by using it.

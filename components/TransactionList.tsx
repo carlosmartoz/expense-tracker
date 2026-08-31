@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Pencil, Trash2, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { backdrop, modalPanel } from "@/lib/motion";
+import Portal from "./Portal";
 import type { Transaction } from "@/lib/types";
 import { categoryIcon } from "@/lib/types";
 import { formatMoney, formatDate } from "@/lib/format";
@@ -90,8 +91,9 @@ export default function TransactionList({
         })}
       </ul>
 
-      <AnimatePresence>
-        {editing && (
+      <Portal>
+        <AnimatePresence>
+          {editing && (
         <motion.div
           className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 p-4 backdrop-blur-sm"
           onClick={() => setEditing(null)}
@@ -120,8 +122,9 @@ export default function TransactionList({
             <TransactionForm initial={editing} onDone={() => setEditing(null)} />
           </motion.div>
         </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>
+      </Portal>
 
       <ConfirmDialog
         open={deleting !== null}

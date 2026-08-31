@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { AlertTriangle } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { backdrop, modalPanel } from "@/lib/motion";
+import Portal from "./Portal";
 
 interface Props {
   open: boolean;
@@ -41,8 +42,9 @@ export default function ConfirmDialog({
   }, [open, onCancel]);
 
   return (
-    <AnimatePresence>
-      {open && (
+    <Portal>
+      <AnimatePresence>
+        {open && (
         <motion.div
           className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
           onClick={onCancel}
@@ -90,8 +92,9 @@ export default function ConfirmDialog({
           </button>
         </div>
           </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </Portal>
   );
 }
