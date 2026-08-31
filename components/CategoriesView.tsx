@@ -66,6 +66,11 @@ export default function CategoriesView() {
         }))
     : [];
 
+  /** See TransactionForm: an edit makes the previous attempt's message stale. */
+  function clearError() {
+    if (error) setError(null);
+  }
+
   function resetForm() {
     setEditingId(null);
     setName("");
@@ -154,7 +159,10 @@ export default function CategoriesView() {
                 <button
                   key={s.type}
                   type="button"
-                  onClick={() => setType(s.type)}
+                  onClick={() => {
+                    clearError();
+                    setType(s.type);
+                  }}
                   // A category can't switch sides after it exists: its
                   // transactions would land on the wrong half of the balance.
                   disabled={Boolean(editing)}
@@ -182,7 +190,10 @@ export default function CategoriesView() {
               placeholder="e.g. Health, Travel…"
               value={name}
               maxLength={MAX_CATEGORY_NAME_LENGTH}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                clearError();
+                setName(e.target.value);
+              }}
             />
           </div>
 
@@ -195,7 +206,10 @@ export default function CategoriesView() {
                   <motion.button
                     key={c}
                     type="button"
-                    onClick={() => setColor(c)}
+                    onClick={() => {
+                      clearError();
+                      setColor(c);
+                    }}
                     aria-label={`Select tone ${c}`}
                     aria-pressed={selected}
                     style={{ backgroundColor: c }}

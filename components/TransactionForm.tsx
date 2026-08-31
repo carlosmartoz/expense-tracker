@@ -52,7 +52,17 @@ export default function TransactionForm({
   const selected =
     available.some((c) => c.id === categoryId) ? categoryId : available[0]?.id ?? "";
 
+  /**
+   * A message describes the attempt that produced it, so the moment anything
+   * is edited it stops being true. Guarded so an untouched form doesn't
+   * re-render on every keystroke.
+   */
+  function clearError() {
+    if (error) setError(null);
+  }
+
   function onTypeChange(next: TransactionType) {
+    clearError();
     setType(next);
     const stillValid = categories.some(
       (c) => c.id === categoryId && c.type === next
@@ -61,6 +71,7 @@ export default function TransactionForm({
   }
 
   function onAmountChange(raw: string) {
+    clearError();
     // Digits past the cap are dropped on the way in. Say so, or the field
     // just looks like it stopped responding.
     const typed = raw.replace(/[^\d,]/g, "").split(",")[0].replace(/^0+(?=\d)/, "");
@@ -164,7 +175,10 @@ export default function TransactionForm({
           ariaLabel="Category"
           value={selected}
           placeholder="No categories yet"
-          onChange={setCategoryId}
+          onChange={(v) => {
+            clearError();
+            setCategoryId(v);
+          }}
           options={available.map((c) => ({
             value: c.id,
             label: c.name,
@@ -182,7 +196,10 @@ export default function TransactionForm({
             type === "income" ? "e.g. May salary…" : "e.g. Delivery, Uber…"
           }
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          onChange={(e) => {
+            clearError();
+            setDescription(e.target.value);
+          }}
         />
       </div>
 
@@ -192,7 +209,10 @@ export default function TransactionForm({
           className="mt-1"
           ariaLabel="Date"
           value={date}
-          onChange={setDate}
+          onChange={(v) => {
+            clearError();
+            setDate(v);
+          }}
         />
       </div>
 
