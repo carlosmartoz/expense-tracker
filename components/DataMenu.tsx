@@ -8,7 +8,6 @@ import {
   backupFilename,
   download,
   parseJSON,
-  toCSV,
   toJSON,
 } from "@/lib/backup";
 import ConfirmDialog from "./ConfirmDialog";
@@ -33,18 +32,9 @@ export default function DataMenu({ compact = false }: { compact?: boolean }) {
 
   const isEmpty = transactions.length === 0;
 
-  function exportJSON() {
-    download(
-      backupFilename("json"),
-      "application/json",
-      toJSON({ transactions, categories })
-    );
+  function exportBackup() {
+    download(backupFilename(), toJSON({ transactions, categories }));
     flash("Backup downloaded.");
-  }
-
-  function exportCSV() {
-    download(backupFilename("csv"), "text/csv", toCSV(transactions, categories));
-    flash("CSV downloaded.");
   }
 
   function flash(message: string) {
@@ -103,26 +93,15 @@ export default function DataMenu({ compact = false }: { compact?: boolean }) {
 
       <div className={compact ? "flex items-center" : "space-y-2"}>
         <button
-          onClick={exportJSON}
+          onClick={exportBackup}
           disabled={isEmpty}
           className={`${buttonClass} disabled:cursor-not-allowed disabled:opacity-40`}
           aria-label="Export backup"
-          title={isEmpty ? "Nothing to export yet" : "Export a JSON backup"}
+          title={isEmpty ? "Nothing to export yet" : "Download a backup"}
         >
           <Download className={compact ? "h-[18px] w-[18px]" : "h-4 w-4"} />
           {!compact && "Export backup"}
         </button>
-
-        {!compact && (
-          <button
-            onClick={exportCSV}
-            disabled={isEmpty}
-            className={`${buttonClass} disabled:cursor-not-allowed disabled:opacity-40`}
-            title={isEmpty ? "Nothing to export yet" : "Export a CSV for spreadsheets"}
-          >
-            <Download className="h-4 w-4" /> Export CSV
-          </button>
-        )}
 
         <button
           onClick={() => fileRef.current?.click()}

@@ -31,18 +31,16 @@ Everything is kept in `localStorage`. That means it is private, it works
 offline, and it is **gone if you clear your site data** — no copy exists
 anywhere else.
 
-So export a backup now and then. The sidebar has both:
+So export a backup now and then. **Export backup** writes a `.json` file that
+restores everything exactly, categories included — and one taken by an older
+version of the app still imports, because it goes through the same migration
+chain as stored data.
 
-- **Export backup** writes a JSON file that restores everything exactly,
-  categories included. This is the one to keep: a backup taken by an older
-  version of the app still imports, because it goes through the same migration
-  chain as stored data.
-- **Export CSV** writes the transactions for a spreadsheet. It goes one way
-  only — a CSV names categories rather than describing them, so it can't carry
-  everything back.
+**Import** reads that file back. It replaces what is currently in the browser,
+so it asks first and tells you what the file holds.
 
-**Import** takes a `.json` backup. It replaces what is currently in the
-browser, so it asks first and tells you what the file holds.
+There is deliberately one format. A backup is either complete or it isn't
+worth having.
 
 ## The two screens
 
@@ -68,7 +66,7 @@ lib/
   config.ts        app name, locale, currency — start here to re-skin
   types.ts         the whole data model: Transaction and Category
   storage.ts       reading and writing localStorage, and the migration chain
-  backup.ts        JSON backup in and out, CSV export
+  backup.ts        the JSON backup, out and back in
   store.tsx        state and the operations on it (Context)
   format.ts        money, dates and the months a ledger covers
   motion.ts        shared animation variants
@@ -118,8 +116,9 @@ variant rather than writing a one-off. The whole app is wrapped in
 npm test
 ```
 
-74 tests, mostly over `lib/`, which is where a mistake is silent: the
-migration chain step by step, the backup round-trip in both formats, and the
-money and date formatting. `components/Portal.test.tsx` is the exception — it
-pins down that overlays render into `<body>`, which is structural and can't be
-eyeballed. The rest of the UI isn't covered; it's checked by using it.
+68 tests, mostly over `lib/`, which is where a mistake is silent: the
+migration chain step by step, the backup round-trip, the ceiling on an amount,
+and the money and date formatting. `components/Portal.test.tsx` is the
+exception — it pins down that overlays render into `<body>`, which is
+structural and can't be eyeballed. The rest of the UI isn't covered; it's
+checked by using it.
