@@ -2,10 +2,7 @@
 
 import { MotionConfig } from "motion/react";
 
-/**
- * App-wide motion settings. `reducedMotion="user"` makes every motion component
- * respect the OS-level prefers-reduced-motion preference automatically.
- */
+/** `reducedMotion="user"` makes every animation respect the OS preference. */
 export default function MotionProvider({
   children,
 }: {

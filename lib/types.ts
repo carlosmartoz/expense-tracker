@@ -22,13 +22,7 @@ import {
 
 export type TransactionType = "income" | "expense";
 
-/* =========================================================================
-   CATEGORIES
-
-   A category is referenced by a stable `id` and lives on one side of the
-   book: income or expense. The ones the app ships with are fixed; anything
-   the reader adds is theirs to rename, recolour and delete.
-   ========================================================================= */
+// A category has a stable id and lives on one side of the book.
 
 export interface Category {
   id: string;
@@ -41,11 +35,7 @@ export interface Category {
   type: TransactionType;
 }
 
-/**
- * Lucide icons referenced by name so a category can be serialized to storage.
- * The ones below the line back categories that shipped with older versions;
- * they stay so data saved back then still draws its icon.
- */
+/** Referenced by name so a category can be serialized. */
 const ICON_MAP: Record<string, LucideIcon> = {
   UtensilsCrossed,
   ShoppingCart,
@@ -60,7 +50,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Wallet,
   PiggyBank,
   Tag,
-  // Behind categories that shipped with older versions.
+  // Retired, kept so older data still draws its icon.
   Wrench,
   Briefcase,
   Receipt,
@@ -72,18 +62,8 @@ export function categoryIcon(icon: string | undefined): LucideIcon {
   return (icon && ICON_MAP[icon]) || Tag;
 }
 
-/**
- * The colours a category can take — the one place hue is allowed outside an
- * error message, and it reaches no further than the icon. Stored per category,
- * so these are literals rather than theme tokens: a token name could be
- * renamed out from under saved data.
- *
- * There are exactly as many as the defaults need: one per default, so no two
- * of them collide, plus white — which the two "Other" buckets share, because
- * they are the same idea on opposite sides of the book. A short list is the
- * point; picking from thirty near-identical hues is not a decision worth
- * offering. lib/types.test.ts holds that invariant.
- */
+/** One per default plus the white both "Other" buckets share. */
+// Literals, not theme tokens: a token could be renamed out from under saved data.
 export const CATEGORY_COLORS = [
   { value: "#ffffff", name: "White" },
   { value: "#ef4444", name: "Red" },
@@ -103,20 +83,10 @@ export const CATEGORY_COLOR_VALUES: readonly string[] = CATEGORY_COLORS.map(
   (c) => c.value
 );
 
-/**
- * The categories the app ships with. They are fixed — not renamed, not
- * recoloured, not deleted. A ledger always has somewhere to put a transaction,
- * and the two "Other" buckets in particular are the floor the delete dialog
- * falls back to.
- *
- * Membership is decided by id against this list rather than a stored flag, so
- * there is no second copy of the truth to drift. Because of that, this file is
- * the only source for a default's colour and icon: change one here and append
- * a `restoreDefaults` step to the migration chain so stored copies follow.
- */
+/** Fixed: never renamed, recoloured or deleted. The floor a ledger stands on. */
+// The only source for a default's colour and icon; see the migration chain.
 export const DEFAULT_CATEGORIES: Category[] = [
-  // Expenses. Food and Supermarket are deliberately separate: eating out and
-  // stocking the kitchen are different habits and worth watching apart.
+  // Food and Supermarket stay apart: eating out and stocking up differ.
   { id: "Food", name: "Food", color: "#ef4444", icon: "UtensilsCrossed", type: "expense" },
   { id: "Supermarket", name: "Supermarket", color: "#eab308", icon: "ShoppingCart", type: "expense" },
   { id: "Transport", name: "Transport", color: "#06b6d4", icon: "Car", type: "expense" },
@@ -129,8 +99,7 @@ export const DEFAULT_CATEGORIES: Category[] = [
   { id: "Other", name: "Other", color: "#ffffff", icon: "CircleEllipsis", type: "expense" },
   // Income
   { id: "Salary", name: "Salary", color: "#f97316", icon: "Wallet", type: "income" },
-  // Same colour and icon as its expense twin: it is the same idea, on the
-  // other side of the book.
+  // Same colour and icon as its expense twin.
   { id: "OtherIncome", name: "Other", color: "#ffffff", icon: "CircleEllipsis", type: "income" },
 ];
 
@@ -144,12 +113,7 @@ export function isDefaultCategory(id: string): boolean {
 /** Max characters for a category name. */
 export const MAX_CATEGORY_NAME_LENGTH = 24;
 
-/**
- * How many digits an amount may have before the decimal comma. Seven covers
- * anything up to 9.999.999,99, which is roomy for a personal ledger and short
- * enough that a slipped keypress can't turn 30.000 into 30.000.000. Decimals
- * are always the two after the comma. Raise it here and nowhere else.
- */
+/** Digits before the comma. Seven allows up to 9.999.999,99. */
 export const MAX_AMOUNT_INTEGER_DIGITS = 7;
 
 export interface Transaction {

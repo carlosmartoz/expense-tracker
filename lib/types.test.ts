@@ -6,11 +6,7 @@ import {
   isDefaultCategory,
 } from "./types";
 
-/**
- * The default set carries rules that are easy to break by hand-editing the
- * list — a colour reused, a palette entry left dangling — and nothing else in
- * the app would notice.
- */
+// Rules a hand edit could break silently: a colour reused, an entry dangling.
 
 describe("the default categories", () => {
   it("all take a colour from the palette", () => {

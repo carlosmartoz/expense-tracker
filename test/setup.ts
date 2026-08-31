@@ -1,13 +1,6 @@
 import { beforeEach } from "vitest";
 
-/**
- * A localStorage the tests fully control.
- *
- * Node ships its own global these days, and it warns and misbehaves without a
- * backing file, so rather than depending on whichever implementation happens to
- * win, the suite installs a plain in-memory one. lib/storage.ts only ever calls
- * these four methods.
- */
+// An in-memory localStorage the tests control; Node's own needs a backing file.
 const store = new Map<string, string>();
 
 const memoryStorage = {
@@ -27,7 +20,7 @@ Object.defineProperty(globalThis, "localStorage", {
   writable: true,
 });
 
-// lib/storage.ts bails out when there's no window, so give it one.
+// storage.ts bails out without a window, so give it one.
 if (!("window" in globalThis)) {
   Object.defineProperty(globalThis, "window", {
     value: { localStorage: memoryStorage },

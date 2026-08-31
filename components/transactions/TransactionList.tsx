@@ -4,13 +4,13 @@ import { useEffect, useState } from "react";
 import { Pencil, Trash2, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { backdrop, modalPanel } from "@/lib/motion";
-import Portal from "./Portal";
+import Portal from "@/components/ui/Portal";
 import type { Transaction } from "@/lib/types";
 import { categoryIcon } from "@/lib/types";
 import { formatMoney, formatDate } from "@/lib/format";
 import { useStore } from "@/lib/store";
-import TransactionForm from "./TransactionForm";
-import ConfirmDialog from "./ConfirmDialog";
+import TransactionForm from "@/components/transactions/TransactionForm";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 
 export default function TransactionList({
   transactions,

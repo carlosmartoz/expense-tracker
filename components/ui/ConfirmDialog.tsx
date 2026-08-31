@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { AlertTriangle } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { backdrop, modalPanel } from "@/lib/motion";
-import Portal from "./Portal";
+import Portal from "@/components/ui/Portal";
 
 interface Props {
   open: boolean;
@@ -18,10 +18,7 @@ interface Props {
   onCancel: () => void;
 }
 
-/**
- * Dark-themed confirmation dialog used in place of the native window.confirm().
- * Closes on Escape, on backdrop click, or via the Cancel button.
- */
+/** Replaces window.confirm(). Closes on Escape, backdrop click or Cancel. */
 export default function ConfirmDialog({
   open,
   title,

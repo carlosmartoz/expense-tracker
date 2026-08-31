@@ -1,10 +1,6 @@
 import type { Variants } from "motion/react";
 
-/**
- * Shared animation variants. Keep movements short (~150-300ms) and easings
- * soft. Every consumer runs under <MotionProvider>, which honours the reader's
- * prefers-reduced-motion setting.
- */
+// Shared variants. Short (~150-300ms), soft easings, under <MotionProvider>.
 
 /** Soft ease-out behind every entrance here. */
 const easeOut = [0.22, 1, 0.36, 1] as const;

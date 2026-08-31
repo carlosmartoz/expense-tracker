@@ -5,8 +5,8 @@ import { ArrowRightLeft, Tags, type LucideIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { viewTransition } from "@/lib/motion";
 import { APP_NAME } from "@/lib/config";
-import MovementsView from "@/components/MovementsView";
-import CategoriesView from "@/components/CategoriesView";
+import TransactionsView from "@/components/transactions/TransactionsView";
+import CategoriesView from "@/components/categories/CategoriesView";
 import DataMenu from "@/components/DataMenu";
 
 type Tab = "movements" | "categories";
@@ -101,7 +101,7 @@ export default function Home() {
               animate="show"
               exit="exit"
             >
-              {tab === "movements" && <MovementsView />}
+              {tab === "movements" && <TransactionsView />}
               {tab === "categories" && <CategoriesView />}
             </motion.div>
           </AnimatePresence>

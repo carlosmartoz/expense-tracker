@@ -22,11 +22,8 @@ interface SelectProps {
   className?: string;
 }
 
-/**
- * Custom dropdown that fully matches the app's dark UI (native <select> popups
- * can't be styled). Keyboard-accessible: Arrow keys / Home / End to move,
- * Enter or Space to open/select, Escape to close.
- */
+/** Dropdown that matches the dark UI; a native <select> popup can't be styled. */
+// Keyboard: arrows / Home / End to move, Enter or Space to pick, Escape to close.
 export default function Select({
   value,
   options,
@@ -68,10 +65,7 @@ export default function Select({
     setOpen(false);
   }
 
-  /**
-   * Opening puts the highlight on whatever is currently selected. Done here
-   * rather than in an effect so both land in the same render.
-   */
+  /** Highlights the current value. Here, not in an effect, so it lands in one render. */
   function openList() {
     const idx = options.findIndex((o) => o.value === value);
     setHighlight(idx >= 0 ? idx : 0);

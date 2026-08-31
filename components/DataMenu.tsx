@@ -10,7 +10,7 @@ import {
   parseJSON,
   toJSON,
 } from "@/lib/backup";
-import ConfirmDialog from "./ConfirmDialog";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 
 interface Pending {
   transactions: number;
@@ -18,10 +18,7 @@ interface Pending {
   apply: () => void;
 }
 
-/**
- * Export, import and clear. Rendered twice — labelled in the sidebar and as
- * icons in the mobile bar — so the same actions are reachable either way.
- */
+/** Export, import and start over. Labelled in the sidebar, icons in the header. */
 export default function DataMenu({ compact = false }: { compact?: boolean }) {
   const { transactions, categories, clearAll, replaceAll } = useStore();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -122,7 +119,7 @@ export default function DataMenu({ compact = false }: { compact?: boolean }) {
               : "btn-ghost w-full justify-start text-xs disabled:cursor-not-allowed disabled:opacity-40"
           }
           aria-label="Clear all"
-          title="Delete every transaction"
+          title="Delete everything and start over"
         >
           <Trash2 className={compact ? "h-4.5 w-4.5" : "h-4 w-4"} />
           {!compact && "Clear all"}
@@ -165,9 +162,9 @@ export default function DataMenu({ compact = false }: { compact?: boolean }) {
 
       <ConfirmDialog
         open={confirmClear}
-        title="Clear all transactions"
-        message="This permanently removes every transaction. Your categories stay. Export a backup first if you're not sure."
-        confirmLabel="Clear all"
+        title="Start over"
+        message="This wipes every transaction and returns the categories to the ones the app ships with. Nothing is kept. Export a backup first if you're not sure."
+        confirmLabel="Erase everything"
         onConfirm={() => {
           clearAll();
           setConfirmClear(false);

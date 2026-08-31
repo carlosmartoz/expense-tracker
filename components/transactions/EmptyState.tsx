@@ -4,11 +4,7 @@ import { Wallet } from "lucide-react";
 import { motion } from "motion/react";
 import { fadeUp } from "@/lib/motion";
 
-/**
- * Stands in for the history on a browser that has never held any data. The
- * form is right beside it, so this points at it rather than repeating its
- * button.
- */
+/** Stands in for the history when there is none. The form is right beside it. */
 export default function EmptyState() {
   return (
     <motion.div

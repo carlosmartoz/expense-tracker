@@ -14,8 +14,8 @@ import {
   type Category,
   type TransactionType,
 } from "@/lib/types";
-import ConfirmDialog from "./ConfirmDialog";
-import Select, { type SelectOption } from "./Select";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
+import Select, { type SelectOption } from "@/components/ui/Select";
 
 const SIDES: { type: TransactionType; label: string }[] = [
   { type: "expense", label: "Expenses" },
@@ -53,12 +53,7 @@ export default function CategoriesView() {
     [categories],
   );
 
-  /**
-   * Defaults only seed a browser that has never held data, so a ledger started
-   * before a category shipped will never see it. Offering the gap here keeps
-   * that the reader's call rather than something a migration does behind their
-   * back — and a category they deleted on purpose stays deleted until they ask.
-   */
+  /** Defaults only seed a fresh browser, so an older ledger can be short a few. */
   const missingDefaults = DEFAULT_CATEGORIES.filter(
     (d) => !categories.some((c) => c.id === d.id),
   ).length;
@@ -84,7 +79,7 @@ export default function CategoriesView() {
         }))
     : [];
 
-  /** See TransactionForm: an edit makes the previous attempt's message stale. */
+  /** An edit makes the last attempt's message stale. */
   function clearError() {
     if (error) setError(null);
   }
@@ -265,9 +260,7 @@ export default function CategoriesView() {
                         />
                       )}
                     </motion.button>
-                    {/* The swatch alone can't say which red it is. Shown on
-                        hover and on keyboard focus, and out of the layout so
-                        it can't nudge the grid. */}
+                    {/* Out of the layout so it can't nudge the grid. */}
                     <span
                       role="tooltip"
                       className="pointer-events-none absolute -top-7 left-1/2 z-10 -translate-x-1/2
@@ -283,12 +276,8 @@ export default function CategoriesView() {
             </div>
           </div>
 
-          {/* The message sits with the buttons it belongs to, in its own
-              group, so the form's spacing doesn't pay for it twice. It is
-              always here and empty when there's nothing wrong: min-h-5 matches
-              the line-height of text-sm, so the slot holds one line either way
-              and the buttons never move. role="alert" announces the message
-              when it turns up. */}
+          {/* Grouped with its buttons so the form's spacing doesn't pay twice. */}
+          {/* min-h-5 is text-sm's line-height: the slot holds a line either way. */}
           <div className="space-y-1">
             <p role="alert" className="min-h-5 text-sm text-danger">
               {error}
@@ -375,10 +364,7 @@ export default function CategoriesView() {
                                 : `${used} transaction${used === 1 ? "" : "s"}`}
                             </p>
                           </div>
-                          {/* A default carries no buttons rather than
-                              disabled ones: an affordance that never works is
-                              worse than none. It is fixed — the app's own
-                              vocabulary, not a starting point to edit. */}
+                          {/* A default carries no buttons rather than dead ones. */}
                           {!isDefaultCategory(cat.id) && (
                             <button
                               onClick={() => startEdit(cat)}

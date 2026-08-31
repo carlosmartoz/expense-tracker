@@ -1,19 +1,14 @@
 import type { Transaction, Category, TransactionType } from "./types";
 import { CATEGORY_COLOR_VALUES, DEFAULT_CATEGORIES } from "./types";
 
-/**
- * Reading and writing the browser's copy of your data. This module owns the
- * storage format — nothing else should touch localStorage directly.
- */
+// This module owns the storage format; nothing else touches localStorage.
 
 const KEY = "expense-tracker";
-
-/** Bumped whenever the stored shape changes. See MIGRATIONS below. */
-export const VERSION = 10;
-
-/** The two keys the app wrote to before everything moved under a single one. */
 const LEGACY_TRANSACTIONS_KEY = "expense-tracker:transactions:v2";
 const LEGACY_CATEGORIES_KEY = "expense-tracker:categories:v1";
+
+/** Bumped whenever the stored shape changes. One MIGRATIONS entry per step. */
+export const VERSION = 10;
 
 export interface Snapshot {
   version: number;
@@ -21,108 +16,61 @@ export interface Snapshot {
   categories: Category[];
 }
 
-/**
- * Each entry upgrades a snapshot one version forward: MIGRATIONS[0] takes a v1
- * snapshot to v2, MIGRATIONS[1] takes v2 to v3, and so on. Data climbs the
- * chain one step at a time, so however old a browser's copy is, it arrives at
- * VERSION without losing anything.
- */
-const MIGRATIONS: ((snapshot: Snapshot) => Snapshot)[] = [
-  // 1 -> 2: the app went back to a single currency, so the per-transaction
-  // `currency` field is dropped. Amounts are left untouched — they were always
-  // stored as plain numbers, and anything entered in another currency stays at
-  // its face value for you to correct by hand.
-  (snapshot) => ({
-    ...snapshot,
-    transactions: snapshot.transactions.map((t) => {
-      const { currency, ...rest } = t as Transaction & { currency?: string };
-      void currency;
-      return rest;
-    }),
+type Step = (snapshot: Snapshot) => Snapshot;
+
+/** Drops the per-transaction currency; amounts keep their face value. */
+const dropCurrency: Step = (snapshot) => ({
+  ...snapshot,
+  transactions: snapshot.transactions.map((t) => {
+    const { currency, ...rest } = t as Transaction & { currency?: string };
+    void currency;
+    return rest;
   }),
+});
 
-  // 2 -> 3: tags are gone. Categories cover the same ground now that any of
-  // them can be renamed, so the second way of labelling a transaction goes.
-  (snapshot) => ({
-    ...snapshot,
-    transactions: snapshot.transactions.map((t) => {
-      const { tags, ...rest } = t as Transaction & { tags?: string[] };
-      void tags;
-      return rest;
-    }),
+/** Drops tags, which categories replaced. */
+const dropTags: Step = (snapshot) => ({
+  ...snapshot,
+  transactions: snapshot.transactions.map((t) => {
+    const { tags, ...rest } = t as Transaction & { tags?: string[] };
+    void tags;
+    return rest;
   }),
+});
 
-  // 3 -> 4: categories became one flat, fully editable list.
-  //
-  // `category` is renamed to `categoryId`, which is what it always held. Every
-  // stored category gains a `type` and loses `isDefault`: income used to be a
-  // single hard-coded bucket, so the one category with that id lands on the
-  // income side and everything else on the expense side.
-  //
-  // The user's list is typed and cleaned, never curated: categories that no
-  // longer ship as defaults (Subscriptions, Gaming, Debts) are kept, because
-  // transactions point at them. New defaults aren't injected either — the list
-  // belongs to whoever has been using the app.
-  (snapshot) => {
-    const LEGACY_INCOME_ID = "Income";
-    const legacy = snapshot.categories as (Category & {
-      isDefault?: boolean;
-      type?: TransactionType;
-    })[];
-
-    const categories: Category[] = legacy.map((c) => {
-      const { isDefault, ...rest } = c;
+/** Renames `category` to `categoryId` and gives every category a side. */
+const flattenCategories: Step = (snapshot) => {
+  const legacy = snapshot.categories as (Category & {
+    isDefault?: boolean;
+    type?: TransactionType;
+  })[];
+  return {
+    ...snapshot,
+    categories: legacy.map(({ isDefault, ...rest }) => {
       void isDefault;
-      return { ...rest, type: rest.type ?? (c.id === LEGACY_INCOME_ID ? "income" : "expense") };
-    });
+      return {
+        ...rest,
+        type: rest.type ?? (rest.id === "Income" ? "income" : "expense"),
+      };
+    }),
+    transactions: snapshot.transactions.map((t) => {
+      const { category, ...rest } = t as Transaction & { category?: string };
+      return { ...rest, categoryId: rest.categoryId ?? category ?? "" };
+    }),
+  };
+};
 
-    return {
-      ...snapshot,
-      categories,
-      transactions: snapshot.transactions.map((t) => {
-        const { category, ...rest } = t as Transaction & { category?: string };
-        return { ...rest, categoryId: rest.categoryId ?? category ?? "" };
-      }),
-    };
-  },
+/** Hands each category the next palette entry, by position. */
+const recolour: Step = (snapshot) => ({
+  ...snapshot,
+  categories: snapshot.categories.map((c, i) => ({
+    ...c,
+    color: CATEGORY_COLOR_VALUES[i % CATEGORY_COLOR_VALUES.length],
+  })),
+});
 
-  // 4 -> 5, then 5 -> 6: the palette went neutral and category colours were
-  // flattened to greys; colour then came back, for the icon only. Both steps
-  // do the same thing — walk the list and hand each category the next entry in
-  // the current palette. Position keeps it stable for a given list and stops
-  // neighbours landing on the same value.
-  //
-  // Nobody loses a choice they made: v5 offered greys and nothing else, so
-  // there was no picked colour to preserve by the time this runs.
-  (snapshot) => recolour(snapshot),
-  (snapshot) => recolour(snapshot),
-
-  // 6 -> 7: the palette shrank to one colour per default, so the by-position
-  // handout above no longer lands anywhere sensible. Every category the app
-  // ships with is put back on its own colour and icon; anything the reader
-  // made themselves is left exactly as it is.
-  (snapshot) => restoreDefaults(snapshot),
-
-  // 7 -> 8: the palette was picked by hand rather than borrowed, so the
-  // shipped categories move again.
-  (snapshot) => restoreDefaults(snapshot),
-
-  // 8 -> 9: Services swaps its spanner for a wifi mark. Same step again —
-  // now that a default can't be edited, code is the only source for its
-  // colour and icon, and a stored copy that disagrees has to be corrected.
-  (snapshot) => restoreDefaults(snapshot),
-
-  // 9 -> 10: Debts ships as a default again. A ledger old enough to still
-  // carry the original one matches that id, so it stops being an ordinary
-  // category and takes the shipped colour and icon like any other default.
-  (snapshot) => restoreDefaults(snapshot),
-];
-
-/**
- * Puts every category the app ships with back on its own colour and icon, and
- * leaves anything the reader made — or any default since retired — untouched.
- */
-function restoreDefaults(snapshot: Snapshot): Snapshot {
+/** Puts shipped categories back on their colour and icon; leaves the rest. */
+const restoreDefaults: Step = (snapshot) => {
   const canonical = new Map(DEFAULT_CATEGORIES.map((c) => [c.id, c]));
   return {
     ...snapshot,
@@ -131,23 +79,23 @@ function restoreDefaults(snapshot: Snapshot): Snapshot {
       return def ? { ...c, color: def.color, icon: def.icon } : c;
     }),
   };
-}
+};
 
-function recolour(snapshot: Snapshot): Snapshot {
-  return {
-    ...snapshot,
-    categories: snapshot.categories.map((c, i) => ({
-      ...c,
-      color: CATEGORY_COLOR_VALUES[i % CATEGORY_COLOR_VALUES.length],
-    })),
-  };
-}
+// One entry per version, oldest first. A default's colour or icon is only in
+// code, so changing one means appending another restoreDefaults.
+const MIGRATIONS: Step[] = [
+  dropCurrency, //     1 -> 2
+  dropTags, //         2 -> 3
+  flattenCategories, // 3 -> 4
+  recolour, //         4 -> 5, the palette went neutral
+  recolour, //         5 -> 6, and colour came back
+  restoreDefaults, //  6 -> 7, one colour per default
+  restoreDefaults, //  7 -> 8, the palette was picked by hand
+  restoreDefaults, //  8 -> 9, Services took a wifi mark
+  restoreDefaults, //  9 -> 10, Debts shipped again
+];
 
-/**
- * Brings a snapshot up to VERSION. Exported so an exported backup file — which
- * may have been written by an older version of the app — can be imported
- * through exactly the same path as data read from the browser.
- */
+/** Climbs a snapshot to VERSION. Also used on an imported backup file. */
 export function migrate(snapshot: Snapshot): Snapshot {
   let out = snapshot;
   for (let v = out.version; v < VERSION; v++) {
@@ -163,15 +111,11 @@ function readJSON<T>(key: string): T | null {
     const raw = localStorage.getItem(key);
     return raw ? (JSON.parse(raw) as T) : null;
   } catch {
-    // Unparseable or unavailable (private mode) — treat as absent.
-    return null;
+    return null; // unparseable or unavailable; treat as absent
   }
 }
 
-/**
- * Pick up data written by the pre-VERSION app, which kept transactions and
- * categories under separate keys and stored no version at all.
- */
+/** Data from before the two old keys were merged into one. */
 function readLegacy(): Snapshot | null {
   const transactions = readJSON<Transaction[]>(LEGACY_TRANSACTIONS_KEY);
   const categories = readJSON<Category[]>(LEGACY_CATEGORIES_KEY);
@@ -183,10 +127,7 @@ function readLegacy(): Snapshot | null {
   };
 }
 
-/**
- * Returns what's stored, or null when this browser has never held any data
- * (a first visit, or storage the browser won't let us read).
- */
+/** What's stored, or null if this browser has never held any data. */
 export function load(): Snapshot | null {
   if (typeof window === "undefined") return null;
 
@@ -199,25 +140,44 @@ export function load(): Snapshot | null {
   const legacy = readLegacy();
   if (!legacy) return null;
 
-  // Write the new key first and confirm it's really there before dropping the
-  // old ones, so a storage failure mid-way can't lose the only copy.
+  // Confirm the new key before dropping the old ones, so a failure mid-way
+  // can't lose the only copy.
   save(legacy);
   if (readJSON<Snapshot>(KEY)) {
-    try {
-      localStorage.removeItem(LEGACY_TRANSACTIONS_KEY);
-      localStorage.removeItem(LEGACY_CATEGORIES_KEY);
-    } catch {
-      /* leaving them behind is harmless; they're ignored from now on */
-    }
+    remove(LEGACY_TRANSACTIONS_KEY, LEGACY_CATEGORIES_KEY);
   }
   return migrate(legacy);
 }
 
+/** True for a ledger indistinguishable from one that was never touched. */
+function isPristine(snapshot: Omit<Snapshot, "version">): boolean {
+  return (
+    snapshot.transactions.length === 0 &&
+    snapshot.categories.length === DEFAULT_CATEGORIES.length &&
+    snapshot.categories.every((c, i) => c.id === DEFAULT_CATEGORIES[i].id)
+  );
+}
+
+function remove(...keys: string[]): void {
+  try {
+    for (const key of keys) localStorage.removeItem(key);
+  } catch {
+    /* nothing to do if storage is unavailable */
+  }
+}
+
+/** Removes every key this app has ever written. */
+function clear(): void {
+  remove(KEY, LEGACY_TRANSACTIONS_KEY, LEGACY_CATEGORIES_KEY);
+}
+
+/** A pristine ledger stores nothing, so starting over leaves no key behind. */
 export function save(snapshot: Omit<Snapshot, "version">): void {
   if (typeof window === "undefined") return;
+  if (isPristine(snapshot)) return clear();
   try {
     localStorage.setItem(KEY, JSON.stringify({ ...snapshot, version: VERSION }));
   } catch {
-    /* storage may be full or unavailable (private mode); nothing to do */
+    /* storage may be full or unavailable (private mode) */
   }
 }

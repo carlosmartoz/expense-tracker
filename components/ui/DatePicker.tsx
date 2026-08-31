@@ -25,10 +25,8 @@ function parseISO(v: string): { y: number; m: number; d: number } | null {
   return { y, m: m - 1, d };
 }
 
-/**
- * Custom calendar popover that matches the app's dark UI (native date pickers
- * can't be styled). Keyboard: Enter/Space/ArrowDown opens, Escape closes.
- */
+/** Calendar popover; a native date input can't be styled to match. */
+// Keyboard: Enter, Space or ArrowDown opens, Escape closes.
 export default function DatePicker({
   value,
   onChange,
@@ -44,7 +42,7 @@ export default function DatePicker({
     return { y: base.y, m: base.m };
   });
 
-  /** Opening jumps the calendar to the selected month, in the same render. */
+  /** Jumps the calendar to the selected month, in the same render. */
   function openCalendar() {
     if (selected) setView({ y: selected.y, m: selected.m });
     setOpen(true);

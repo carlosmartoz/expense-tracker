@@ -2,8 +2,7 @@ import { CURRENCY, LOCALE } from "./config";
 import type { Transaction } from "./types";
 import { MAX_AMOUNT_INTEGER_DIGITS } from "./types";
 
-// Amounts follow the currency's own convention — for ARS that's "2.672.371,00":
-// dot for thousands, comma for the decimal, always two decimals.
+// ARS convention: dot for thousands, comma for the decimal, two decimals.
 const amountFormatter = new Intl.NumberFormat(CURRENCY.locale, {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
@@ -13,11 +12,7 @@ export function formatAmount(value: number): string {
   return amountFormatter.format(Number.isFinite(value) ? value : 0);
 }
 
-/**
- * Like formatAmount but prefixed with the currency symbol, e.g. "$ 1.200,00".
- * A negative value keeps its sign ahead of the symbol ("-$ 1.200,00"), which is
- * how a balance in the red is normally written.
- */
+/** formatAmount with the symbol, sign first: "-$ 1.200,00". */
 export function formatMoney(value: number): string {
   const n = Number.isFinite(value) ? value : 0;
   const sign = n < 0 ? "-" : "";
@@ -37,12 +32,7 @@ export function parseAmount(input: string): number {
 /** The largest amount the form accepts, e.g. 9999999.99. */
 export const MAX_AMOUNT = Number(`${"9".repeat(MAX_AMOUNT_INTEGER_DIGITS)}.99`);
 
-/**
- * Live-format what the user types into the amount field: group the integer
- * part with dots, allow at most two decimals after a comma, and refuse digits
- * past MAX_AMOUNT_INTEGER_DIGITS so the field can't run away.
- * e.g. "2672371" -> "2.672.371", "2672371,5" -> "2.672.371,5".
- */
+/** Formats as you type: "2672371" -> "2.672.371", capped at the ceiling. */
 export function formatAmountInput(raw: string): string {
   let cleaned = raw.replace(/[^\d,]/g, "");
   // keep only the first comma

@@ -2,15 +2,10 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import ConfirmDialog from "./ConfirmDialog";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 
-/**
- * Reproduces the layout the app actually has: the dialog is mounted from
- * inside the sidebar, which is `position: sticky` and therefore a stacking
- * context of its own. Before the portal, a `fixed` overlay rendered in there
- * was confined to that subtree and later siblings painted over it, however
- * high its z-index. These tests fail if the portal is ever removed.
- */
+// The dialog mounts inside a sticky sidebar, which is its own stacking context.
+// These fail if the portal is ever removed.
 
 let root: Root | null = null;
 let host: HTMLElement | null = null;

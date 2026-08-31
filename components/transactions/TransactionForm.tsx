@@ -15,8 +15,8 @@ import {
   MAX_AMOUNT,
   parseAmount,
 } from "@/lib/format";
-import Select, { type SelectOption } from "./Select";
-import DatePicker from "./DatePicker";
+import Select, { type SelectOption } from "@/components/ui/Select";
+import DatePicker from "@/components/ui/DatePicker";
 
 function todayISO(): string {
   return new Date().toISOString().slice(0, 10);
@@ -47,16 +47,11 @@ export default function TransactionForm({
     () => categories.filter((c) => c.type === type),
     [categories, type]
   );
-  // Falls back to the first available whenever the current pick doesn't belong
-  // to this side — which happens right after flipping the type toggle.
+  // Falls back to the first available after the type toggle flips.
   const selected =
     available.some((c) => c.id === categoryId) ? categoryId : available[0]?.id ?? "";
 
-  /**
-   * A message describes the attempt that produced it, so the moment anything
-   * is edited it stops being true. Guarded so an untouched form doesn't
-   * re-render on every keystroke.
-   */
+  /** An edit makes the last attempt's message stale. Guarded to avoid churn. */
   function clearError() {
     if (error) setError(null);
   }
@@ -72,8 +67,7 @@ export default function TransactionForm({
 
   function onAmountChange(raw: string) {
     clearError();
-    // Digits past the cap are dropped on the way in. Say so, or the field
-    // just looks like it stopped responding.
+    // Digits past the cap are dropped, so say so.
     const typed = raw.replace(/[^\d,]/g, "").split(",")[0].replace(/^0+(?=\d)/, "");
     setAtLimit(typed.length > MAX_AMOUNT_INTEGER_DIGITS);
     setAmount(formatAmountInput(raw));
@@ -92,8 +86,7 @@ export default function TransactionForm({
       setError("Enter a valid amount greater than 0.");
       return;
     }
-    // The field caps what can be typed, but an amount that arrived by import
-    // can be over it and reach here through the edit form.
+    // An imported amount can be over the cap and reach here via the edit form.
     if (value > MAX_AMOUNT) {
       setError(`Maximum is ${formatMoney(MAX_AMOUNT)}.`);
       return;
@@ -154,9 +147,7 @@ export default function TransactionForm({
           onBlur={onAmountBlur}
           aria-describedby={atLimit ? "amount-limit" : undefined}
         />
-        {/* Always in the layout, only sometimes visible: rendering it
-            conditionally made the panel jump the moment the cap was hit,
-            which is a lot of movement for a line of guidance. */}
+        {/* Always in the layout so hitting the cap doesn't shift the panel. */}
         <p
           id="amount-limit"
           aria-hidden={!atLimit}
@@ -216,11 +207,8 @@ export default function TransactionForm({
         />
       </div>
 
-      {/* The message sits with the button it belongs to, in its own group, so
-          the form's spacing doesn't pay for it twice. It is always here and
-          empty when there's nothing wrong: min-h-5 matches the line-height of
-          text-sm, so the slot holds one line either way and the button never
-          moves. role="alert" announces the message when it turns up. */}
+      {/* Grouped with its button so the form's spacing doesn't pay twice. */}
+      {/* min-h-5 is text-sm's line-height: the slot holds a line either way. */}
       <div className="space-y-1">
         <p role="alert" className="min-h-5 text-sm text-danger">
           {error}

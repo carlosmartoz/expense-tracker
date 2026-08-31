@@ -21,6 +21,7 @@ interface StoreValue {
   addTransaction: (t: Omit<Transaction, "id">) => void;
   updateTransaction: (id: string, patch: Omit<Transaction, "id">) => void;
   deleteTransaction: (id: string) => void;
+  /** Wipes everything and starts over from the shipped categories. */
   clearAll: () => void;
   /** Swaps in an imported backup, replacing everything currently held. */
   replaceAll: (next: { transactions: Transaction[]; categories: Category[] }) => void;
@@ -29,10 +30,7 @@ interface StoreValue {
   updateCategory: (id: string, patch: { name?: string; color?: string }) => void;
   /** Adds any category from DEFAULT_CATEGORIES this ledger doesn't have yet. */
   addMissingDefaults: () => void;
-  /**
-   * Removes a category, moving every transaction that used it to `moveToId`.
-   * Refuses on a default: those are the floor the ledger stands on.
-   */
+  /** Moves the category's transactions to `moveToId`. Refuses on a default. */
   deleteCategory: (id: string, moveToId: string) => void;
 }
 
@@ -50,13 +48,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [categories, setCategories] = useState<Category[]>(DEFAULT_CATEGORIES);
   const [hydrated, setHydrated] = useState(false);
 
-  // Read the stored copy once on mount. A browser that has never held any data
-  // starts empty — with the default categories ready, but no transactions:
-  // this is your ledger, not a demo.
-  //
-  // This is the one place setState in an effect is the right tool: localStorage
-  // doesn't exist while the page is rendered on the server, so the first paint
-  // has to be the empty state and the stored data can only arrive afterwards.
+  // localStorage has no server-side value, so stored data can only arrive here.
   useEffect(() => {
     const stored = load();
     /* eslint-disable react-hooks/set-state-in-effect */
@@ -99,7 +91,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         ),
       deleteTransaction: (id) =>
         setTransactions((prev) => prev.filter((t) => t.id !== id)),
-      clearAll: () => setTransactions([]),
+      clearAll: () => {
+        setTransactions([]);
+        setCategories(DEFAULT_CATEGORIES);
+      },
       replaceAll: ({ transactions: nextTx, categories: nextCats }) => {
         setTransactions(
           [...nextTx].sort((a, b) => (a.date < b.date ? 1 : -1))

@@ -1,14 +1,7 @@
 import { migrate, VERSION, type Snapshot } from "./storage";
 import { APP_NAME } from "./config";
 
-/**
- * Getting your data out of the browser and back in.
- *
- * There is one format, and it is JSON: it round-trips a whole ledger exactly,
- * categories included, and can be read back even when it was written by an
- * older version of the app. One format means a backup can only ever be a
- * complete one.
- */
+// One format, JSON: a backup is always a whole ledger, never a partial one.
 
 export class BackupError extends Error {}
 
@@ -27,10 +20,7 @@ function isTransactionish(v: unknown): boolean {
   );
 }
 
-/**
- * Reads a backup. Older files are run through the same migration chain as
- * stored data, so one taken months ago still imports cleanly.
- */
+/** Reads a backup, migrating an older file the same way stored data is. */
 export function parseJSON(text: string): Snapshot {
   let raw: unknown;
   try {
@@ -56,10 +46,6 @@ export function parseJSON(text: string): Snapshot {
     categories: obj.categories,
   });
 }
-
-/* =========================================================================
-   Browser plumbing
-   ========================================================================= */
 
 /** e.g. "expense-tracker-2026-08-30.json" */
 export function backupFilename(): string {

@@ -4,10 +4,10 @@ import { useMemo, useState } from "react";
 import { useStore } from "@/lib/store";
 import { monthKeyOf, formatMoney, sortedMonthKeys } from "@/lib/format";
 import type { Filters } from "@/lib/types";
-import EmptyState from "./EmptyState";
-import TransactionForm from "./TransactionForm";
-import TransactionList from "./TransactionList";
-import FiltersBar from "./Filters";
+import EmptyState from "@/components/transactions/EmptyState";
+import TransactionForm from "@/components/transactions/TransactionForm";
+import TransactionList from "@/components/transactions/TransactionList";
+import FiltersBar from "@/components/transactions/Filters";
 
 const DEFAULT_FILTERS: Filters = {
   categoryId: "all",
@@ -16,7 +16,7 @@ const DEFAULT_FILTERS: Filters = {
   search: "",
 };
 
-export default function MovementsView() {
+export default function TransactionsView() {
   const { transactions } = useStore();
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
 

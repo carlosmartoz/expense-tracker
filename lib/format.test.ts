@@ -12,10 +12,7 @@ import {
 } from "./format";
 import { MAX_AMOUNT_INTEGER_DIGITS } from "./types";
 
-/**
- * The app reads in English and counts money the Argentine way. That pairing is
- * deliberate, so it's worth a test that would fail if either half drifted.
- */
+// English text, Argentine money: a deliberate pairing worth pinning down.
 
 describe("money", () => {
   it.each([

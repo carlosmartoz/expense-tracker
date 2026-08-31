@@ -4,7 +4,7 @@ import { FilterX } from "lucide-react";
 import { categoryIcon, type Filters } from "@/lib/types";
 import { formatMonthKey } from "@/lib/format";
 import { useStore } from "@/lib/store";
-import Select, { type SelectOption } from "./Select";
+import Select, { type SelectOption } from "@/components/ui/Select";
 
 interface Props {
   filters: Filters;

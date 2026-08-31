@@ -31,6 +31,10 @@ Everything is kept in `localStorage`. That means it is private, it works
 offline, and it is **gone if you clear your site data** — no copy exists
 anywhere else.
 
+**Start over** wipes everything — transactions and any category you added —
+and leaves no key in `localStorage` at all. An untouched ledger stores nothing,
+so a browser after a reset looks exactly like one that was never used.
+
 So export a backup now and then. **Export backup** writes a `.json` file that
 restores everything exactly, categories included — and one taken by an older
 version of the app still imports, because it goes through the same migration
@@ -58,10 +62,10 @@ app/
   layout.tsx       Fonts and the global provider
   page.tsx         Shell and navigation
 components/
-  MovementsView, CategoriesView              the two screens
-  TransactionForm, TransactionList, Filters  the ledger
-  DataMenu, EmptyState                       import/export and first run
-  Select, DatePicker, ConfirmDialog, Portal  dark-theme building blocks
+  transactions/  TransactionsView and the ledger: form, list, filters, empty state
+  categories/    CategoriesView
+  ui/            Select, DatePicker, ConfirmDialog, Portal — generic pieces
+  DataMenu, MotionProvider                   app shell
 lib/
   config.ts        app name, locale, currency — start here to re-skin
   types.ts         the whole data model: Transaction and Category
@@ -158,7 +162,7 @@ variant rather than writing a one-off. The whole app is wrapped in
 npm test
 ```
 
-89 tests, mostly over `lib/`, which is where a mistake is silent: the
+92 tests, mostly over `lib/`, which is where a mistake is silent: the
 migration chain step by step, the backup round-trip, the ceiling on an amount,
 and the money and date formatting. `components/Portal.test.tsx` is the
 exception — it pins down that overlays render into `<body>`, which is

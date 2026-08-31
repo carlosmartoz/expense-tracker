@@ -3,16 +3,13 @@ import { load, save, migrate, VERSION, type Snapshot } from "./storage";
 import { CATEGORY_COLOR_VALUES, DEFAULT_CATEGORIES } from "./types";
 import type { Category, Transaction } from "./types";
 
-/**
- * The migration chain is the one place where a mistake silently eats data that
- * can't be recovered, so it gets the closest attention in the suite.
- */
+// The one place a mistake silently eats data, so it gets the closest look.
 
 const KEY = "expense-tracker";
 const OLD_TX = "expense-tracker:transactions:v2";
 const OLD_CAT = "expense-tracker:categories:v1";
 
-/** A realistic install from before any of this: two keys, no version stamp. */
+// A realistic old install: two keys, no version stamp.
 const OLD_TRANSACTIONS = [
   { id: "a", type: "expense", amount: 6500, category: "Food", currency: "ARS",
     description: "Delivery", date: "2026-08-12", tags: ["Credit card"] },
@@ -192,10 +189,8 @@ describe("climbing the migration chain", () => {
     expect(retired).toBeTruthy();
   });
 
-  // Note there is deliberately no "every category has its own colour" check.
-  // The palette holds exactly one colour per default, so a category the reader
-  // made — or a retired default — has to share with one of them. Uniqueness is
-  // a promise about the shipped set only, and types.test.ts is where it lives.
+  // No "every category has its own colour" check on purpose: with one colour
+  // per default, anything else must share. types.test.ts covers the shipped set.
 
   it("changes nothing when it runs again", () => {
     const once = migrate(asSnapshot(1));
@@ -230,5 +225,39 @@ describe("what actually lands in storage", () => {
   it("stamps the current version on write", () => {
     save({ transactions: [], categories: [] });
     expect(JSON.parse(localStorage.getItem(KEY)!).version).toBe(VERSION);
+  });
+});
+
+describe("starting over", () => {
+  it("leaves no key behind", () => {
+    save({
+      transactions: [
+        { id: "a", type: "expense", amount: 10, categoryId: "Food", description: "x", date: "2026-01-01" },
+      ],
+      categories: DEFAULT_CATEGORIES,
+    });
+    expect(localStorage.getItem(KEY)).not.toBeNull();
+
+    save({ transactions: [], categories: DEFAULT_CATEGORIES });
+    expect(localStorage.getItem(KEY)).toBeNull();
+    expect(load()).toBeNull();
+  });
+
+  it("also drops the keys written by older versions", () => {
+    localStorage.setItem(OLD_TX, "[]");
+    localStorage.setItem(OLD_CAT, "[]");
+    save({ transactions: [], categories: DEFAULT_CATEGORIES });
+    expect(localStorage.getItem(OLD_TX)).toBeNull();
+    expect(localStorage.getItem(OLD_CAT)).toBeNull();
+  });
+
+  it("keeps storing once a category has been added", () => {
+    const withCustom = [
+      ...DEFAULT_CATEGORIES,
+      { id: "mine", name: "Pets", color: "#ef4444", icon: "Tag", type: "expense" as const },
+    ];
+    save({ transactions: [], categories: withCustom });
+    expect(localStorage.getItem(KEY)).not.toBeNull();
+    expect(load()?.categories).toHaveLength(withCustom.length);
   });
 });
