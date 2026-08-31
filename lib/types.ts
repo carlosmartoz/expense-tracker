@@ -8,14 +8,15 @@ import {
   Clapperboard,
   ShoppingBag,
   Gamepad2,
-  Receipt,
+  CircleEllipsis,
   Wallet,
   Briefcase,
   PiggyBank,
+  Tag,
+  Receipt,
   House,
   Tv,
   Landmark,
-  Tag,
 } from "lucide-react";
 
 export type TransactionType = "income" | "expense";
@@ -42,8 +43,8 @@ export interface Category {
 
 /**
  * Lucide icons referenced by name so a category can be serialized to storage.
- * The last three back categories that shipped with older versions; they stay
- * so data saved back then still draws its icon.
+ * The ones below the line back categories that shipped with older versions;
+ * they stay so data saved back then still draws its icon.
  */
 const ICON_MAP: Record<string, LucideIcon> = {
   UtensilsCrossed,
@@ -54,11 +55,13 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Clapperboard,
   Gamepad2,
   ShoppingBag,
-  Receipt,
+  CircleEllipsis,
   Wallet,
   Briefcase,
   PiggyBank,
   Tag,
+  // Behind categories that shipped with older versions.
+  Receipt,
   House,
   Tv,
   Landmark,
@@ -70,29 +73,39 @@ export function categoryIcon(icon: string | undefined): LucideIcon {
 
 /**
  * The colours a category can take — the one place hue is allowed outside an
- * error message, and it reaches no further than the icon. Distinct enough to
- * pick a category out of a list at a glance, and each one legible against the
- * dark surfaces. Stored per category, so these are literals rather than theme
- * tokens: a token name could be renamed out from under saved data.
+ * error message, and it reaches no further than the icon. Stored per category,
+ * so these are literals rather than theme tokens: a token name could be
+ * renamed out from under saved data.
+ *
+ * There are exactly as many as the defaults need: one per default, so no two
+ * of them collide, plus white — which the two "Other" buckets share, because
+ * they are the same idea on opposite sides of the book. A short list is the
+ * point; picking from thirty near-identical hues is not a decision worth
+ * offering. `defaultColoursAreUnique` in the tests holds the invariant.
  */
 export const CATEGORY_COLORS = [
+  "#ffffff", // white — the catch-all, on both sides
   "#f59e0b", // amber
   "#f97316", // orange
-  "#ef4444", // red
   "#ec4899", // pink
   "#d946ef", // fuchsia
-  "#a855f7", // purple
   "#8b5cf6", // violet
-  "#6366f1", // indigo
   "#0ea5e9", // sky
   "#06b6d4", // cyan
   "#14b8a6", // teal
   "#22c55e", // green
   "#84cc16", // lime
-  "#eab308", // yellow
-  "#94a3b8", // slate
 ] as const;
 
+/**
+ * The categories the app ships with. They can be renamed and recoloured like
+ * any other, but never deleted — a ledger always has somewhere to put a
+ * transaction, and the two "Other" buckets in particular are the floor the
+ * delete dialog falls back to.
+ *
+ * Membership is decided by id against this list rather than a stored flag, so
+ * there is no second copy of the truth to drift.
+ */
 export const DEFAULT_CATEGORIES: Category[] = [
   // Expenses. Food and Supermarket are deliberately separate: eating out and
   // stocking the kitchen are different habits and worth watching apart.
@@ -104,12 +117,21 @@ export const DEFAULT_CATEGORIES: Category[] = [
   { id: "Entertainment", name: "Entertainment", color: "#d946ef", icon: "Clapperboard", type: "expense" },
   { id: "Gaming", name: "Gaming", color: "#06b6d4", icon: "Gamepad2", type: "expense" },
   { id: "Shopping", name: "Shopping", color: "#f97316", icon: "ShoppingBag", type: "expense" },
-  { id: "Other", name: "Other", color: "#94a3b8", icon: "Receipt", type: "expense" },
+  { id: "Other", name: "Other", color: "#ffffff", icon: "CircleEllipsis", type: "expense" },
   // Income
   { id: "Salary", name: "Salary", color: "#ec4899", icon: "Wallet", type: "income" },
   { id: "Freelance", name: "Freelance", color: "#22c55e", icon: "Briefcase", type: "income" },
-  { id: "OtherIncome", name: "Other", color: "#a855f7", icon: "PiggyBank", type: "income" },
+  // Same colour and icon as its expense twin: it is the same idea, on the
+  // other side of the book.
+  { id: "OtherIncome", name: "Other", color: "#ffffff", icon: "CircleEllipsis", type: "income" },
 ];
+
+const DEFAULT_IDS = new Set(DEFAULT_CATEGORIES.map((c) => c.id));
+
+/** Defaults can be renamed and recoloured, but never removed. */
+export function isDefaultCategory(id: string): boolean {
+  return DEFAULT_IDS.has(id);
+}
 
 /** Max characters for a category name. */
 export const MAX_CATEGORY_NAME_LENGTH = 24;

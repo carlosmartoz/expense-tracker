@@ -96,6 +96,12 @@ Colour is rationed to two jobs, and both earn it:
   the palette is hex literals rather than theme tokens: a token could be
   renamed out from under saved data.
 
+  The palette is exactly as long as the defaults need — one colour each, so no
+  two of them collide, plus white shared by the two "Other" buckets, which are
+  the same idea on opposite sides of the book. A category you create has to
+  reuse one of those eleven; that is the trade for a list short enough to pick
+  from. `lib/types.test.ts` holds the invariant.
+
 A useful check when changing any of this: build, then grep the compiled
 stylesheet for hex values whose R, G and B are more than a few points apart.
 `--color-danger` should be the only hit — category colours live in the data,
@@ -107,10 +113,17 @@ When you change the shape of stored data, append a step rather than editing an
 old one, and add a test — this is the only place a mistake destroys something
 that can't be recovered.
 
-**Categories belong to the user.** `DEFAULT_CATEGORIES` only seeds a browser
-that has never held data. After that the list is theirs, and a migration should
-type or clean it, never curate it — a category someone deleted shouldn't
-reappear because the app shipped an update.
+**Categories belong to the user, with a floor.** `DEFAULT_CATEGORIES` only
+seeds a browser that has never held data, and after that the list is theirs to
+rename and recolour. What they can't do is delete a default: a ledger always
+needs somewhere to put a transaction, and the "Other" buckets are what the
+delete dialog falls back to. Membership is decided by id against that list
+rather than a stored flag, so there's no second copy of the truth to drift —
+and a category retired from the defaults stops being protected, which is
+correct.
+
+A migration should type or clean the list, never curate it — a category
+someone deleted shouldn't reappear because the app shipped an update.
 
 The cost of that rule is that a ledger started before a category existed never
 sees it, so the Categories screen offers the gap explicitly: when the defaults
@@ -138,7 +151,7 @@ variant rather than writing a one-off. The whole app is wrapped in
 npm test
 ```
 
-70 tests, mostly over `lib/`, which is where a mistake is silent: the
+82 tests, mostly over `lib/`, which is where a mistake is silent: the
 migration chain step by step, the backup round-trip, the ceiling on an amount,
 and the money and date formatting. `components/Portal.test.tsx` is the
 exception — it pins down that overlays render into `<body>`, which is

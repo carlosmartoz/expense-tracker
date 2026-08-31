@@ -1,5 +1,5 @@
 {
-  "version": 6,
+  "version": 7,
   "transactions": [
     {
       "id": "seed-mtgeqgpr-1",
@@ -1078,8 +1078,8 @@
     {
       "id": "Other",
       "name": "Other",
-      "color": "#94a3b8",
-      "icon": "Receipt",
+      "color": "#ffffff",
+      "icon": "CircleEllipsis",
       "type": "expense"
     },
     {
@@ -1099,8 +1099,8 @@
     {
       "id": "OtherIncome",
       "name": "Other",
-      "color": "#a855f7",
-      "icon": "PiggyBank",
+      "color": "#ffffff",
+      "icon": "CircleEllipsis",
       "type": "income"
     }
   ]

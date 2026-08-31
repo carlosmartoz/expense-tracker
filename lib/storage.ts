@@ -1,5 +1,5 @@
 import type { Transaction, Category, TransactionType } from "./types";
-import { CATEGORY_COLORS } from "./types";
+import { CATEGORY_COLORS, DEFAULT_CATEGORIES } from "./types";
 
 /**
  * Reading and writing the browser's copy of your data. This module owns the
@@ -9,7 +9,7 @@ import { CATEGORY_COLORS } from "./types";
 const KEY = "expense-tracker";
 
 /** Bumped whenever the stored shape changes. See MIGRATIONS below. */
-export const VERSION = 6;
+export const VERSION = 7;
 
 /** The two keys the app wrote to before everything moved under a single one. */
 const LEGACY_TRANSACTIONS_KEY = "expense-tracker:transactions:v2";
@@ -96,6 +96,21 @@ const MIGRATIONS: ((snapshot: Snapshot) => Snapshot)[] = [
   // there was no picked colour to preserve by the time this runs.
   (snapshot) => recolour(snapshot),
   (snapshot) => recolour(snapshot),
+
+  // 6 -> 7: the palette shrank to one colour per default, so the by-position
+  // handout above no longer lands anywhere sensible. Every category the app
+  // ships with is put back on its own colour and icon; anything the reader
+  // made themselves is left exactly as it is.
+  (snapshot) => {
+    const canonical = new Map(DEFAULT_CATEGORIES.map((c) => [c.id, c]));
+    return {
+      ...snapshot,
+      categories: snapshot.categories.map((c) => {
+        const def = canonical.get(c.id);
+        return def ? { ...c, color: def.color, icon: def.icon } : c;
+      }),
+    };
+  },
 ];
 
 function recolour(snapshot: Snapshot): Snapshot {

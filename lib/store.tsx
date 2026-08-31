@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import type { Transaction, Category, TransactionType } from "./types";
-import { DEFAULT_CATEGORIES } from "./types";
+import { DEFAULT_CATEGORIES, isDefaultCategory } from "./types";
 import { load, save } from "./storage";
 
 interface StoreValue {
@@ -28,7 +28,10 @@ interface StoreValue {
   updateCategory: (id: string, patch: { name?: string; color?: string }) => void;
   /** Adds any category from DEFAULT_CATEGORIES this ledger doesn't have yet. */
   addMissingDefaults: () => void;
-  /** Removes a category, moving every transaction that used it to `moveToId`. */
+  /**
+   * Removes a category, moving every transaction that used it to `moveToId`.
+   * Refuses on a default: those are the floor the ledger stands on.
+   */
   deleteCategory: (id: string, moveToId: string) => void;
 }
 
@@ -137,6 +140,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           })
         ),
       deleteCategory: (id, moveToId) => {
+        if (isDefaultCategory(id)) return;
         const target = categories.find((c) => c.id === id);
         const destination = categories.find((c) => c.id === moveToId);
         if (!target || !destination || destination.id === target.id) return;

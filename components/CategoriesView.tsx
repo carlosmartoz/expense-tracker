@@ -9,6 +9,7 @@ import {
   categoryIcon,
   CATEGORY_COLORS,
   DEFAULT_CATEGORIES,
+  isDefaultCategory,
   MAX_CATEGORY_NAME_LENGTH,
   type Category,
   type TransactionType,
@@ -131,6 +132,8 @@ export default function CategoriesView() {
   }
 
   function askRemove(cat: Category) {
+    // The button isn't rendered for a default, so this only catches a stray call.
+    if (isDefaultCategory(cat.id)) return;
     const fallback = categories.find(
       (c) => c.type === cat.type && c.id !== cat.id
     );
@@ -357,14 +360,19 @@ export default function CategoriesView() {
                           >
                             <Pencil className="h-4 w-4" />
                           </button>
-                          <button
-                            onClick={() => askRemove(cat)}
-                            className="shrink-0 cursor-pointer rounded-lg p-2 text-text-secondary transition hover:bg-surface-raised hover:text-text-primary"
-                            aria-label={`Delete ${cat.name}`}
-                            title="Delete"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
+                          {/* A default has no delete button rather than a
+                              disabled one: an affordance that never works is
+                              worse than none. */}
+                          {!isDefaultCategory(cat.id) && (
+                            <button
+                              onClick={() => askRemove(cat)}
+                              className="shrink-0 cursor-pointer rounded-lg p-2 text-text-secondary transition hover:bg-surface-raised hover:text-text-primary"
+                              aria-label={`Delete ${cat.name}`}
+                              title="Delete"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          )}
                         </motion.li>
                       );
                     })}

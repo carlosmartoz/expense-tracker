@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { load, save, migrate, VERSION, type Snapshot } from "./storage";
-import { CATEGORY_COLORS } from "./types";
+import { CATEGORY_COLORS, DEFAULT_CATEGORIES } from "./types";
 import type { Category, Transaction } from "./types";
 
 /**
@@ -93,7 +93,7 @@ describe("adopting the two old keys", () => {
 });
 
 describe("climbing the migration chain", () => {
-  it.each([1, 2, 3, 4, 5, 6])("reaches the current version starting from v%i", (from) => {
+  it.each([1, 2, 3, 4, 5, 6, 7])("reaches the current version starting from v%i", (from) => {
     localStorage.setItem(KEY, JSON.stringify(asSnapshot(from)));
     expect(load()?.version).toBe(VERSION);
   });
@@ -173,10 +173,33 @@ describe("climbing the migration chain", () => {
     expect(out.categories.some((c) => c.color.startsWith("var("))).toBe(false);
   });
 
-  it("keeps neighbouring categories on different colours", () => {
+  it("puts each shipped category back on its own colour and icon", () => {
     const out = migrate(asSnapshot(1));
-    const pairs = out.categories.slice(1).map((c, i) => [out.categories[i].color, c.color]);
-    expect(pairs.every(([a, b]) => a !== b)).toBe(true);
+    for (const def of DEFAULT_CATEGORIES) {
+      const got = out.categories.find((c) => c.id === def.id);
+      if (!got) continue; // the fixture doesn't carry every default
+      expect(got.color).toBe(def.color);
+      expect(got.icon).toBe(def.icon);
+    }
+  });
+
+  it("leaves a category the reader made alone", () => {
+    const out = migrate(asSnapshot(1));
+    const custom = out.categories.find((c) => c.id === "custom-1");
+    expect(custom?.name).toBe("Health");
+    // Retired defaults are treated the same way: nobody rewrites them either.
+    expect(out.categories.find((c) => c.id === "Debts")).toBeTruthy();
+  });
+
+  // Note there is deliberately no "every category has its own colour" check.
+  // The palette holds exactly one colour per default, so a category the reader
+  // made — or a retired default — has to share with one of them. Uniqueness is
+  // a promise about the shipped set only, and types.test.ts is where it lives.
+
+  it("changes nothing when it runs again", () => {
+    const once = migrate(asSnapshot(1));
+    const twice = migrate(once);
+    expect(twice).toEqual(once);
   });
 
   it("leaves a snapshot that is already current alone", () => {
