@@ -109,7 +109,14 @@ that can't be recovered.
 
 **Categories belong to the user.** `DEFAULT_CATEGORIES` only seeds a browser
 that has never held data. After that the list is theirs, and a migration should
-type or clean it, never curate it.
+type or clean it, never curate it — a category someone deleted shouldn't
+reappear because the app shipped an update.
+
+The cost of that rule is that a ledger started before a category existed never
+sees it, so the Categories screen offers the gap explicitly: when the defaults
+contain something the list doesn't, a button appears to add it. Adding a
+default is then the reader's decision rather than something that happened to
+them.
 
 **Native form controls are avoided** so the dark theme holds together: there is
 a custom `Select` and a custom `DatePicker`, both keyboard accessible.

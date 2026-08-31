@@ -1,13 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Check, Pencil, Plus, Trash2, X } from "lucide-react";
+import { Check, Pencil, Plus, RotateCcw, Trash2, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { listItem, stagger } from "@/lib/motion";
 import { useStore } from "@/lib/store";
 import {
   categoryIcon,
   CATEGORY_COLORS,
+  DEFAULT_CATEGORIES,
   MAX_CATEGORY_NAME_LENGTH,
   type Category,
   type TransactionType,
@@ -21,8 +22,14 @@ const SIDES: { type: TransactionType; label: string }[] = [
 ];
 
 export default function CategoriesView() {
-  const { categories, transactions, addCategory, updateCategory, deleteCategory } =
-    useStore();
+  const {
+    categories,
+    transactions,
+    addCategory,
+    updateCategory,
+    deleteCategory,
+    addMissingDefaults,
+  } = useStore();
 
   const [name, setName] = useState("");
   const [color, setColor] = useState<string>(CATEGORY_COLORS[0]);
@@ -44,6 +51,16 @@ export default function CategoriesView() {
       })),
     [categories]
   );
+
+  /**
+   * Defaults only seed a browser that has never held data, so a ledger started
+   * before a category shipped will never see it. Offering the gap here keeps
+   * that the reader's call rather than something a migration does behind their
+   * back — and a category they deleted on purpose stays deleted until they ask.
+   */
+  const missingDefaults = DEFAULT_CATEGORIES.filter(
+    (d) => !categories.some((c) => c.id === d.id)
+  ).length;
 
   /** How many transactions point at each category, for the delete dialog. */
   const usage = useMemo(() => {
@@ -135,12 +152,26 @@ export default function CategoriesView() {
 
   return (
     <div className="space-y-5">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Categories</h1>
-        <p className="text-sm text-text-subtle">
-          One list for both sides of the book. Rename, recolour or remove any of
-          them.
-        </p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Categories</h1>
+          <p className="text-sm text-text-subtle">
+            One list for both sides of the book. Rename, recolour or remove any
+            of them.
+          </p>
+        </div>
+        {missingDefaults > 0 && (
+          <button
+            type="button"
+            onClick={addMissingDefaults}
+            className="btn-ghost text-xs"
+            title="Categories that ship with the app but aren't in your list"
+          >
+            <RotateCcw className="h-4 w-4" />
+            Add {missingDefaults} missing default
+            {missingDefaults === 1 ? "" : "s"}
+          </button>
+        )}
       </div>
 
       <div className="grid gap-5 lg:grid-cols-[340px_1fr]">

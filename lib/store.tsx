@@ -26,6 +26,8 @@ interface StoreValue {
   replaceAll: (next: { transactions: Transaction[]; categories: Category[] }) => void;
   addCategory: (c: { name: string; color: string; type: TransactionType }) => void;
   updateCategory: (id: string, patch: { name?: string; color?: string }) => void;
+  /** Adds any category from DEFAULT_CATEGORIES this ledger doesn't have yet. */
+  addMissingDefaults: () => void;
   /** Removes a category, moving every transaction that used it to `moveToId`. */
   deleteCategory: (id: string, moveToId: string) => void;
 }
@@ -114,6 +116,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             ...prev,
             { id: uid(), name: trimmed, color, icon: "Tag", type },
           ];
+        }),
+      addMissingDefaults: () =>
+        setCategories((prev) => {
+          const missing = DEFAULT_CATEGORIES.filter(
+            (d) => !prev.some((c) => c.id === d.id)
+          );
+          return missing.length ? [...prev, ...missing] : prev;
         }),
       updateCategory: (id, patch) =>
         setCategories((prev) =>
