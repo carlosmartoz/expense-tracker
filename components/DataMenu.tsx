@@ -99,7 +99,7 @@ export default function DataMenu({ compact = false }: { compact?: boolean }) {
           aria-label="Export backup"
           title={isEmpty ? "Nothing to export yet" : "Download a backup"}
         >
-          <Download className={compact ? "h-[18px] w-[18px]" : "h-4 w-4"} />
+          <Download className={compact ? "h-4.5 w-4.5" : "h-4 w-4"} />
           {!compact && "Export backup"}
         </button>
 
@@ -109,7 +109,7 @@ export default function DataMenu({ compact = false }: { compact?: boolean }) {
           aria-label="Import"
           title="Import a JSON backup"
         >
-          <Upload className={compact ? "h-[18px] w-[18px]" : "h-4 w-4"} />
+          <Upload className={compact ? "h-4.5 w-4.5" : "h-4 w-4"} />
           {!compact && "Import"}
         </button>
 
@@ -124,7 +124,7 @@ export default function DataMenu({ compact = false }: { compact?: boolean }) {
           aria-label="Clear all"
           title="Delete every transaction"
         >
-          <Trash2 className={compact ? "h-[18px] w-[18px]" : "h-4 w-4"} />
+          <Trash2 className={compact ? "h-4.5 w-4.5" : "h-4 w-4"} />
           {!compact && "Clear all"}
         </button>
       </div>

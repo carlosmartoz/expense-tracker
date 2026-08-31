@@ -41,7 +41,7 @@ export default function CategoriesView() {
   const [error, setError] = useState<string | null>(null);
 
   const editing = editingId
-    ? categories.find((c) => c.id === editingId) ?? null
+    ? (categories.find((c) => c.id === editingId) ?? null)
     : null;
 
   const grouped = useMemo(
@@ -50,7 +50,7 @@ export default function CategoriesView() {
         ...side,
         items: categories.filter((c) => c.type === side.type),
       })),
-    [categories]
+    [categories],
   );
 
   /**
@@ -60,7 +60,7 @@ export default function CategoriesView() {
    * back — and a category they deleted on purpose stays deleted until they ask.
    */
   const missingDefaults = DEFAULT_CATEGORIES.filter(
-    (d) => !categories.some((c) => c.id === d.id)
+    (d) => !categories.some((c) => c.id === d.id),
   ).length;
 
   /** How many transactions point at each category, for the delete dialog. */
@@ -117,7 +117,7 @@ export default function CategoriesView() {
       (c) =>
         c.id !== editingId &&
         c.type === type &&
-        c.name.toLowerCase() === trimmed.toLowerCase()
+        c.name.toLowerCase() === trimmed.toLowerCase(),
     );
     if (clash) {
       setError("That name is already taken.");
@@ -135,7 +135,7 @@ export default function CategoriesView() {
     // The button isn't rendered for a default, so this only catches a stray call.
     if (isDefaultCategory(cat.id)) return;
     const fallback = categories.find(
-      (c) => c.type === cat.type && c.id !== cat.id
+      (c) => c.type === cat.type && c.id !== cat.id,
     );
     if (!fallback) {
       setError(`This is your only ${cat.type} category.`);
@@ -256,7 +256,12 @@ export default function CategoriesView() {
                         : ""
                     }`}
                   >
-                    {selected && <Check className="h-4 w-4 text-surface-base" strokeWidth={3} />}
+                    {selected && (
+                      <Check
+                        className="h-4 w-4 text-surface-base"
+                        strokeWidth={3}
+                      />
+                    )}
                   </motion.button>
                 );
               })}
@@ -339,7 +344,10 @@ export default function CategoriesView() {
                               : "border-border bg-surface-raised/40"
                           }`}
                         >
-                          <span className="shrink-0" style={{ color: cat.color }}>
+                          <span
+                            className="shrink-0"
+                            style={{ color: cat.color }}
+                          >
                             <Icon className="h-6 w-6" />
                           </span>
                           <div className="min-w-0 flex-1">

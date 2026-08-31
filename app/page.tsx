@@ -50,7 +50,7 @@ export default function Home() {
                     transition={{ type: "spring", stiffness: 500, damping: 40 }}
                   />
                 )}
-                <Icon className="h-[18px] w-[18px]" />
+                <Icon className="h-4.5 w-4.5" />
                 {t.label}
               </button>
             );
@@ -78,7 +78,7 @@ export default function Home() {
                   : "text-text-subtle hover:text-text-secondary"
               }`}
             >
-              <Icon className="h-[18px] w-[18px]" />
+              <Icon className="h-4.5 w-4.5" />
               {/* Room for the word on anything but a phone. */}
               <span className="hidden sm:inline">{t.label}</span>
             </button>
