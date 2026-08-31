@@ -130,7 +130,7 @@ export default function DataMenu({ compact = false }: { compact?: boolean }) {
       </div>
 
       {!compact && error && (
-        <p className="mt-2 text-xs font-medium leading-snug text-text-primary">{error}</p>
+        <p className="mt-2 text-xs leading-snug text-danger">{error}</p>
       )}
       {!compact && note && (
         <p className="mt-2 text-xs leading-snug text-text-secondary">{note}</p>

@@ -33,6 +33,13 @@
   --color-positive: #fafafa;
   --color-negative: #8f8f8f;
 
+  /* ----- Error
+     The one hue in the palette, and it is spent here on purpose: an error is
+     the only thing that has to interrupt. Reserve it for messages that say
+     something went wrong — not for destructive buttons, which the confirm
+     dialog already guards. */
+  --color-danger: #f87171;
+
   /* ----- Category tones
      Six steps that stay legible as an icon on a dark surface. A category is
      told apart by its icon and its name; the tone is only a nudge. */

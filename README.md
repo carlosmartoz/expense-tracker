@@ -79,12 +79,19 @@ English while amounts are grouped the Argentine way (`$ 1.234,56`). Those are
 two separate settings on purpose: `LOCALE` governs text and dates,
 `CURRENCY.locale` governs how numbers are grouped.
 
-**The palette is neutral on purpose — there is no hue anywhere.** Meaning is
-carried by position, weight, an icon or a `+`/`−` sign, never by colour. Every
-value lives as an `@theme` token in `app/globals.css`, and components reference
-tokens rather than hex literals. The one exception is `Category.color`, which is
-stored per category and holds one of the six steps in `CATEGORY_TONES`; a tone
-is a nudge, the icon and the name are what tell two categories apart.
+**The palette is neutral on purpose.** Meaning is carried by position, weight,
+an icon or a `+`/`−` sign, rather than by colour. Every value lives as an
+`@theme` token in `app/globals.css`, and components reference tokens rather
+than hex literals.
+
+There is exactly one hue in the whole app, `--color-danger`, and it belongs to
+error messages — the only thing that has to interrupt. Spending it anywhere
+else is what would make it stop working, so destructive buttons stay neutral;
+the confirm dialog is what guards those.
+
+Category tones are the other thing to know: `Category.color` is stored per
+category and holds one of the six steps in `CATEGORY_TONES`. A tone is a
+nudge — the icon and the name are what tell two categories apart.
 
 **Stored data is versioned.** `lib/storage.ts` keeps one key with a version
 stamp and a chain of migrations; each entry moves a snapshot forward one step.
