@@ -7,7 +7,7 @@ import { listItem, stagger } from "@/lib/motion";
 import { useStore } from "@/lib/store";
 import {
   categoryIcon,
-  CATEGORY_TONES,
+  CATEGORY_COLORS,
   MAX_CATEGORY_NAME_LENGTH,
   type Category,
   type TransactionType,
@@ -25,7 +25,7 @@ export default function CategoriesView() {
     useStore();
 
   const [name, setName] = useState("");
-  const [color, setColor] = useState<string>(CATEGORY_TONES[0]);
+  const [color, setColor] = useState<string>(CATEGORY_COLORS[0]);
   const [type, setType] = useState<TransactionType>("expense");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<Category | null>(null);
@@ -74,7 +74,7 @@ export default function CategoriesView() {
   function resetForm() {
     setEditingId(null);
     setName("");
-    setColor(CATEGORY_TONES[0]);
+    setColor(CATEGORY_COLORS[0]);
     setType("expense");
     setError(null);
   }
@@ -138,7 +138,8 @@ export default function CategoriesView() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Categories</h1>
         <p className="text-sm text-text-subtle">
-          One list for both sides of the book. Rename, retone or remove any of them.
+          One list for both sides of the book. Rename, recolour or remove any of
+          them.
         </p>
       </div>
 
@@ -198,9 +199,9 @@ export default function CategoriesView() {
           </div>
 
           <div>
-            <label className="stat-label">Tone</label>
+            <label className="stat-label">Colour</label>
             <div className="mt-2 flex flex-wrap gap-2.5">
-              {CATEGORY_TONES.map((c) => {
+              {CATEGORY_COLORS.map((c) => {
                 const selected = c === color;
                 return (
                   <motion.button
@@ -210,7 +211,7 @@ export default function CategoriesView() {
                       clearError();
                       setColor(c);
                     }}
-                    aria-label={`Select tone ${c}`}
+                    aria-label={`Select colour ${c}`}
                     aria-pressed={selected}
                     style={{ backgroundColor: c }}
                     whileHover={{ scale: 1.12 }}

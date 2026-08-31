@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { load, save, migrate, VERSION, type Snapshot } from "./storage";
-import { CATEGORY_TONES } from "./types";
+import { CATEGORY_COLORS } from "./types";
 import type { Category, Transaction } from "./types";
 
 /**
@@ -93,7 +93,7 @@ describe("adopting the two old keys", () => {
 });
 
 describe("climbing the migration chain", () => {
-  it.each([1, 2, 3, 4, 5])("reaches the current version starting from v%i", (from) => {
+  it.each([1, 2, 3, 4, 5, 6])("reaches the current version starting from v%i", (from) => {
     localStorage.setItem(KEY, JSON.stringify(asSnapshot(from)));
     expect(load()?.version).toBe(VERSION);
   });
@@ -162,17 +162,18 @@ describe("climbing the migration chain", () => {
     ]);
   });
 
-  it("re-tones every category, hue and dead theme token alike", () => {
+  it("puts every category on a colour from the current palette", () => {
     const out = migrate(asSnapshot(1));
-    const tones: string[] = [...CATEGORY_TONES];
-    expect(out.categories.every((c) => tones.includes(c.color))).toBe(true);
-    // The hex that was stored and the var() token that no longer resolves both
-    // have to be gone, or they'd render as colour on a neutral page.
-    expect(out.categories.find((c) => c.id === "Debts")?.color).not.toBe("#ef4444");
+    const palette: string[] = [...CATEGORY_COLORS];
+    expect(out.categories.every((c) => palette.includes(c.color))).toBe(true);
+  });
+
+  it("leaves no var() token behind, since those no longer resolve", () => {
+    const out = migrate(asSnapshot(1));
     expect(out.categories.some((c) => c.color.startsWith("var("))).toBe(false);
   });
 
-  it("keeps neighbouring categories on different tones", () => {
+  it("keeps neighbouring categories on different colours", () => {
     const out = migrate(asSnapshot(1));
     const pairs = out.categories.slice(1).map((c, i) => [out.categories[i].color, c.color]);
     expect(pairs.every(([a, b]) => a !== b)).toBe(true);

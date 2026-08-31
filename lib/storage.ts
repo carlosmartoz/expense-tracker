@@ -1,5 +1,5 @@
 import type { Transaction, Category, TransactionType } from "./types";
-import { CATEGORY_TONES } from "./types";
+import { CATEGORY_COLORS } from "./types";
 
 /**
  * Reading and writing the browser's copy of your data. This module owns the
@@ -9,7 +9,7 @@ import { CATEGORY_TONES } from "./types";
 const KEY = "expense-tracker";
 
 /** Bumped whenever the stored shape changes. See MIGRATIONS below. */
-export const VERSION = 5;
+export const VERSION = 6;
 
 /** The two keys the app wrote to before everything moved under a single one. */
 const LEGACY_TRANSACTIONS_KEY = "expense-tracker:transactions:v2";
@@ -86,18 +86,27 @@ const MIGRATIONS: ((snapshot: Snapshot) => Snapshot)[] = [
     };
   },
 
-  // 4 -> 5: the palette went neutral, so stored categories still carry hues —
-  // and some carry var(--color-cat-*) tokens that no longer exist. Each one is
-  // mapped onto the tone scale by its position, which is stable for a given
-  // list and keeps neighbours from landing on the same step.
-  (snapshot) => ({
+  // 4 -> 5, then 5 -> 6: the palette went neutral and category colours were
+  // flattened to greys; colour then came back, for the icon only. Both steps
+  // do the same thing — walk the list and hand each category the next entry in
+  // the current palette. Position keeps it stable for a given list and stops
+  // neighbours landing on the same value.
+  //
+  // Nobody loses a choice they made: v5 offered greys and nothing else, so
+  // there was no picked colour to preserve by the time this runs.
+  (snapshot) => recolour(snapshot),
+  (snapshot) => recolour(snapshot),
+];
+
+function recolour(snapshot: Snapshot): Snapshot {
+  return {
     ...snapshot,
     categories: snapshot.categories.map((c, i) => ({
       ...c,
-      color: CATEGORY_TONES[i % CATEGORY_TONES.length],
+      color: CATEGORY_COLORS[i % CATEGORY_COLORS.length],
     })),
-  }),
-];
+  };
+}
 
 /**
  * Brings a snapshot up to VERSION. Exported so an exported backup file — which

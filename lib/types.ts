@@ -1,18 +1,19 @@
 import type { LucideIcon } from "lucide-react";
 import {
   UtensilsCrossed,
+  ShoppingCart,
   Car,
-  House,
   Wrench,
   HeartPulse,
   Clapperboard,
   ShoppingBag,
+  Gamepad2,
   Receipt,
   Wallet,
   Briefcase,
   PiggyBank,
+  House,
   Tv,
-  Gamepad2,
   Landmark,
   Tag,
 } from "lucide-react";
@@ -31,7 +32,7 @@ export type TransactionType = "income" | "expense";
 export interface Category {
   id: string;
   name: string;
-  /** One of CATEGORY_TONES, or a var(--…) theme token. */
+  /** One of CATEGORY_COLORS. Applied to the category's icon and nothing else. */
   color: string;
   /** Key into ICON_MAP. Categories created by hand fall back to "Tag". */
   icon: string;
@@ -41,24 +42,25 @@ export interface Category {
 
 /**
  * Lucide icons referenced by name so a category can be serialized to storage.
- * The bottom three back categories that shipped with older versions; they stay
+ * The last three back categories that shipped with older versions; they stay
  * so data saved back then still draws its icon.
  */
 const ICON_MAP: Record<string, LucideIcon> = {
   UtensilsCrossed,
+  ShoppingCart,
   Car,
-  House,
   Wrench,
   HeartPulse,
   Clapperboard,
+  Gamepad2,
   ShoppingBag,
   Receipt,
   Wallet,
   Briefcase,
   PiggyBank,
   Tag,
+  House,
   Tv,
-  Gamepad2,
   Landmark,
 };
 
@@ -67,33 +69,46 @@ export function categoryIcon(icon: string | undefined): LucideIcon {
 }
 
 /**
- * The tones a category can take. The palette is neutral, so a tone is a nudge
- * rather than an identity — what actually tells two categories apart is the
- * icon and the name. Six steps is as many as stay distinguishable.
+ * The colours a category can take — the one place hue is allowed outside an
+ * error message, and it reaches no further than the icon. Distinct enough to
+ * pick a category out of a list at a glance, and each one legible against the
+ * dark surfaces. Stored per category, so these are literals rather than theme
+ * tokens: a token name could be renamed out from under saved data.
  */
-export const CATEGORY_TONES = [
-  "#fafafa",
-  "#dcdcdc",
-  "#bdbdbd",
-  "#9e9e9e",
-  "#808080",
-  "#666666",
+export const CATEGORY_COLORS = [
+  "#f59e0b", // amber
+  "#f97316", // orange
+  "#ef4444", // red
+  "#ec4899", // pink
+  "#d946ef", // fuchsia
+  "#a855f7", // purple
+  "#8b5cf6", // violet
+  "#6366f1", // indigo
+  "#0ea5e9", // sky
+  "#06b6d4", // cyan
+  "#14b8a6", // teal
+  "#22c55e", // green
+  "#84cc16", // lime
+  "#eab308", // yellow
+  "#94a3b8", // slate
 ] as const;
 
 export const DEFAULT_CATEGORIES: Category[] = [
-  // Expenses
-  { id: "Food", name: "Food", color: CATEGORY_TONES[0], icon: "UtensilsCrossed", type: "expense" },
-  { id: "Transport", name: "Transport", color: CATEGORY_TONES[1], icon: "Car", type: "expense" },
-  { id: "Home", name: "Home", color: CATEGORY_TONES[2], icon: "House", type: "expense" },
-  { id: "Services", name: "Services", color: CATEGORY_TONES[3], icon: "Wrench", type: "expense" },
-  { id: "Health", name: "Health", color: CATEGORY_TONES[4], icon: "HeartPulse", type: "expense" },
-  { id: "Entertainment", name: "Entertainment", color: CATEGORY_TONES[1], icon: "Clapperboard", type: "expense" },
-  { id: "Shopping", name: "Shopping", color: CATEGORY_TONES[2], icon: "ShoppingBag", type: "expense" },
-  { id: "Other", name: "Other", color: CATEGORY_TONES[5], icon: "Receipt", type: "expense" },
+  // Expenses. Food and Supermarket are deliberately separate: eating out and
+  // stocking the kitchen are different habits and worth watching apart.
+  { id: "Food", name: "Food", color: "#f59e0b", icon: "UtensilsCrossed", type: "expense" },
+  { id: "Supermarket", name: "Supermarket", color: "#84cc16", icon: "ShoppingCart", type: "expense" },
+  { id: "Transport", name: "Transport", color: "#8b5cf6", icon: "Car", type: "expense" },
+  { id: "Services", name: "Services", color: "#14b8a6", icon: "Wrench", type: "expense" },
+  { id: "Health", name: "Health", color: "#0ea5e9", icon: "HeartPulse", type: "expense" },
+  { id: "Entertainment", name: "Entertainment", color: "#d946ef", icon: "Clapperboard", type: "expense" },
+  { id: "Gaming", name: "Gaming", color: "#06b6d4", icon: "Gamepad2", type: "expense" },
+  { id: "Shopping", name: "Shopping", color: "#f97316", icon: "ShoppingBag", type: "expense" },
+  { id: "Other", name: "Other", color: "#94a3b8", icon: "Receipt", type: "expense" },
   // Income
-  { id: "Salary", name: "Salary", color: CATEGORY_TONES[0], icon: "Wallet", type: "income" },
-  { id: "Freelance", name: "Freelance", color: CATEGORY_TONES[2], icon: "Briefcase", type: "income" },
-  { id: "OtherIncome", name: "Other", color: CATEGORY_TONES[5], icon: "PiggyBank", type: "income" },
+  { id: "Salary", name: "Salary", color: "#ec4899", icon: "Wallet", type: "income" },
+  { id: "Freelance", name: "Freelance", color: "#22c55e", icon: "Briefcase", type: "income" },
+  { id: "OtherIncome", name: "Other", color: "#a855f7", icon: "PiggyBank", type: "income" },
 ];
 
 /** Max characters for a category name. */

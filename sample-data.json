@@ -1,5 +1,5 @@
 {
-  "version": 5,
+  "version": 6,
   "transactions": [
     {
       "id": "seed-mtgeqgpr-1",
@@ -13,7 +13,7 @@
       "id": "seed-mtgeqgpr-2",
       "type": "expense",
       "amount": 6500,
-      "categoryId": "Food",
+      "categoryId": "Supermarket",
       "description": "Supermarket",
       "date": "2026-04-02"
     },
@@ -29,7 +29,7 @@
       "id": "seed-mtgeqgpr-4",
       "type": "expense",
       "amount": 9500,
-      "categoryId": "Food",
+      "categoryId": "Supermarket",
       "description": "Supermarket",
       "date": "2026-04-08"
     },
@@ -45,7 +45,7 @@
       "id": "seed-mtgeqgpr-6",
       "type": "expense",
       "amount": 8000,
-      "categoryId": "Food",
+      "categoryId": "Supermarket",
       "description": "Supermarket",
       "date": "2026-04-14"
     },
@@ -149,7 +149,7 @@
       "id": "seed-mtgeqgpr-19",
       "type": "expense",
       "amount": 12000,
-      "categoryId": "Entertainment",
+      "categoryId": "Gaming",
       "description": "Steam",
       "date": "2026-04-14"
     },
@@ -157,7 +157,7 @@
       "id": "seed-mtgeqgpr-20",
       "type": "expense",
       "amount": 38000,
-      "categoryId": "Home",
+      "categoryId": "Services",
       "description": "Rent / Fees",
       "date": "2026-04-10"
     },
@@ -197,7 +197,7 @@
       "id": "seed-mtgeqgpr-25",
       "type": "expense",
       "amount": 6500,
-      "categoryId": "Food",
+      "categoryId": "Supermarket",
       "description": "Supermarket",
       "date": "2026-05-02"
     },
@@ -213,7 +213,7 @@
       "id": "seed-mtgeqgpr-27",
       "type": "expense",
       "amount": 9500,
-      "categoryId": "Food",
+      "categoryId": "Supermarket",
       "description": "Supermarket",
       "date": "2026-05-08"
     },
@@ -229,7 +229,7 @@
       "id": "seed-mtgeqgpr-29",
       "type": "expense",
       "amount": 8000,
-      "categoryId": "Food",
+      "categoryId": "Supermarket",
       "description": "Supermarket",
       "date": "2026-05-14"
     },
@@ -333,7 +333,7 @@
       "id": "seed-mtgeqgpr-42",
       "type": "expense",
       "amount": 38000,
-      "categoryId": "Home",
+      "categoryId": "Services",
       "description": "Rent / Fees",
       "date": "2026-05-10"
     },
@@ -381,7 +381,7 @@
       "id": "seed-mtgeqgpr-48",
       "type": "expense",
       "amount": 6500,
-      "categoryId": "Food",
+      "categoryId": "Supermarket",
       "description": "Supermarket",
       "date": "2026-06-02"
     },
@@ -397,7 +397,7 @@
       "id": "seed-mtgeqgpr-50",
       "type": "expense",
       "amount": 9500,
-      "categoryId": "Food",
+      "categoryId": "Supermarket",
       "description": "Supermarket",
       "date": "2026-06-08"
     },
@@ -413,7 +413,7 @@
       "id": "seed-mtgeqgpr-52",
       "type": "expense",
       "amount": 8000,
-      "categoryId": "Food",
+      "categoryId": "Supermarket",
       "description": "Supermarket",
       "date": "2026-06-14"
     },
@@ -517,7 +517,7 @@
       "id": "seed-mtgeqgpr-65",
       "type": "expense",
       "amount": 12000,
-      "categoryId": "Entertainment",
+      "categoryId": "Gaming",
       "description": "Steam",
       "date": "2026-06-14"
     },
@@ -525,7 +525,7 @@
       "id": "seed-mtgeqgpr-66",
       "type": "expense",
       "amount": 38000,
-      "categoryId": "Home",
+      "categoryId": "Services",
       "description": "Rent / Fees",
       "date": "2026-06-10"
     },
@@ -573,7 +573,7 @@
       "id": "seed-mtgeqgpr-72",
       "type": "expense",
       "amount": 6500,
-      "categoryId": "Food",
+      "categoryId": "Supermarket",
       "description": "Supermarket",
       "date": "2026-07-02"
     },
@@ -589,7 +589,7 @@
       "id": "seed-mtgeqgpr-74",
       "type": "expense",
       "amount": 9500,
-      "categoryId": "Food",
+      "categoryId": "Supermarket",
       "description": "Supermarket",
       "date": "2026-07-08"
     },
@@ -605,7 +605,7 @@
       "id": "seed-mtgeqgpr-76",
       "type": "expense",
       "amount": 8000,
-      "categoryId": "Food",
+      "categoryId": "Supermarket",
       "description": "Supermarket",
       "date": "2026-07-14"
     },
@@ -717,7 +717,7 @@
       "id": "seed-mtgeqgpr-90",
       "type": "expense",
       "amount": 38000,
-      "categoryId": "Home",
+      "categoryId": "Services",
       "description": "Rent / Fees",
       "date": "2026-07-10"
     },
@@ -773,7 +773,7 @@
       "id": "seed-mtgeqgpr-97",
       "type": "expense",
       "amount": 6500,
-      "categoryId": "Food",
+      "categoryId": "Supermarket",
       "description": "Supermarket",
       "date": "2026-08-02"
     },
@@ -789,7 +789,7 @@
       "id": "seed-mtgeqgpr-99",
       "type": "expense",
       "amount": 9500,
-      "categoryId": "Food",
+      "categoryId": "Supermarket",
       "description": "Supermarket",
       "date": "2026-08-08"
     },
@@ -805,7 +805,7 @@
       "id": "seed-mtgeqgpr-101",
       "type": "expense",
       "amount": 8000,
-      "categoryId": "Food",
+      "categoryId": "Supermarket",
       "description": "Supermarket",
       "date": "2026-08-14"
     },
@@ -821,7 +821,7 @@
       "id": "seed-mtgeqgpr-103",
       "type": "expense",
       "amount": 6500,
-      "categoryId": "Food",
+      "categoryId": "Supermarket",
       "description": "Supermarket",
       "date": "2026-08-20"
     },
@@ -837,7 +837,7 @@
       "id": "seed-mtgeqgpr-105",
       "type": "expense",
       "amount": 9500,
-      "categoryId": "Food",
+      "categoryId": "Supermarket",
       "description": "Supermarket",
       "date": "2026-08-26"
     },
@@ -973,7 +973,7 @@
       "id": "seed-mtgeqgpr-122",
       "type": "expense",
       "amount": 12000,
-      "categoryId": "Entertainment",
+      "categoryId": "Gaming",
       "description": "Steam",
       "date": "2026-08-14"
     },
@@ -981,7 +981,7 @@
       "id": "seed-mtgeqgpr-123",
       "type": "expense",
       "amount": 38000,
-      "categoryId": "Home",
+      "categoryId": "Services",
       "description": "Rent / Fees",
       "date": "2026-08-10"
     },
@@ -1022,77 +1022,84 @@
     {
       "id": "Food",
       "name": "Food",
-      "color": "#fafafa",
+      "color": "#f59e0b",
       "icon": "UtensilsCrossed",
+      "type": "expense"
+    },
+    {
+      "id": "Supermarket",
+      "name": "Supermarket",
+      "color": "#84cc16",
+      "icon": "ShoppingCart",
       "type": "expense"
     },
     {
       "id": "Transport",
       "name": "Transport",
-      "color": "#dcdcdc",
+      "color": "#8b5cf6",
       "icon": "Car",
-      "type": "expense"
-    },
-    {
-      "id": "Home",
-      "name": "Home",
-      "color": "#bdbdbd",
-      "icon": "House",
       "type": "expense"
     },
     {
       "id": "Services",
       "name": "Services",
-      "color": "#9e9e9e",
+      "color": "#14b8a6",
       "icon": "Wrench",
       "type": "expense"
     },
     {
       "id": "Health",
       "name": "Health",
-      "color": "#808080",
+      "color": "#0ea5e9",
       "icon": "HeartPulse",
       "type": "expense"
     },
     {
       "id": "Entertainment",
       "name": "Entertainment",
-      "color": "#666666",
+      "color": "#d946ef",
       "icon": "Clapperboard",
+      "type": "expense"
+    },
+    {
+      "id": "Gaming",
+      "name": "Gaming",
+      "color": "#06b6d4",
+      "icon": "Gamepad2",
       "type": "expense"
     },
     {
       "id": "Shopping",
       "name": "Shopping",
-      "color": "#fafafa",
+      "color": "#f97316",
       "icon": "ShoppingBag",
       "type": "expense"
     },
     {
       "id": "Other",
       "name": "Other",
-      "color": "#dcdcdc",
+      "color": "#94a3b8",
       "icon": "Receipt",
       "type": "expense"
     },
     {
       "id": "Salary",
       "name": "Salary",
-      "color": "#bdbdbd",
+      "color": "#ec4899",
       "icon": "Wallet",
       "type": "income"
     },
     {
       "id": "Freelance",
       "name": "Freelance",
-      "color": "#9e9e9e",
+      "color": "#22c55e",
       "icon": "Briefcase",
       "type": "income"
     },
     {
       "id": "OtherIncome",
       "name": "Other",
-      "color": "#808080",
+      "color": "#a855f7",
       "icon": "PiggyBank",
       "type": "income"
     }

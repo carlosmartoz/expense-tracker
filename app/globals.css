@@ -34,21 +34,12 @@
   --color-negative: #8f8f8f;
 
   /* ----- Error
-     The one hue in the palette, and it is spent here on purpose: an error is
-     the only thing that has to interrupt. Reserve it for messages that say
-     something went wrong — not for destructive buttons, which the confirm
-     dialog already guards. */
+     The only hue defined here, and it is spent on purpose: an error is the one
+     thing that has to interrupt. Reserve it for messages that say something
+     went wrong — not for destructive buttons, which the confirm dialog already
+     guards. (Category icons also carry colour, but that is stored per category
+     in CATEGORY_COLORS rather than themed here.) */
   --color-danger: #f87171;
-
-  /* ----- Category tones
-     Six steps that stay legible as an icon on a dark surface. A category is
-     told apart by its icon and its name; the tone is only a nudge. */
-  --color-cat-1: #fafafa;
-  --color-cat-2: #dcdcdc;
-  --color-cat-3: #bdbdbd;
-  --color-cat-4: #9e9e9e;
-  --color-cat-5: #808080;
-  --color-cat-6: #666666;
 
   /* ----- Effects ----- */
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.5), 0 16px 40px rgba(0, 0, 0, 0.4);

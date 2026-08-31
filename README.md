@@ -47,8 +47,8 @@ worth having.
 - **Transactions** — the ledger. Add, edit and delete, with the running balance
   for whatever the filters are showing, and filters by month, category, type
   and free text.
-- **Categories** — one list covering both sides of the book. Rename, retone or
-  remove any of them.
+- **Categories** — one list covering both sides of the book. Rename, recolour
+  or remove any of them.
 
 ## How it fits together
 
@@ -79,19 +79,27 @@ English while amounts are grouped the Argentine way (`$ 1.234,56`). Those are
 two separate settings on purpose: `LOCALE` governs text and dates,
 `CURRENCY.locale` governs how numbers are grouped.
 
-**The palette is neutral on purpose.** Meaning is carried by position, weight,
-an icon or a `+`/`−` sign, rather than by colour. Every value lives as an
-`@theme` token in `app/globals.css`, and components reference tokens rather
-than hex literals.
+**The interface is neutral on purpose.** Surfaces, text, buttons and states are
+greyscale; meaning is carried by position, weight, an icon or a `+`/`−` sign.
+Every value lives as an `@theme` token in `app/globals.css`, and components
+reference tokens rather than hex literals.
 
-There is exactly one hue in the whole app, `--color-danger`, and it belongs to
-error messages — the only thing that has to interrupt. Spending it anywhere
-else is what would make it stop working, so destructive buttons stay neutral;
-the confirm dialog is what guards those.
+Colour is rationed to two jobs, and both earn it:
 
-Category tones are the other thing to know: `Category.color` is stored per
-category and holds one of the six steps in `CATEGORY_TONES`. A tone is a
-nudge — the icon and the name are what tell two categories apart.
+- `--color-danger` is the only hue in the stylesheet, and it belongs to error
+  messages — the one thing that has to interrupt. Spending it elsewhere is what
+  would stop it working, so destructive buttons stay neutral; the confirm
+  dialog is what guards those.
+- **Category icons**, and nothing else about a category. `Category.color` holds
+  one of `CATEGORY_COLORS` and is applied as an inline style on the icon, never
+  to a row, a label or a background. It is stored per category, which is why
+  the palette is hex literals rather than theme tokens: a token could be
+  renamed out from under saved data.
+
+A useful check when changing any of this: build, then grep the compiled
+stylesheet for hex values whose R, G and B are more than a few points apart.
+`--color-danger` should be the only hit — category colours live in the data,
+not the stylesheet.
 
 **Stored data is versioned.** `lib/storage.ts` keeps one key with a version
 stamp and a chain of migrations; each entry moves a snapshot forward one step.
@@ -123,7 +131,7 @@ variant rather than writing a one-off. The whole app is wrapped in
 npm test
 ```
 
-68 tests, mostly over `lib/`, which is where a mistake is silent: the
+70 tests, mostly over `lib/`, which is where a mistake is silent: the
 migration chain step by step, the backup round-trip, the ceiling on an amount,
 and the money and date formatting. `components/Portal.test.tsx` is the
 exception — it pins down that overlays render into `<body>`, which is
