@@ -151,7 +151,7 @@ variant rather than writing a one-off. The whole app is wrapped in
 npm test
 ```
 
-82 tests, mostly over `lib/`, which is where a mistake is silent: the
+83 tests, mostly over `lib/`, which is where a mistake is silent: the
 migration chain step by step, the backup round-trip, the ceiling on an amount,
 and the money and date formatting. `components/Portal.test.tsx` is the
 exception — it pins down that overlays render into `<body>`, which is

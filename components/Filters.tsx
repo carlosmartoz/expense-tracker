@@ -58,14 +58,14 @@ export default function FiltersBar({
   return (
     <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
       <input
-        className="input col-span-2 sm:w-[180px] sm:flex-none"
+        className="input col-span-2 sm:w-45 sm:flex-none"
         placeholder="Search…"
         value={filters.search}
         onChange={(e) => patch({ search: e.target.value })}
       />
 
       <Select
-        className="w-full sm:w-[160px]"
+        className="w-full sm:w-40"
         ariaLabel="Filter by month"
         value={filters.month}
         options={monthOptions}
@@ -73,7 +73,7 @@ export default function FiltersBar({
       />
 
       <Select
-        className="w-full sm:w-[190px]"
+        className="w-full sm:w-47.5"
         ariaLabel="Filter by category"
         value={filters.categoryId}
         options={categoryOptions}
@@ -81,7 +81,7 @@ export default function FiltersBar({
       />
 
       <Select
-        className="w-full sm:w-[130px]"
+        className="w-full sm:w-32.5"
         ariaLabel="Filter by type"
         value={filters.type}
         options={typeOptions}

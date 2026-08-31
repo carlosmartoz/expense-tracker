@@ -1,5 +1,5 @@
 {
-  "version": 7,
+  "version": 8,
   "transactions": [
     {
       "id": "seed-mtgeqgpr-1",
@@ -565,7 +565,7 @@
       "id": "seed-mtgeqgpr-71",
       "type": "income",
       "amount": 120000,
-      "categoryId": "Freelance",
+      "categoryId": "OtherIncome",
       "description": "Freelance",
       "date": "2026-07-18"
     },
@@ -765,7 +765,7 @@
       "id": "seed-mtgeqgpr-96",
       "type": "income",
       "amount": 120000,
-      "categoryId": "Freelance",
+      "categoryId": "OtherIncome",
       "description": "Freelance",
       "date": "2026-08-18"
     },
@@ -1022,35 +1022,35 @@
     {
       "id": "Food",
       "name": "Food",
-      "color": "#f59e0b",
+      "color": "#ef4444",
       "icon": "UtensilsCrossed",
       "type": "expense"
     },
     {
       "id": "Supermarket",
       "name": "Supermarket",
-      "color": "#84cc16",
+      "color": "#eab308",
       "icon": "ShoppingCart",
       "type": "expense"
     },
     {
       "id": "Transport",
       "name": "Transport",
-      "color": "#8b5cf6",
+      "color": "#06b6d4",
       "icon": "Car",
       "type": "expense"
     },
     {
       "id": "Services",
       "name": "Services",
-      "color": "#14b8a6",
+      "color": "#ec4899",
       "icon": "Wrench",
       "type": "expense"
     },
     {
       "id": "Health",
       "name": "Health",
-      "color": "#0ea5e9",
+      "color": "#22c55e",
       "icon": "HeartPulse",
       "type": "expense"
     },
@@ -1064,14 +1064,14 @@
     {
       "id": "Gaming",
       "name": "Gaming",
-      "color": "#06b6d4",
+      "color": "#8b5cf6",
       "icon": "Gamepad2",
       "type": "expense"
     },
     {
       "id": "Shopping",
       "name": "Shopping",
-      "color": "#f97316",
+      "color": "#3b82f6",
       "icon": "ShoppingBag",
       "type": "expense"
     },
@@ -1085,15 +1085,8 @@
     {
       "id": "Salary",
       "name": "Salary",
-      "color": "#ec4899",
+      "color": "#f97316",
       "icon": "Wallet",
-      "type": "income"
-    },
-    {
-      "id": "Freelance",
-      "name": "Freelance",
-      "color": "#22c55e",
-      "icon": "Briefcase",
       "type": "income"
     },
     {

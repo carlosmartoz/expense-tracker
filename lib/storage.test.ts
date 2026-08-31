@@ -93,7 +93,7 @@ describe("adopting the two old keys", () => {
 });
 
 describe("climbing the migration chain", () => {
-  it.each([1, 2, 3, 4, 5, 6, 7])("reaches the current version starting from v%i", (from) => {
+  it.each([1, 2, 3, 4, 5, 6, 7, 8])("reaches the current version starting from v%i", (from) => {
     localStorage.setItem(KEY, JSON.stringify(asSnapshot(from)));
     expect(load()?.version).toBe(VERSION);
   });

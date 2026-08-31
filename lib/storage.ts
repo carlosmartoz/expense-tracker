@@ -9,7 +9,7 @@ import { CATEGORY_COLORS, DEFAULT_CATEGORIES } from "./types";
 const KEY = "expense-tracker";
 
 /** Bumped whenever the stored shape changes. See MIGRATIONS below. */
-export const VERSION = 7;
+export const VERSION = 8;
 
 /** The two keys the app wrote to before everything moved under a single one. */
 const LEGACY_TRANSACTIONS_KEY = "expense-tracker:transactions:v2";
@@ -101,17 +101,28 @@ const MIGRATIONS: ((snapshot: Snapshot) => Snapshot)[] = [
   // handout above no longer lands anywhere sensible. Every category the app
   // ships with is put back on its own colour and icon; anything the reader
   // made themselves is left exactly as it is.
-  (snapshot) => {
-    const canonical = new Map(DEFAULT_CATEGORIES.map((c) => [c.id, c]));
-    return {
-      ...snapshot,
-      categories: snapshot.categories.map((c) => {
-        const def = canonical.get(c.id);
-        return def ? { ...c, color: def.color, icon: def.icon } : c;
-      }),
-    };
-  },
+  (snapshot) => restoreDefaults(snapshot),
+
+  // 7 -> 8: the palette was picked by hand rather than borrowed, so the
+  // shipped categories move again. Same rule as the step before it, which is
+  // why they share an implementation.
+  (snapshot) => restoreDefaults(snapshot),
 ];
+
+/**
+ * Puts every category the app ships with back on its own colour and icon, and
+ * leaves anything the reader made — or any default since retired — untouched.
+ */
+function restoreDefaults(snapshot: Snapshot): Snapshot {
+  const canonical = new Map(DEFAULT_CATEGORIES.map((c) => [c.id, c]));
+  return {
+    ...snapshot,
+    categories: snapshot.categories.map((c) => {
+      const def = canonical.get(c.id);
+      return def ? { ...c, color: def.color, icon: def.icon } : c;
+    }),
+  };
+}
 
 function recolour(snapshot: Snapshot): Snapshot {
   return {

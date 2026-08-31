@@ -41,7 +41,7 @@ export default function TransactionList({
 
   return (
     <>
-      <ul className="divide-y divide-white/[0.06]">
+      <ul className="divide-y divide-white/6">
         {transactions.map((t) => {
           const meta = categoryMap[t.categoryId];
           const Icon = categoryIcon(meta?.icon);

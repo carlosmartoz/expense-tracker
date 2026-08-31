@@ -10,9 +10,9 @@ import {
   Gamepad2,
   CircleEllipsis,
   Wallet,
-  Briefcase,
   PiggyBank,
   Tag,
+  Briefcase,
   Receipt,
   House,
   Tv,
@@ -57,10 +57,10 @@ const ICON_MAP: Record<string, LucideIcon> = {
   ShoppingBag,
   CircleEllipsis,
   Wallet,
-  Briefcase,
   PiggyBank,
   Tag,
   // Behind categories that shipped with older versions.
+  Briefcase,
   Receipt,
   House,
   Tv,
@@ -85,16 +85,15 @@ export function categoryIcon(icon: string | undefined): LucideIcon {
  */
 export const CATEGORY_COLORS = [
   "#ffffff", // white — the catch-all, on both sides
-  "#f59e0b", // amber
+  "#ef4444", // red
   "#f97316", // orange
-  "#ec4899", // pink
-  "#d946ef", // fuchsia
-  "#8b5cf6", // violet
-  "#0ea5e9", // sky
-  "#06b6d4", // cyan
-  "#14b8a6", // teal
+  "#eab308", // yellow
   "#22c55e", // green
-  "#84cc16", // lime
+  "#06b6d4", // cyan
+  "#3b82f6", // blue
+  "#8b5cf6", // violet
+  "#d946ef", // fuchsia
+  "#ec4899", // pink
 ] as const;
 
 /**
@@ -109,18 +108,17 @@ export const CATEGORY_COLORS = [
 export const DEFAULT_CATEGORIES: Category[] = [
   // Expenses. Food and Supermarket are deliberately separate: eating out and
   // stocking the kitchen are different habits and worth watching apart.
-  { id: "Food", name: "Food", color: "#f59e0b", icon: "UtensilsCrossed", type: "expense" },
-  { id: "Supermarket", name: "Supermarket", color: "#84cc16", icon: "ShoppingCart", type: "expense" },
-  { id: "Transport", name: "Transport", color: "#8b5cf6", icon: "Car", type: "expense" },
-  { id: "Services", name: "Services", color: "#14b8a6", icon: "Wrench", type: "expense" },
-  { id: "Health", name: "Health", color: "#0ea5e9", icon: "HeartPulse", type: "expense" },
+  { id: "Food", name: "Food", color: "#ef4444", icon: "UtensilsCrossed", type: "expense" },
+  { id: "Supermarket", name: "Supermarket", color: "#eab308", icon: "ShoppingCart", type: "expense" },
+  { id: "Transport", name: "Transport", color: "#06b6d4", icon: "Car", type: "expense" },
+  { id: "Services", name: "Services", color: "#ec4899", icon: "Wrench", type: "expense" },
+  { id: "Health", name: "Health", color: "#22c55e", icon: "HeartPulse", type: "expense" },
   { id: "Entertainment", name: "Entertainment", color: "#d946ef", icon: "Clapperboard", type: "expense" },
-  { id: "Gaming", name: "Gaming", color: "#06b6d4", icon: "Gamepad2", type: "expense" },
-  { id: "Shopping", name: "Shopping", color: "#f97316", icon: "ShoppingBag", type: "expense" },
+  { id: "Gaming", name: "Gaming", color: "#8b5cf6", icon: "Gamepad2", type: "expense" },
+  { id: "Shopping", name: "Shopping", color: "#3b82f6", icon: "ShoppingBag", type: "expense" },
   { id: "Other", name: "Other", color: "#ffffff", icon: "CircleEllipsis", type: "expense" },
   // Income
-  { id: "Salary", name: "Salary", color: "#ec4899", icon: "Wallet", type: "income" },
-  { id: "Freelance", name: "Freelance", color: "#22c55e", icon: "Briefcase", type: "income" },
+  { id: "Salary", name: "Salary", color: "#f97316", icon: "Wallet", type: "income" },
   // Same colour and icon as its expense twin: it is the same idea, on the
   // other side of the book.
   { id: "OtherIncome", name: "Other", color: "#ffffff", icon: "CircleEllipsis", type: "income" },
