@@ -20,9 +20,9 @@ export default function Home() {
   const [tab, setTab] = useState<Tab>("movements");
 
   return (
-    <div className="min-h-screen lg:flex">
+    <div className="min-h-screen xl:flex">
       {/* Sidebar */}
-      <aside className="hidden w-60 shrink-0 flex-col border-r border-border bg-surface-panel p-5 lg:flex lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto">
+      <aside className="hidden w-60 shrink-0 flex-col border-r border-border bg-surface-panel p-5 xl:flex xl:sticky xl:top-0 xl:h-screen xl:overflow-y-auto">
         <div className="mb-8">
           <span className="text-lg font-bold tracking-tight text-text-primary">
             {APP_NAME}
@@ -62,8 +62,8 @@ export default function Home() {
         </div>
       </aside>
 
-      {/* Mobile top nav */}
-      <div className="sticky top-0 z-10 flex items-center gap-1 border-b border-border bg-surface-base/90 px-4 py-2 backdrop-blur lg:hidden">
+      {/* Header, below xl — where there is no room for the sidebar */}
+      <div className="sticky top-0 z-10 flex items-center gap-1 border-b border-border bg-surface-base/90 px-4 py-2 backdrop-blur xl:hidden">
         <span className="mr-auto min-w-0 truncate font-bold">{APP_NAME}</span>
         {TABS.map((t) => {
           const Icon = t.icon;
@@ -72,13 +72,15 @@ export default function Home() {
               key={t.id}
               onClick={() => setTab(t.id)}
               aria-label={t.label}
-              className={`cursor-pointer rounded-lg px-3 py-1.5 text-sm font-medium ${
+              className={`flex cursor-pointer items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition ${
                 tab === t.id
                   ? "bg-surface-raised text-text-primary"
-                  : "text-text-subtle"
+                  : "text-text-subtle hover:text-text-secondary"
               }`}
             >
               <Icon className="h-[18px] w-[18px]" />
+              {/* Room for the word on anything but a phone. */}
+              <span className="hidden sm:inline">{t.label}</span>
             </button>
           );
         })}
