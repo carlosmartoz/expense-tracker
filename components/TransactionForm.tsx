@@ -84,7 +84,7 @@ export default function TransactionForm({
     // The field caps what can be typed, but an amount that arrived by import
     // can be over it and reach here through the edit form.
     if (value > MAX_AMOUNT) {
-      setError(`The most you can enter is ${formatMoney(MAX_AMOUNT)}.`);
+      setError(`Maximum is ${formatMoney(MAX_AMOUNT)}.`);
       return;
     }
     if (!selected) {
@@ -196,17 +196,21 @@ export default function TransactionForm({
         />
       </div>
 
-      {error && (
-        <p className="text-sm text-danger">
+      {/* The message sits with the button it belongs to, in its own group, so
+          the form's spacing doesn't pay for it twice. It is always here and
+          empty when there's nothing wrong: min-h-5 matches the line-height of
+          text-sm, so the slot holds one line either way and the button never
+          moves. role="alert" announces the message when it turns up. */}
+      <div className="space-y-1">
+        <p role="alert" className="min-h-5 text-sm text-danger">
           {error}
         </p>
-      )}
-
-      <button type="submit" className="btn-primary w-full">
-        {isEditing
-          ? "Save changes"
-          : `Add ${type === "expense" ? "expense" : "income"}`}
-      </button>
+        <button type="submit" className="btn-primary w-full">
+          {isEditing
+            ? "Save changes"
+            : `Add ${type === "expense" ? "expense" : "income"}`}
+        </button>
+      </div>
     </form>
   );
 }

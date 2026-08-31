@@ -97,7 +97,7 @@ export default function CategoriesView() {
         c.name.toLowerCase() === trimmed.toLowerCase()
     );
     if (clash) {
-      setError(`There's already a ${type} category with that name.`);
+      setError("That name is already taken.");
       return;
     }
     if (editingId) {
@@ -113,9 +113,7 @@ export default function CategoriesView() {
       (c) => c.type === cat.type && c.id !== cat.id
     );
     if (!fallback) {
-      setError(
-        `“${cat.name}” is your only ${cat.type} category — create another one first.`
-      );
+      setError(`This is your only ${cat.type} category.`);
       return;
     }
     setError(null);
@@ -216,34 +214,40 @@ export default function CategoriesView() {
             </div>
           </div>
 
-          {error && (
-            <p className="text-sm text-danger">
+          {/* The message sits with the buttons it belongs to, in its own
+              group, so the form's spacing doesn't pay for it twice. It is
+              always here and empty when there's nothing wrong: min-h-5 matches
+              the line-height of text-sm, so the slot holds one line either way
+              and the buttons never move. role="alert" announces the message
+              when it turns up. */}
+          <div className="space-y-1">
+            <p role="alert" className="min-h-5 text-sm text-danger">
               {error}
             </p>
-          )}
 
-          <div className="flex gap-2">
-            <button type="submit" className="btn-primary flex-1">
-              {editing ? (
-                <>
-                  <Check className="h-4 w-4" /> Save changes
-                </>
-              ) : (
-                <>
-                  <Plus className="h-4 w-4" /> Add category
-                </>
-              )}
-            </button>
-            {editing && (
-              <button
-                type="button"
-                onClick={resetForm}
-                className="btn-ghost"
-                aria-label="Cancel edit"
-              >
-                <X className="h-4 w-4" /> Cancel
+            <div className="flex gap-2">
+              <button type="submit" className="btn-primary flex-1">
+                {editing ? (
+                  <>
+                    <Check className="h-4 w-4" /> Save changes
+                  </>
+                ) : (
+                  <>
+                    <Plus className="h-4 w-4" /> Add category
+                  </>
+                )}
               </button>
-            )}
+              {editing && (
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  className="btn-ghost"
+                  aria-label="Cancel edit"
+                >
+                  <X className="h-4 w-4" /> Cancel
+                </button>
+              )}
+            </div>
           </div>
         </form>
 
