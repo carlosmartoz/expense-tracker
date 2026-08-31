@@ -34,15 +34,15 @@ anywhere else.
 So export a backup now and then. The sidebar has both:
 
 - **Export backup** writes a JSON file that restores everything exactly,
-  categories included. It is also the format to keep: a backup taken by an
-  older version of the app still imports, because it goes through the same
-  migration chain as stored data.
-- **Export CSV** writes the transactions for a spreadsheet, with category names
-  rather than internal ids.
+  categories included. This is the one to keep: a backup taken by an older
+  version of the app still imports, because it goes through the same migration
+  chain as stored data.
+- **Export CSV** writes the transactions for a spreadsheet. It goes one way
+  only — a CSV names categories rather than describing them, so it can't carry
+  everything back.
 
-**Import** accepts either. It replaces what is currently in the browser, so it
-asks first and tells you what the file holds. A CSV that names a category you
-don't have creates it.
+**Import** takes a `.json` backup. It replaces what is currently in the
+browser, so it asks first and tells you what the file holds.
 
 ## The two screens
 
@@ -68,7 +68,7 @@ lib/
   config.ts        app name, locale, currency — start here to re-skin
   types.ts         the whole data model: Transaction and Category
   storage.ts       reading and writing localStorage, and the migration chain
-  backup.ts        export and import, JSON and CSV
+  backup.ts        JSON backup in and out, CSV export
   store.tsx        state and the operations on it (Context)
   format.ts        money, dates and the months a ledger covers
   motion.ts        shared animation variants

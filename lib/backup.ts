@@ -1,16 +1,18 @@
-import type { Category, Transaction, TransactionType } from "./types";
-import { CATEGORY_TONES } from "./types";
+import type { Category, Transaction } from "./types";
 import { migrate, VERSION, type Snapshot } from "./storage";
 import { APP_NAME } from "./config";
 
 /**
  * Getting your data out of the browser and back in.
  *
- * Two formats, for two jobs:
- *  - JSON is the backup. It round-trips exactly, categories included, and can
- *    be read back even if it was written by an older version of the app.
- *  - CSV is for spreadsheets. It carries transactions only, with category
- *    *names* rather than ids, because that's what's readable in a column.
+ * JSON is the backup, and the only thing that comes back in: it round-trips
+ * exactly, categories included, and can be read even if it was written by an
+ * older version of the app.
+ *
+ * CSV goes one way only, to a spreadsheet. It carries transactions with
+ * category *names* rather than ids, because that is what's readable in a
+ * column — and what a name can't carry is the rest of a category, which is why
+ * it isn't a backup and isn't accepted back.
  */
 
 export class BackupError extends Error {}
@@ -95,128 +97,6 @@ export function parseJSON(text: string): Snapshot {
     transactions: obj.transactions,
     categories: obj.categories,
   });
-}
-
-/** Splits one CSV line, honouring quoted fields and doubled quotes. */
-function splitCSVLine(line: string): string[] {
-  const out: string[] = [];
-  let cell = "";
-  let quoted = false;
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i];
-    if (quoted) {
-      if (ch === '"') {
-        if (line[i + 1] === '"') {
-          cell += '"';
-          i++;
-        } else {
-          quoted = false;
-        }
-      } else {
-        cell += ch;
-      }
-    } else if (ch === '"') {
-      quoted = true;
-    } else if (ch === ",") {
-      out.push(cell);
-      cell = "";
-    } else {
-      cell += ch;
-    }
-  }
-  out.push(cell);
-  return out;
-}
-
-function uid(): string {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return crypto.randomUUID();
-  }
-  return `id-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-}
-
-/**
- * Reads a CSV of transactions against the categories you already have.
- * A row naming a category that doesn't exist on its side creates one, so a
- * file exported from somewhere else lands complete rather than half-empty.
- */
-export function parseCSV(
-  text: string,
-  existing: Category[]
-): { transactions: Transaction[]; categories: Category[] } {
-  const lines = text
-    .split(/\r?\n/)
-    .map((l) => l.trim())
-    .filter(Boolean);
-  if (lines.length === 0) throw new BackupError("That file is empty.");
-
-  const header = splitCSVLine(lines[0]).map((h) => h.trim().toLowerCase());
-  const missing = CSV_HEADER.filter((h) => !header.includes(h));
-  if (missing.length) {
-    throw new BackupError(
-      `That CSV is missing the ${missing.join(", ")} column${
-        missing.length > 1 ? "s" : ""
-      }.`
-    );
-  }
-  const col = (name: string) => header.indexOf(name);
-
-  const categories = [...existing];
-  const transactions: Transaction[] = [];
-
-  for (let i = 1; i < lines.length; i++) {
-    const cells = splitCSVLine(lines[i]);
-    const rowNo = i + 1;
-
-    const date = cells[col("date")]?.trim() ?? "";
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-      throw new BackupError(`Row ${rowNo}: "${date}" isn't a YYYY-MM-DD date.`);
-    }
-
-    const rawType = cells[col("type")]?.trim().toLowerCase();
-    if (rawType !== "income" && rawType !== "expense") {
-      throw new BackupError(
-        `Row ${rowNo}: type must be income or expense, not "${rawType}".`
-      );
-    }
-    const type = rawType as TransactionType;
-
-    const amount = Number(cells[col("amount")]?.trim());
-    if (!Number.isFinite(amount) || amount <= 0) {
-      throw new BackupError(
-        `Row ${rowNo}: amount must be a number greater than 0.`
-      );
-    }
-
-    const categoryName = cells[col("category")]?.trim() || "Other";
-    let category = categories.find(
-      (c) => c.type === type && c.name.toLowerCase() === categoryName.toLowerCase()
-    );
-    if (!category) {
-      category = {
-        id: uid(),
-        name: categoryName,
-        color: CATEGORY_TONES[categories.length % CATEGORY_TONES.length],
-        icon: "Tag",
-        type,
-      };
-      categories.push(category);
-    }
-
-    transactions.push({
-      id: uid(),
-      type,
-      amount,
-      categoryId: category.id,
-      description: cells[col("description")]?.trim() || categoryName,
-      date,
-    });
-  }
-
-  if (transactions.length === 0) {
-    throw new BackupError("That CSV has a header but no rows.");
-  }
-  return { transactions, categories };
 }
 
 /* =========================================================================

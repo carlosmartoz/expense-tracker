@@ -7,7 +7,6 @@ import {
   BackupError,
   backupFilename,
   download,
-  parseCSV,
   parseJSON,
   toCSV,
   toJSON,
@@ -62,11 +61,14 @@ export default function DataMenu({ compact = false }: { compact?: boolean }) {
     setError(null);
     setNote(null);
 
+    if (!file.name.toLowerCase().endsWith(".json")) {
+      setError("Pick a .json backup — the one Export backup writes.");
+      return;
+    }
+
     try {
       const text = await file.text();
-      const next = file.name.toLowerCase().endsWith(".csv")
-        ? parseCSV(text, categories)
-        : parseJSON(text);
+      const next = parseJSON(text);
       setPending({
         transactions: next.transactions.length,
         categories: next.categories.length,
@@ -94,7 +96,7 @@ export default function DataMenu({ compact = false }: { compact?: boolean }) {
       <input
         ref={fileRef}
         type="file"
-        accept=".json,.csv,application/json,text/csv"
+        accept=".json"
         onChange={onFile}
         className="hidden"
       />
@@ -126,7 +128,7 @@ export default function DataMenu({ compact = false }: { compact?: boolean }) {
           onClick={() => fileRef.current?.click()}
           className={buttonClass}
           aria-label="Import"
-          title="Import a JSON backup or a CSV"
+          title="Import a JSON backup"
         >
           <Upload className={compact ? "h-[18px] w-[18px]" : "h-4 w-4"} />
           {!compact && "Import"}
