@@ -26,9 +26,8 @@ export type TransactionType = "income" | "expense";
    CATEGORIES
 
    A category is referenced by a stable `id` and lives on one side of the
-   book: income or expense. The list below only seeds a browser that has
-   never held any data — from then on the categories are the user's own, to
-   rename, recolour or delete.
+   book: income or expense. The ones the app ships with are fixed; anything
+   the reader adds is theirs to rename, recolour and delete.
    ========================================================================= */
 
 export interface Category {
@@ -57,6 +56,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Gamepad2,
   ShoppingBag,
   CircleEllipsis,
+  Landmark,
   Wallet,
   PiggyBank,
   Tag,
@@ -66,7 +66,6 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Receipt,
   House,
   Tv,
-  Landmark,
 };
 
 export function categoryIcon(icon: string | undefined): LucideIcon {
@@ -83,13 +82,14 @@ export function categoryIcon(icon: string | undefined): LucideIcon {
  * of them collide, plus white — which the two "Other" buckets share, because
  * they are the same idea on opposite sides of the book. A short list is the
  * point; picking from thirty near-identical hues is not a decision worth
- * offering. `defaultColoursAreUnique` in the tests holds the invariant.
+ * offering. lib/types.test.ts holds that invariant.
  */
 export const CATEGORY_COLORS = [
   { value: "#ffffff", name: "White" },
   { value: "#ef4444", name: "Red" },
   { value: "#f97316", name: "Orange" },
   { value: "#eab308", name: "Yellow" },
+  { value: "#84cc16", name: "Lime" },
   { value: "#22c55e", name: "Green" },
   { value: "#06b6d4", name: "Cyan" },
   { value: "#3b82f6", name: "Blue" },
@@ -104,13 +104,15 @@ export const CATEGORY_COLOR_VALUES: readonly string[] = CATEGORY_COLORS.map(
 );
 
 /**
- * The categories the app ships with. They can be renamed and recoloured like
- * any other, but never deleted — a ledger always has somewhere to put a
- * transaction, and the two "Other" buckets in particular are the floor the
- * delete dialog falls back to.
+ * The categories the app ships with. They are fixed — not renamed, not
+ * recoloured, not deleted. A ledger always has somewhere to put a transaction,
+ * and the two "Other" buckets in particular are the floor the delete dialog
+ * falls back to.
  *
  * Membership is decided by id against this list rather than a stored flag, so
- * there is no second copy of the truth to drift.
+ * there is no second copy of the truth to drift. Because of that, this file is
+ * the only source for a default's colour and icon: change one here and append
+ * a `restoreDefaults` step to the migration chain so stored copies follow.
  */
 export const DEFAULT_CATEGORIES: Category[] = [
   // Expenses. Food and Supermarket are deliberately separate: eating out and
@@ -123,6 +125,7 @@ export const DEFAULT_CATEGORIES: Category[] = [
   { id: "Entertainment", name: "Entertainment", color: "#d946ef", icon: "Clapperboard", type: "expense" },
   { id: "Gaming", name: "Gaming", color: "#8b5cf6", icon: "Gamepad2", type: "expense" },
   { id: "Shopping", name: "Shopping", color: "#3b82f6", icon: "ShoppingBag", type: "expense" },
+  { id: "Debts", name: "Debts", color: "#84cc16", icon: "Landmark", type: "expense" },
   { id: "Other", name: "Other", color: "#ffffff", icon: "CircleEllipsis", type: "expense" },
   // Income
   { id: "Salary", name: "Salary", color: "#f97316", icon: "Wallet", type: "income" },
@@ -133,7 +136,7 @@ export const DEFAULT_CATEGORIES: Category[] = [
 
 const DEFAULT_IDS = new Set(DEFAULT_CATEGORIES.map((c) => c.id));
 
-/** Defaults can be renamed and recoloured, but never removed. */
+/** Defaults are fixed: the app's own vocabulary, not a starting point. */
 export function isDefaultCategory(id: string): boolean {
   return DEFAULT_IDS.has(id);
 }

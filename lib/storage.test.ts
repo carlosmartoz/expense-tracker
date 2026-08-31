@@ -93,7 +93,7 @@ describe("adopting the two old keys", () => {
 });
 
 describe("climbing the migration chain", () => {
-  it.each([1, 2, 3, 4, 5, 6, 7, 8, 9])("reaches the current version starting from v%i", (from) => {
+  it.each([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])("reaches the current version starting from v%i", (from) => {
     localStorage.setItem(KEY, JSON.stringify(asSnapshot(from)));
     expect(load()?.version).toBe(VERSION);
   });
@@ -187,8 +187,9 @@ describe("climbing the migration chain", () => {
     const out = migrate(asSnapshot(1));
     const custom = out.categories.find((c) => c.id === "custom-1");
     expect(custom?.name).toBe("Health");
-    // Retired defaults are treated the same way: nobody rewrites them either.
-    expect(out.categories.find((c) => c.id === "Debts")).toBeTruthy();
+    // Subscriptions is retired and stays exactly as the reader left it.
+    const retired = out.categories.find((c) => c.id === "Subscriptions");
+    expect(retired).toBeTruthy();
   });
 
   // Note there is deliberately no "every category has its own colour" check.

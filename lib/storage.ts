@@ -9,7 +9,7 @@ import { CATEGORY_COLOR_VALUES, DEFAULT_CATEGORIES } from "./types";
 const KEY = "expense-tracker";
 
 /** Bumped whenever the stored shape changes. See MIGRATIONS below. */
-export const VERSION = 9;
+export const VERSION = 10;
 
 /** The two keys the app wrote to before everything moved under a single one. */
 const LEGACY_TRANSACTIONS_KEY = "expense-tracker:transactions:v2";
@@ -110,6 +110,11 @@ const MIGRATIONS: ((snapshot: Snapshot) => Snapshot)[] = [
   // 8 -> 9: Services swaps its spanner for a wifi mark. Same step again —
   // now that a default can't be edited, code is the only source for its
   // colour and icon, and a stored copy that disagrees has to be corrected.
+  (snapshot) => restoreDefaults(snapshot),
+
+  // 9 -> 10: Debts ships as a default again. A ledger old enough to still
+  // carry the original one matches that id, so it stops being an ordinary
+  // category and takes the shipped colour and icon like any other default.
   (snapshot) => restoreDefaults(snapshot),
 ];
 
