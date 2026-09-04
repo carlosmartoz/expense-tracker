@@ -1,8 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // Permite que el móvil (u otros equipos de la LAN) accedan al dev server
-  // sin que Next bloquee la petición por ser un origen distinto a localhost.
+  // Lets another machine on the same network reach the dev server without Next
+  // rejecting the request as a foreign origin. Replace with your own LAN
+  // address, or drop the line if you only ever open it on localhost.
   allowedDevOrigins: ['192.168.0.124'],
   turbopack: {
     // Pin the workspace root so Turbopack's dev workers resolve node_modules

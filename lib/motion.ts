@@ -1,13 +1,9 @@
 import type { Variants } from "motion/react";
 
-/**
- * Shared animation tokens for a subtle, polished "modern bank" feel.
- * Keep movements short (≈150–300ms) and easings soft. All consumers run under
- * <MotionProvider> which honours the user's prefers-reduced-motion setting.
- */
+// Shared variants. Short (~150-300ms), soft easings, under <MotionProvider>.
 
-/** Soft ease-out used across entrances. */
-export const easeOut = [0.22, 1, 0.36, 1] as const;
+/** Soft ease-out behind every entrance here. */
+const easeOut = [0.22, 1, 0.36, 1] as const;
 
 /** Simple fade + slight rise. Good default for headers and standalone blocks. */
 export const fadeUp: Variants = {
@@ -19,12 +15,6 @@ export const fadeUp: Variants = {
 export const stagger: Variants = {
   hidden: {},
   show: { transition: { staggerChildren: 0.06, delayChildren: 0.04 } },
-};
-
-/** Child entrance used inside a {@link stagger} container (cards, grid items). */
-export const cardItem: Variants = {
-  hidden: { opacity: 0, y: 12 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.3, ease: easeOut } },
 };
 
 /** Tab / page content swap (use with AnimatePresence mode="wait"). */

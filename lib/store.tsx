@@ -8,27 +8,30 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { Transaction, CategoryDef } from "./types";
-import { DEFAULT_CATEGORIES, FALLBACK_CATEGORY_ID } from "./types";
-import { buildSeedData } from "./seed";
-
-const STORAGE_KEY = "expense-tracker:transactions:v2";
-const CATEGORIES_KEY = "expense-tracker:categories:v1";
+import type { Transaction, Category, TransactionType } from "./types";
+import { DEFAULT_CATEGORIES, isDefaultCategory } from "./types";
+import { load, save } from "./storage";
 
 interface StoreValue {
   transactions: Transaction[];
-  categories: CategoryDef[];
+  categories: Category[];
   /** id -> category, for quick lookups in render. */
-  categoryMap: Record<string, CategoryDef>;
+  categoryMap: Record<string, Category>;
   hydrated: boolean;
   addTransaction: (t: Omit<Transaction, "id">) => void;
   updateTransaction: (id: string, patch: Omit<Transaction, "id">) => void;
   deleteTransaction: (id: string) => void;
-  resetToSeed: () => void;
+  /** Wipes everything and starts over from the shipped categories. */
   clearAll: () => void;
-  addCategory: (c: { name: string; color: string }) => void;
+  /** Swaps in an imported backup, replacing everything currently held. */
+  replaceAll: (next: { transactions: Transaction[]; categories: Category[] }) => void;
+  addCategory: (c: { name: string; color: string; type: TransactionType }) => void;
+  /** Renames or recolours a category. Refuses on a default: those are fixed. */
   updateCategory: (id: string, patch: { name?: string; color?: string }) => void;
-  deleteCategory: (id: string) => void;
+  /** Adds any category from DEFAULT_CATEGORIES this ledger doesn't have yet. */
+  addMissingDefaults: () => void;
+  /** Moves the category's transactions to `moveToId`. Refuses on a default. */
+  deleteCategory: (id: string, moveToId: string) => void;
 }
 
 const StoreContext = createContext<StoreValue | null>(null);
@@ -40,65 +43,28 @@ function uid(): string {
   return `id-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
-/**
- * Defaults are not user-editable, so they always come straight from code (this
- * keeps name/color/icon changes propagating to everyone). Only the user's custom
- * categories are read back from storage and appended.
- */
-function mergeCategories(stored: CategoryDef[] | null): CategoryDef[] {
-  if (!stored || !Array.isArray(stored)) return DEFAULT_CATEGORIES;
-  const customs = stored
-    .filter((s) => !DEFAULT_CATEGORIES.some((d) => d.id === s.id))
-    .map((s) => ({ ...s, isDefault: false }));
-  return [...DEFAULT_CATEGORIES, ...customs];
-}
-
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [categories, setCategories] = useState<CategoryDef[]>(DEFAULT_CATEGORIES);
+  const [categories, setCategories] = useState<Category[]>(DEFAULT_CATEGORIES);
   const [hydrated, setHydrated] = useState(false);
 
-  // Load from localStorage once on mount; seed transactions on first run.
+  // localStorage has no server-side value, so stored data can only arrive here.
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        setTransactions(JSON.parse(raw));
-      } else {
-        const seed = buildSeedData();
-        setTransactions(seed);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(seed));
-      }
-    } catch {
-      setTransactions(buildSeedData());
-    }
-    try {
-      const rawCats = localStorage.getItem(CATEGORIES_KEY);
-      setCategories(mergeCategories(rawCats ? JSON.parse(rawCats) : null));
-    } catch {
-      setCategories(DEFAULT_CATEGORIES);
-    }
+    const stored = load();
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setTransactions(stored ? stored.transactions : []);
+    setCategories(
+      stored && stored.categories.length ? stored.categories : DEFAULT_CATEGORIES
+    );
     setHydrated(true);
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
 
   // Persist on every change (after hydration).
   useEffect(() => {
     if (!hydrated) return;
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
-    } catch {
-      /* storage may be unavailable (private mode); ignore */
-    }
-  }, [transactions, hydrated]);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    try {
-      localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories));
-    } catch {
-      /* ignore */
-    }
-  }, [categories, hydrated]);
+    save({ transactions, categories });
+  }, [transactions, categories, hydrated]);
 
   const categoryMap = useMemo(
     () => Object.fromEntries(categories.map((c) => [c.id, c])),
@@ -125,21 +91,40 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         ),
       deleteTransaction: (id) =>
         setTransactions((prev) => prev.filter((t) => t.id !== id)),
-      resetToSeed: () => setTransactions(buildSeedData()),
-      clearAll: () => setTransactions([]),
-      addCategory: ({ name, color }) =>
+      clearAll: () => {
+        setTransactions([]);
+        setCategories(DEFAULT_CATEGORIES);
+      },
+      replaceAll: ({ transactions: nextTx, categories: nextCats }) => {
+        setTransactions(
+          [...nextTx].sort((a, b) => (a.date < b.date ? 1 : -1))
+        );
+        if (nextCats.length) setCategories(nextCats);
+      },
+      addCategory: ({ name, color, type }) =>
         setCategories((prev) => {
           const trimmed = name.trim();
           if (!trimmed) return prev;
-          if (prev.some((c) => c.name.toLowerCase() === trimmed.toLowerCase())) {
-            return prev;
-          }
+          // Names only have to be unique within their own side of the book.
+          const clash = prev.some(
+            (c) =>
+              c.type === type && c.name.toLowerCase() === trimmed.toLowerCase()
+          );
+          if (clash) return prev;
           return [
             ...prev,
-            { id: uid(), name: trimmed, color, icon: "Tag", isDefault: false },
+            { id: uid(), name: trimmed, color, icon: "Tag", type },
           ];
         }),
-      updateCategory: (id, patch) =>
+      addMissingDefaults: () =>
+        setCategories((prev) => {
+          const missing = DEFAULT_CATEGORIES.filter(
+            (d) => !prev.some((c) => c.id === d.id)
+          );
+          return missing.length ? [...prev, ...missing] : prev;
+        }),
+      updateCategory: (id, patch) => {
+        if (isDefaultCategory(id)) return;
         setCategories((prev) =>
           prev.map((c) => {
             if (c.id !== id) return c;
@@ -150,16 +135,21 @@ export function StoreProvider({ children }: { children: ReactNode }) {
               ...(patch.color ? { color: patch.color } : {}),
             };
           })
-        ),
-      deleteCategory: (id) => {
+        );
+      },
+      deleteCategory: (id, moveToId) => {
+        if (isDefaultCategory(id)) return;
         const target = categories.find((c) => c.id === id);
-        if (!target || target.isDefault) return;
+        const destination = categories.find((c) => c.id === moveToId);
+        if (!target || !destination || destination.id === target.id) return;
+        // Never leave a side of the book without a category to pick.
+        const remaining = categories.filter(
+          (c) => c.type === target.type && c.id !== id
+        );
+        if (remaining.length === 0) return;
         setCategories((prev) => prev.filter((c) => c.id !== id));
-        // Reassign any transactions using the removed category to the fallback.
         setTransactions((prev) =>
-          prev.map((t) =>
-            t.category === id ? { ...t, category: FALLBACK_CATEGORY_ID } : t
-          )
+          prev.map((t) => (t.categoryId === id ? { ...t, categoryId: moveToId } : t))
         );
       },
     }),

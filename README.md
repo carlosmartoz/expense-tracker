@@ -1,42 +1,55 @@
-# Fintrack — Expense Tracker
+# Expense Tracker
 
-A personal finance app with a modern-banking feel and an edge-to-edge **dark
-theme**: log income and expenses and visualize your money with charts.
+A place to write down what you earn and what you spend, and see where the month
+went. It runs entirely in your browser — there is no account, no server and
+nothing leaves your machine. Everything lives in `localStorage`, and a backup
+is a JSON file you export and import yourself.
 
-Stack: **Next.js 16 (App Router, Turbopack) · React 19 · TypeScript · Tailwind CSS v4 · Recharts 3**.
+Two screens:
 
-## Running it
+- **Transactions** — the ledger. Add, edit and delete, with the running balance
+  for whatever the filters are showing, and filters by month, category, type,
+  currency and free text.
+- **Categories** — one list covering both sides of the book. The ones the app
+  ships with are fixed; anything you add is yours to rename, recolour and
+  remove.
 
-```bash
-npm install
-npm run dev      # http://localhost:3000
-```
+Amounts are in pesos or dollars. The two are counted apart and never converted
+into one another — that would need an exchange rate, and a rate that moves
+rewrites the value of every past transaction each time it is touched.
 
-For a production build:
+**Next.js 16 (App Router, Turbopack) · React 19 · TypeScript · Tailwind CSS v4**
 
-```bash
-npm run build && npm start
-```
-
-## Structure
+## How it fits together
 
 ```
 app/
-  globals.css           # Tailwind v4 + dark theme (tokens in @theme)
-  layout.tsx            # Global provider + fonts
-  page.tsx              # Shell with navigation (Dashboard / Transactions)
-components/
-  Dashboard.tsx, MovementsView.tsx
-  TransactionForm.tsx, TransactionList.tsx, Filters.tsx, StatCard.tsx
-  Select.tsx            # Custom dropdown (styled for the dark theme)
-  charts/               # CategoryPie, MonthlyTrend, MonthComparison, SavingsGauge
+  layout.tsx        fonts, metadata and the global providers
+  page.tsx          navigation between the two screens
+components/         JSX only; the logic lives in hooks/
+  shell/            DataMenu, MotionProvider — the app frame
+  transactions/     TransactionsView, and the ledger it is made of
+  categories/       CategoriesView, and the pieces it is made of
+  ui/               Select, DatePicker, Modal, ConfirmDialog, Portal,
+                    SegmentedToggle, ColorPicker, Field, ErrorText,
+                    IconButton, CategoryIcon — no app knowledge
+hooks/              a screen's behaviour, testable without rendering it
+  useTransactionForm, useTransactionFilters, useCategories, useBackup
 lib/
-  types.ts              # Models and categories
-  store.tsx             # Global state (Context + localStorage)
-  seed.ts               # Demo data (5 months, with spikes in categories)
-  analytics.ts          # Monthly summary calculations
-  format.ts             # Currency/date formatting (es-AR)
+  config.ts         app name, locale, currencies — start here to re-skin
+  types.ts          the data model: Transaction and Category
+  storage.ts        localStorage and the migration chain
+  backup.ts         the JSON backup, out and back in
+  store.tsx         state and the operations on it (Context)
+  format.ts         money, dates and the months a ledger covers
+  totals.ts         one balance per currency, never a single figure
+  motion.ts         shared animation variants
+public/
+  icon.svg          the tab icon, declared in the layout's metadata
+styles/
+  globals.css       Tailwind v4 and the dark theme (tokens in @theme)
+tests/              mirrors the tree above
+  setup.ts          an in-memory localStorage the suite controls
+  lib/              storage, backup, format, totals, types
+  components/ui/    Portal
 ```
-
-</content>
-</invoke>

@@ -1,139 +1,145 @@
 import type { LucideIcon } from "lucide-react";
+import type { CurrencyCode } from "./config";
 import {
   UtensilsCrossed,
+  ShoppingCart,
   Car,
-  Tv,
+  Wifi,
+  HeartPulse,
+  Clapperboard,
+  ShoppingBag,
   Gamepad2,
-  House,
+  CircleEllipsis,
   Wallet,
-  Receipt,
-  Wrench,
-  Landmark,
+  PiggyBank,
   Tag,
+  Wrench,
+  Briefcase,
+  Receipt,
+  House,
+  Tv,
+  Landmark,
 } from "lucide-react";
 
 export type TransactionType = "income" | "expense";
 
-/* =========================================================================
-   CURRENCIES
-   ========================================================================= */
+/** The two sides of the book, in the order every list shows them. */
+export const SIDES = [
+  { value: "expense", label: "Expenses" },
+  { value: "income", label: "Income" },
+] as const satisfies readonly { value: TransactionType; label: string }[];
 
-export const CURRENCIES = {
-  ARS: { code: "ARS", symbol: "$", label: "Argentine Peso" },
-  USD: { code: "USD", symbol: "US$", label: "Dollar" },
-  EUR: { code: "EUR", symbol: "€", label: "Euro" },
-} as const;
+// A category has a stable id and lives on one side of the book.
 
-export type CurrencyCode = keyof typeof CURRENCIES;
-export const CURRENCY_LIST = Object.values(CURRENCIES);
-export const DEFAULT_CURRENCY: CurrencyCode = "ARS";
-
-/* =========================================================================
-   CATEGORIES
-
-   A category is referenced by a stable `id`. Default categories use their
-   English name as id so existing/seed data keeps working; custom categories
-   get a generated id, which means they can be renamed without orphaning the
-   transactions that point at them.
-   ========================================================================= */
-
-/** A category id (string). Kept as a named alias for readability. */
-export type Category = string;
-
-export interface CategoryDef {
+export interface Category {
   id: string;
   name: string;
-  /** CSS color: a hex value or a var(--…) theme token. */
+  /** One of CATEGORY_COLORS. Applied to the category's icon and nothing else. */
   color: string;
-  /** Key into ICON_MAP. Custom categories fall back to "Tag". */
+  /** Key into ICON_MAP. Categories created by hand fall back to "Tag". */
   icon: string;
-  /** Default categories ship with the app and can't be deleted. */
-  isDefault: boolean;
+  /** Which side of the book this category belongs to. Fixed once created. */
+  type: TransactionType;
 }
 
-/** Lucide icons referenced by name so a category can be serialized to storage. */
-export const ICON_MAP: Record<string, LucideIcon> = {
+/** Referenced by name so a category can be serialized. */
+const ICON_MAP: Record<string, LucideIcon> = {
   UtensilsCrossed,
+  ShoppingCart,
   Car,
-  Tv,
+  HeartPulse,
+  Wifi,
+  Clapperboard,
   Gamepad2,
-  House,
-  Wallet,
-  Receipt,
-  Wrench,
+  ShoppingBag,
+  CircleEllipsis,
   Landmark,
+  Wallet,
+  PiggyBank,
   Tag,
+  // Retired, kept so older data still draws its icon.
+  Wrench,
+  Briefcase,
+  Receipt,
+  House,
+  Tv,
 };
 
 export function categoryIcon(icon: string | undefined): LucideIcon {
   return (icon && ICON_MAP[icon]) || Tag;
 }
 
-/** The income bucket has special handling and can't be removed. */
-export const INCOME_CATEGORY_ID = "Income";
-/** Fallback bucket transactions are reassigned to when a category is deleted. */
-export const FALLBACK_CATEGORY_ID = "Other";
-
-export const DEFAULT_CATEGORIES: CategoryDef[] = [
-  { id: "Food", name: "Food", color: "var(--color-cat-food)", icon: "UtensilsCrossed", isDefault: true },
-  { id: "Transport", name: "Transport", color: "var(--color-cat-transport)", icon: "Car", isDefault: true },
-  { id: "Subscriptions", name: "Subscriptions", color: "var(--color-cat-subscriptions)", icon: "Tv", isDefault: true },
-  { id: "Gaming", name: "Gaming", color: "var(--color-cat-gaming)", icon: "Gamepad2", isDefault: true },
-  { id: "Home", name: "Home", color: "var(--color-cat-home)", icon: "House", isDefault: true },
-  { id: "Services", name: "Services", color: "#14b8a6", icon: "Wrench", isDefault: true },
-  { id: "Debts", name: "Debts", color: "#ef4444", icon: "Landmark", isDefault: true },
-  { id: INCOME_CATEGORY_ID, name: "Income", color: "var(--color-cat-income)", icon: "Wallet", isDefault: true },
-  { id: FALLBACK_CATEGORY_ID, name: "Other", color: "var(--color-cat-other)", icon: "Receipt", isDefault: true },
-];
-
-/**
- * Palette offered when creating/editing a custom category: distinct hues, none
- * repeated, none equal to the brand color (#6b8aff).
- */
+/** One per default plus the white both "Other" buckets share. */
+// Literals, not theme tokens: a token could be renamed out from under saved data.
 export const CATEGORY_COLORS = [
-  "#f59e0b", // amber
-  "#f97316", // orange
-  "#ef4444", // red
-  "#ec4899", // pink
-  "#d946ef", // fuchsia
-  "#a855f7", // purple
-  "#8b5cf6", // violet
-  "#0ea5e9", // sky
-  "#06b6d4", // cyan
-  "#14b8a6", // teal
-  "#22c55e", // green
-  "#84cc16", // lime
-  "#eab308", // yellow
-  "#94a3b8", // slate
+  { value: "#ffffff", name: "White" },
+  { value: "#ef4444", name: "Red" },
+  { value: "#f97316", name: "Orange" },
+  { value: "#eab308", name: "Yellow" },
+  { value: "#84cc16", name: "Lime" },
+  { value: "#22c55e", name: "Green" },
+  { value: "#06b6d4", name: "Cyan" },
+  { value: "#3b82f6", name: "Blue" },
+  { value: "#8b5cf6", name: "Violet" },
+  { value: "#d946ef", name: "Fuchsia" },
+  { value: "#ec4899", name: "Pink" },
+] as const;
+
+/** The hex values on their own, for anything that only needs to check one. */
+export const CATEGORY_COLOR_VALUES: readonly string[] = CATEGORY_COLORS.map(
+  (c) => c.value
+);
+
+/** Fixed: never renamed, recoloured or deleted. The floor a ledger stands on. */
+// The only source for a default's colour and icon; see the migration chain.
+export const DEFAULT_CATEGORIES: Category[] = [
+  // Food and Supermarket stay apart: eating out and stocking up differ.
+  { id: "Food", name: "Food", color: "#ef4444", icon: "UtensilsCrossed", type: "expense" },
+  { id: "Supermarket", name: "Supermarket", color: "#eab308", icon: "ShoppingCart", type: "expense" },
+  { id: "Transport", name: "Transport", color: "#06b6d4", icon: "Car", type: "expense" },
+  { id: "Services", name: "Services", color: "#ec4899", icon: "Wifi", type: "expense" },
+  { id: "Health", name: "Health", color: "#22c55e", icon: "HeartPulse", type: "expense" },
+  { id: "Entertainment", name: "Entertainment", color: "#d946ef", icon: "Clapperboard", type: "expense" },
+  { id: "Gaming", name: "Gaming", color: "#8b5cf6", icon: "Gamepad2", type: "expense" },
+  { id: "Shopping", name: "Shopping", color: "#3b82f6", icon: "ShoppingBag", type: "expense" },
+  { id: "Debts", name: "Debts", color: "#84cc16", icon: "Landmark", type: "expense" },
+  { id: "Other", name: "Other", color: "#ffffff", icon: "CircleEllipsis", type: "expense" },
+  // Income
+  { id: "Salary", name: "Salary", color: "#f97316", icon: "Wallet", type: "income" },
+  // Same colour and icon as its expense twin.
+  { id: "OtherIncome", name: "Other", color: "#ffffff", icon: "CircleEllipsis", type: "income" },
 ];
 
-/** Max number of tags allowed per transaction (keeps the row UI from breaking). */
-export const MAX_TAGS = 3;
-/** Max characters per tag. */
-export const MAX_TAG_LENGTH = 16;
+const DEFAULT_IDS = new Set(DEFAULT_CATEGORIES.map((c) => c.id));
+
+/** Defaults are fixed: the app's own vocabulary, not a starting point. */
+export function isDefaultCategory(id: string): boolean {
+  return DEFAULT_IDS.has(id);
+}
+
 /** Max characters for a category name. */
 export const MAX_CATEGORY_NAME_LENGTH = 24;
+
+/** Digits before the comma. Seven allows up to 9.999.999,99. */
+export const MAX_AMOUNT_INTEGER_DIGITS = 7;
 
 export interface Transaction {
   id: string;
   type: TransactionType;
   amount: number; // always positive; sign is derived from `type`
-  category: Category; // category id
-  /** Currency of this transaction. Missing ⇒ DEFAULT_CURRENCY (legacy data). */
-  currency?: CurrencyCode;
+  /** Face value only. Currencies are never converted into one another. */
+  currency: CurrencyCode;
+  categoryId: string;
   description: string;
   date: string; // ISO date string (YYYY-MM-DD)
-  /** Optional short labels for extra context, e.g. "Credit card", "Work". */
-  tags?: string[];
 }
 
 export interface Filters {
   /** Category id or "all" */
-  category: string;
+  categoryId: string;
   type: TransactionType | "all";
+  currency: CurrencyCode | "all";
   /** YYYY-MM (month key) or "all" */
   month: string;
-  /** A specific tag name, or "all" */
-  tag: string;
   search: string;
 }
