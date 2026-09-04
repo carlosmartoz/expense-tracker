@@ -42,7 +42,7 @@ export default function TransactionRow({
         }`}
       >
         {isIncome ? "+" : "−"}
-        {formatMoney(t.amount)}
+        {formatMoney(t.amount, t.currency)}
       </span>
 
       {/* Always visible on touch, hover-reveal on desktop. */}

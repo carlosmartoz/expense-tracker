@@ -1,17 +1,12 @@
 "use client";
 
 import { Check, Plus, X } from "lucide-react";
-import { CATEGORY_COLORS, MAX_CATEGORY_NAME_LENGTH } from "@/lib/types";
+import { CATEGORY_COLORS, MAX_CATEGORY_NAME_LENGTH, SIDES } from "@/lib/types";
 import type { useCategories } from "@/hooks/useCategories";
 import ColorPicker from "@/components/ui/ColorPicker";
 import ErrorText from "@/components/ui/ErrorText";
 import Field from "@/components/ui/Field";
 import SegmentedToggle from "@/components/ui/SegmentedToggle";
-
-const SIDES = [
-  { value: "expense", label: "Expenses" },
-  { value: "income", label: "Income" },
-] as const;
 
 type Form = ReturnType<typeof useCategories>["form"];
 

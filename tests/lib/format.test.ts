@@ -11,6 +11,7 @@ import {
   sortedMonthKeys,
 } from "@/lib/format";
 import { MAX_AMOUNT_INTEGER_DIGITS } from "@/lib/types";
+import { DEFAULT_CURRENCY } from "@/lib/config";
 
 // English text, Argentine money: a deliberate pairing worth pinning down.
 
@@ -31,6 +32,35 @@ describe("money", () => {
   it("falls back to zero rather than printing NaN", () => {
     expect(formatMoney(Number.NaN)).toBe("$ 0,00");
     expect(formatAmount(Number.POSITIVE_INFINITY)).toBe("0,00");
+  });
+});
+
+// Two currencies, one grouping: only the symbol tells them apart.
+describe("which currency an amount is in", () => {
+  it("defaults to the one everything was written in before there was a choice", () => {
+    expect(formatMoney(1234.5)).toBe(formatMoney(1234.5, DEFAULT_CURRENCY));
+    expect(DEFAULT_CURRENCY).toBe("ARS");
+  });
+
+  it.each([
+    ["ARS", "$ 1.234,50"],
+    ["USD", "US$ 1.234,50"],
+  ] as const)("marks %s as %s", (currency, expected) => {
+    expect(formatMoney(1234.5, currency)).toBe(expected);
+  });
+
+  it("groups both the same way, so only the symbol differs", () => {
+    const [ars, usd] = [formatMoney(2672371, "ARS"), formatMoney(2672371, "USD")];
+    expect(ars.replace("$ ", "")).toBe(usd.replace("US$ ", ""));
+  });
+
+  it("keeps the minus ahead of the symbol", () => {
+    expect(formatMoney(-150, "USD")).toBe("-US$ 150,00");
+  });
+
+  it("falls back rather than printing nothing for a code it doesn't know", () => {
+    const unknown = "XYZ" as unknown as typeof DEFAULT_CURRENCY;
+    expect(formatMoney(150, unknown)).toBe(formatMoney(150, DEFAULT_CURRENCY));
   });
 });
 

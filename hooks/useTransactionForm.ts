@@ -15,6 +15,7 @@ import {
   MAX_AMOUNT,
   parseAmount,
 } from "@/lib/format";
+import { DEFAULT_CURRENCY, type CurrencyCode } from "@/lib/config";
 
 function todayISO(): string {
   return new Date().toISOString().slice(0, 10);
@@ -28,9 +29,11 @@ function integerDigits(raw: string): number {
     .replace(/^0+(?=\d)/, "").length;
 }
 
-export interface TransactionFormState {
+/** What the form exposes. Not exported: the component reads it off the hook. */
+interface TransactionFormState {
   type: TransactionType;
   amount: string;
+  currency: CurrencyCode;
   description: string;
   date: string;
   /** The category actually in effect, which may differ from the last pick. */
@@ -42,6 +45,7 @@ export interface TransactionFormState {
   isEditing: boolean;
   setType: (next: TransactionType) => void;
   setAmount: (raw: string) => void;
+  setCurrency: (next: CurrencyCode) => void;
   setCategoryId: (id: string) => void;
   setDescription: (text: string) => void;
   setDate: (iso: string) => void;
@@ -62,6 +66,9 @@ export function useTransactionForm(
   );
   const [amount, setAmountRaw] = useState(
     initial ? formatAmount(initial.amount) : ""
+  );
+  const [currency, setCurrencyRaw] = useState<CurrencyCode>(
+    initial?.currency ?? DEFAULT_CURRENCY
   );
   const [pickedCategory, setPickedCategory] = useState(initial?.categoryId ?? "");
   const [description, setDescriptionRaw] = useState(initial?.description ?? "");
@@ -121,7 +128,7 @@ export function useTransactionForm(
     }
     // An imported amount can be over the cap and reach here via the edit form.
     if (value > MAX_AMOUNT) {
-      setError(`Maximum is ${formatMoney(MAX_AMOUNT)}.`);
+      setError(`Maximum is ${formatMoney(MAX_AMOUNT, currency)}.`);
       return;
     }
     if (!categoryId) {
@@ -133,6 +140,7 @@ export function useTransactionForm(
     const payload = {
       type,
       amount: value,
+      currency,
       categoryId,
       description: description.trim() || name,
       date,
@@ -153,6 +161,7 @@ export function useTransactionForm(
   return {
     type,
     amount,
+    currency,
     description,
     date,
     categoryId,
@@ -162,6 +171,7 @@ export function useTransactionForm(
     isEditing: Boolean(initial),
     setType,
     setAmount,
+    setCurrency: withClear(setCurrencyRaw),
     setCategoryId: withClear(setPickedCategory),
     setDescription: withClear(setDescriptionRaw),
     setDate: withClear(setDateRaw),

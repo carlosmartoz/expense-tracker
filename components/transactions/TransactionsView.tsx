@@ -8,8 +8,16 @@ import TransactionForm from "@/components/transactions/TransactionForm";
 import TransactionList from "@/components/transactions/TransactionList";
 
 export default function TransactionsView() {
-  const { filters, setFilters, clearFilters, months, filtered, totals, isEmpty } =
-    useTransactionFilters();
+  const {
+    filters,
+    setFilters,
+    clearFilters,
+    months,
+    currencies,
+    filtered,
+    totals,
+    isEmpty,
+  } = useTransactionFilters();
 
   return (
     <div className="grid grid-cols-1 gap-5 lg:grid-cols-[340px_1fr]">
@@ -37,6 +45,7 @@ export default function TransactionsView() {
             <FiltersBar
               filters={filters}
               months={months}
+              currencies={currencies}
               onChange={setFilters}
               onClear={clearFilters}
             />

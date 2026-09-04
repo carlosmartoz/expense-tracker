@@ -1,9 +1,10 @@
-import { CURRENCY, LOCALE } from "./config";
+import { CURRENCIES, DEFAULT_CURRENCY, LOCALE, type CurrencyCode } from "./config";
 import type { Transaction } from "./types";
 import { MAX_AMOUNT_INTEGER_DIGITS } from "./types";
 
 // ARS convention: dot for thousands, comma for the decimal, two decimals.
-const amountFormatter = new Intl.NumberFormat(CURRENCY.locale, {
+// Every currency groups this way, so one formatter serves them all.
+const amountFormatter = new Intl.NumberFormat(CURRENCIES[DEFAULT_CURRENCY].locale, {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 });
@@ -12,11 +13,16 @@ export function formatAmount(value: number): string {
   return amountFormatter.format(Number.isFinite(value) ? value : 0);
 }
 
-/** formatAmount with the symbol, sign first: "-$ 1.200,00". */
-export function formatMoney(value: number): string {
+/** formatAmount with the symbol, sign first: "-$ 1.200,00", "US$ 150,00".
+    An unrecognised code falls back to the default rather than printing nothing. */
+export function formatMoney(
+  value: number,
+  currency: CurrencyCode = DEFAULT_CURRENCY
+): string {
   const n = Number.isFinite(value) ? value : 0;
   const sign = n < 0 ? "-" : "";
-  return `${sign}${CURRENCY.symbol} ${formatAmount(Math.abs(n))}`;
+  const { symbol } = CURRENCIES[currency] ?? CURRENCIES[DEFAULT_CURRENCY];
+  return `${sign}${symbol} ${formatAmount(Math.abs(n))}`;
 }
 
 /** Parse a display string like "2.672.371,00" back into a number. */

@@ -1,5 +1,6 @@
 import type { Transaction, Category, TransactionType } from "./types";
 import { CATEGORY_COLOR_VALUES, DEFAULT_CATEGORIES } from "./types";
+import { CURRENCIES, DEFAULT_CURRENCY } from "./config";
 
 // This module owns the storage format; nothing else touches localStorage.
 
@@ -8,7 +9,7 @@ const LEGACY_TRANSACTIONS_KEY = "expense-tracker:transactions:v2";
 const LEGACY_CATEGORIES_KEY = "expense-tracker:categories:v1";
 
 /** Bumped whenever the stored shape changes. One MIGRATIONS entry per step. */
-export const VERSION = 10;
+export const VERSION = 11;
 
 export interface Snapshot {
   version: number;
@@ -19,12 +20,14 @@ export interface Snapshot {
 type Step = (snapshot: Snapshot) => Snapshot;
 
 /** Drops the per-transaction currency; amounts keep their face value. */
+// A free-form string, not the `currency` v11 adds back. Between the two steps
+// a transaction carries none, which is why the result is asserted, not inferred.
 const dropCurrency: Step = (snapshot) => ({
   ...snapshot,
   transactions: snapshot.transactions.map((t) => {
     const { currency, ...rest } = t as Transaction & { currency?: string };
     void currency;
-    return rest;
+    return rest as Transaction;
   }),
 });
 
@@ -69,6 +72,16 @@ const recolour: Step = (snapshot) => ({
   })),
 });
 
+/** Gives every transaction a currency. Everything written before there was
+    more than one to choose was in the default, so that is what it was. */
+const stampCurrency: Step = (snapshot) => ({
+  ...snapshot,
+  transactions: snapshot.transactions.map((t) => ({
+    ...t,
+    currency: t.currency in CURRENCIES ? t.currency : DEFAULT_CURRENCY,
+  })),
+});
+
 /** Puts shipped categories back on their colour and icon; leaves the rest. */
 const restoreDefaults: Step = (snapshot) => {
   const canonical = new Map(DEFAULT_CATEGORIES.map((c) => [c.id, c]));
@@ -93,6 +106,7 @@ const MIGRATIONS: Step[] = [
   restoreDefaults, //  7 -> 8, the palette was picked by hand
   restoreDefaults, //  8 -> 9, Services took a wifi mark
   restoreDefaults, //  9 -> 10, Debts shipped again
+  stampCurrency, //   10 -> 11, amounts learned which currency they are in
 ];
 
 /** Climbs a snapshot to VERSION. Also used on an imported backup file. */

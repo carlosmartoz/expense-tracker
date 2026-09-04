@@ -11,7 +11,9 @@ const OLD_CAT = "expense-tracker:categories:v1";
 
 // A realistic old install: two keys, no version stamp.
 const OLD_TRANSACTIONS = [
-  { id: "a", type: "expense", amount: 6500, category: "Food", currency: "ARS",
+  // That `currency` is the free-form v1 field, not today's: it is dropped at
+  // v2 and never consulted again, which the chain below pins down.
+  { id: "a", type: "expense", amount: 6500, category: "Food", currency: "US Dollars",
     description: "Delivery", date: "2026-08-12", tags: ["Credit card"] },
   { id: "b", type: "expense", amount: 4990, category: "Subscriptions",
     description: "Netflix", date: "2026-08-05" },
@@ -90,14 +92,42 @@ describe("adopting the two old keys", () => {
 });
 
 describe("climbing the migration chain", () => {
-  it.each([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])("reaches the current version starting from v%i", (from) => {
+  it.each([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])("reaches the current version starting from v%i", (from) => {
     localStorage.setItem(KEY, JSON.stringify(asSnapshot(from)));
     expect(load()?.version).toBe(VERSION);
   });
 
-  it("drops the per-transaction currency", () => {
+  it("gives every transaction a currency", () => {
     const out = migrate(asSnapshot(1));
-    expect(out.transactions.every((t) => !("currency" in t))).toBe(true);
+    expect(out.transactions.every((t) => t.currency === "ARS")).toBe(true);
+  });
+
+  it("does not read the free-form currency v2 threw away", () => {
+    // "US Dollars" was never a code and can't be trusted into the new field;
+    // everything written before there was a choice was in the default.
+    const out = migrate(asSnapshot(1));
+    expect(out.transactions[0].currency).toBe("ARS");
+  });
+
+  it("leaves a currency that is already set alone", () => {
+    const snapshot = asSnapshot(10);
+    snapshot.transactions = snapshot.transactions.map((t, i) => ({
+      ...t,
+      currency: i === 0 ? "USD" : "ARS",
+    })) as Transaction[];
+    const out = migrate(snapshot);
+    expect(out.transactions.map((t) => t.currency)).toEqual([
+      "USD", "ARS", "ARS", "ARS",
+    ]);
+  });
+
+  it("replaces a currency it doesn't recognise rather than storing it", () => {
+    const snapshot = asSnapshot(10);
+    snapshot.transactions = snapshot.transactions.map((t) => ({
+      ...t,
+      currency: "XYZ",
+    })) as unknown as Transaction[];
+    expect(migrate(snapshot).transactions.every((t) => t.currency === "ARS")).toBe(true);
   });
 
   it("drops tags", () => {
@@ -200,12 +230,13 @@ describe("climbing the migration chain", () => {
 
   it("leaves a snapshot that is already current alone", () => {
     const current: Omit<Snapshot, "version"> = {
-      transactions: [{ id: "z", type: "income", amount: 10, categoryId: "Salary", description: "x", date: "2026-01-01" }],
+      transactions: [{ id: "z", type: "income", amount: 10, currency: "USD", categoryId: "Salary", description: "x", date: "2026-01-01" }],
       categories: [{ id: "Salary", name: "Salary", color: "#ec4899", icon: "Wallet", type: "income" }],
     };
     save(current);
     const out = load();
     expect(out?.transactions[0].categoryId).toBe("Salary");
+    expect(out?.transactions[0].currency).toBe("USD");
     expect(out?.categories[0].type).toBe("income");
   });
 });
@@ -216,10 +247,12 @@ describe("what actually lands in storage", () => {
     const migrated = load()!;
     save({ transactions: migrated.transactions, categories: migrated.categories });
     const raw = localStorage.getItem(KEY)!;
-    expect(raw).not.toContain('"currency"');
     expect(raw).not.toContain('"tags"');
     expect(raw).not.toContain('"isDefault"');
     expect(raw).not.toContain('"category":');
+    // `currency` is a live field again, so what's stored is the new one only.
+    expect(raw).not.toContain('"US Dollars"');
+    expect(raw).toContain('"currency":"ARS"');
   });
 
   it("stamps the current version on write", () => {
@@ -232,7 +265,7 @@ describe("starting over", () => {
   it("leaves no key behind", () => {
     save({
       transactions: [
-        { id: "a", type: "expense", amount: 10, categoryId: "Food", description: "x", date: "2026-01-01" },
+        { id: "a", type: "expense", amount: 10, currency: "ARS", categoryId: "Food", description: "x", date: "2026-01-01" },
       ],
       categories: DEFAULT_CATEGORIES,
     });

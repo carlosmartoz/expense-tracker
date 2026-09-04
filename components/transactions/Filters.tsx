@@ -1,14 +1,17 @@
 "use client";
 
 import { FilterX } from "lucide-react";
-import { categoryIcon, type Filters } from "@/lib/types";
+import { categoryIcon, SIDES, type Filters } from "@/lib/types";
 import { formatMonthKey } from "@/lib/format";
+import { type CurrencyCode } from "@/lib/config";
 import { useStore } from "@/lib/store";
 import Select, { type SelectOption } from "@/components/ui/Select";
 
 interface Props {
   filters: Filters;
   months: string[];
+  /** Every currency the ledger holds, which decides whether to offer the filter. */
+  currencies: CurrencyCode[];
   onChange: (next: Filters) => void;
   onClear: () => void;
 }
@@ -16,6 +19,7 @@ interface Props {
 export default function FiltersBar({
   filters,
   months,
+  currencies,
   onChange,
   onClear,
 }: Props) {
@@ -28,6 +32,7 @@ export default function FiltersBar({
   const hasActiveFilters =
     filters.categoryId !== "all" ||
     filters.type !== "all" ||
+    filters.currency !== "all" ||
     filters.month !== "all" ||
     filters.search.trim() !== "";
 
@@ -49,11 +54,26 @@ export default function FiltersBar({
       })),
   ];
 
-  const typeOptions: SelectOption[] = [
-    { value: "all", label: "All" },
-    { value: "expense", label: "Expenses" },
-    { value: "income", label: "Income" },
+  // A ledger in one currency has nothing to choose between, so it gets no
+  // control — but one already set has to stay reachable to be cleared.
+  const showCurrency = currencies.length > 1 || filters.currency !== "all";
+
+  // The chosen one stays listed even if the last of it was just deleted, so
+  // the control never sits there showing a blank.
+  const currencyChoices = [
+    ...new Set(
+      filters.currency === "all"
+        ? currencies
+        : [...currencies, filters.currency]
+    ),
   ];
+
+  const currencyOptions: SelectOption[] = [
+    { value: "all", label: "All currencies" },
+    ...currencyChoices.map((c) => ({ value: c, label: c })),
+  ];
+
+  const typeOptions: SelectOption[] = [{ value: "all", label: "All" }, ...SIDES];
 
   return (
     <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
@@ -79,6 +99,16 @@ export default function FiltersBar({
         options={categoryOptions}
         onChange={(v) => patch({ categoryId: v })}
       />
+
+      {showCurrency && (
+        <Select
+          className="w-full sm:w-37.5"
+          ariaLabel="Filter by currency"
+          value={filters.currency}
+          options={currencyOptions}
+          onChange={(v) => patch({ currency: v as Filters["currency"] })}
+        />
+      )}
 
       <Select
         className="w-full sm:w-32.5"

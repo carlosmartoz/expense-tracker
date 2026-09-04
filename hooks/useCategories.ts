@@ -6,14 +6,10 @@ import {
   CATEGORY_COLORS,
   DEFAULT_CATEGORIES,
   isDefaultCategory,
+  SIDES,
   type Category,
   type TransactionType,
 } from "@/lib/types";
-
-const SIDES = [
-  { value: "expense", label: "Expenses" },
-  { value: "income", label: "Income" },
-] as const;
 
 export interface CategoryGroup {
   type: TransactionType;

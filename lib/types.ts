@@ -1,4 +1,5 @@
 import type { LucideIcon } from "lucide-react";
+import type { CurrencyCode } from "./config";
 import {
   UtensilsCrossed,
   ShoppingCart,
@@ -21,6 +22,12 @@ import {
 } from "lucide-react";
 
 export type TransactionType = "income" | "expense";
+
+/** The two sides of the book, in the order every list shows them. */
+export const SIDES = [
+  { value: "expense", label: "Expenses" },
+  { value: "income", label: "Income" },
+] as const satisfies readonly { value: TransactionType; label: string }[];
 
 // A category has a stable id and lives on one side of the book.
 
@@ -120,6 +127,8 @@ export interface Transaction {
   id: string;
   type: TransactionType;
   amount: number; // always positive; sign is derived from `type`
+  /** Face value only. Currencies are never converted into one another. */
+  currency: CurrencyCode;
   categoryId: string;
   description: string;
   date: string; // ISO date string (YYYY-MM-DD)
@@ -129,6 +138,7 @@ export interface Filters {
   /** Category id or "all" */
   categoryId: string;
   type: TransactionType | "all";
+  currency: CurrencyCode | "all";
   /** YYYY-MM (month key) or "all" */
   month: string;
   search: string;

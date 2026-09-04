@@ -3,20 +3,16 @@
 import { useMemo, useState } from "react";
 import { useStore } from "@/lib/store";
 import { monthKeyOf, sortedMonthKeys } from "@/lib/format";
+import { currenciesUsed, sumByCurrency } from "@/lib/totals";
 import type { Filters, Transaction } from "@/lib/types";
 
 const NO_FILTERS: Filters = {
   categoryId: "all",
   type: "all",
+  currency: "all",
   month: "all",
   search: "",
 };
-
-export interface Totals {
-  income: number;
-  expense: number;
-  balance: number;
-}
 
 /** Filters the ledger and sums whatever is left showing. */
 export function useTransactionFilters() {
@@ -28,11 +24,15 @@ export function useTransactionFilters() {
     [transactions]
   );
 
+  /** Drives whether the currency filter is worth showing at all. */
+  const currencies = useMemo(() => currenciesUsed(transactions), [transactions]);
+
   const filtered = useMemo(() => {
     const needle = filters.search.trim().toLowerCase();
     const matches = (t: Transaction) =>
       (filters.categoryId === "all" || t.categoryId === filters.categoryId) &&
       (filters.type === "all" || t.type === filters.type) &&
+      (filters.currency === "all" || t.currency === filters.currency) &&
       (filters.month === "all" || monthKeyOf(t.date) === filters.month) &&
       (!needle || t.description.toLowerCase().includes(needle));
 
@@ -41,21 +41,14 @@ export function useTransactionFilters() {
       .sort((a, b) => (a.date < b.date ? 1 : -1));
   }, [transactions, filters]);
 
-  const totals = useMemo<Totals>(() => {
-    let income = 0;
-    let expense = 0;
-    for (const t of filtered) {
-      if (t.type === "income") income += t.amount;
-      else expense += t.amount;
-    }
-    return { income, expense, balance: income - expense };
-  }, [filtered]);
+  const totals = useMemo(() => sumByCurrency(filtered), [filtered]);
 
   return {
     filters,
     setFilters,
     clearFilters: () => setFilters(NO_FILTERS),
     months,
+    currencies,
     filtered,
     totals,
     isEmpty: transactions.length === 0,

@@ -1,5 +1,5 @@
 import { migrate, VERSION, type Snapshot } from "./storage";
-import { APP_NAME } from "./config";
+import { APP_NAME, CURRENCIES } from "./config";
 
 // One format, JSON: a backup is always a whole ledger, never a partial one.
 
@@ -16,7 +16,11 @@ function isTransactionish(v: unknown): boolean {
     typeof t.id === "string" &&
     (t.type === "income" || t.type === "expense") &&
     typeof t.amount === "number" &&
-    typeof t.date === "string"
+    typeof t.date === "string" &&
+    // Absent in a file written before there was more than one currency;
+    // the migration chain stamps those. Present but unknown is a broken file.
+    (t.currency === undefined ||
+      (typeof t.currency === "string" && t.currency in CURRENCIES))
   );
 }
 
