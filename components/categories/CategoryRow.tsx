@@ -1,8 +1,6 @@
 "use client";
 
 import { Pencil, Trash2 } from "lucide-react";
-import { motion } from "motion/react";
-import { listItem } from "@/lib/motion";
 import { isDefaultCategory, type Category } from "@/lib/types";
 import CategoryIcon from "@/components/ui/CategoryIcon";
 import IconButton from "@/components/ui/IconButton";
@@ -23,10 +21,7 @@ export default function CategoryRow({
   const fixed = isDefaultCategory(category.id);
 
   return (
-    <motion.li
-      layout
-      variants={listItem}
-      exit="exit"
+    <li
       className={`flex items-center gap-3 rounded-xl border p-3 transition ${
         editing
           ? "border-border-strong bg-surface-raised"
@@ -59,6 +54,6 @@ export default function CategoryRow({
           />
         </>
       )}
-    </motion.li>
+    </li>
   );
 }

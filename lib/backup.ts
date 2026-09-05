@@ -1,5 +1,5 @@
-import { migrate, VERSION, type Snapshot } from "./storage";
-import { APP_NAME, CURRENCIES } from "./config";
+import { migrate, VERSION, type Snapshot } from "@/lib/storage";
+import { APP_NAME, CURRENCIES } from "@/lib/config";
 
 // One format, JSON: a backup is always a whole ledger, never a partial one.
 

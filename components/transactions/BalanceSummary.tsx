@@ -4,10 +4,9 @@ import { formatMoney } from "@/lib/format";
 import type { Totals } from "@/lib/totals";
 
 /** What the filters currently add up to — one row per currency, never a sum
-    across them. A ledger in a single currency reads exactly as it always did. */
+    across them. Every currency gets a row whether or not it is in use, so the
+    block keeps its height and nothing below it moves. */
 export default function BalanceSummary({ totals }: { totals: Totals[] }) {
-  const showCode = totals.length > 1;
-
   return (
     <div className="space-y-2">
       {totals.map((t) => (
@@ -16,9 +15,7 @@ export default function BalanceSummary({ totals }: { totals: Totals[] }) {
           className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 rounded-2xl bg-surface-raised/40 p-4"
         >
           <div>
-            <p className="stat-label">
-              Balance{showCode ? ` · ${t.currency}` : ""}
-            </p>
+            <p className="stat-label">Balance · {t.currency}</p>
             <p className="text-3xl font-bold tracking-tight text-text-primary">
               {formatMoney(t.balance, t.currency)}
             </p>

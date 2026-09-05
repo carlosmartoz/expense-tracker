@@ -1,7 +1,5 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
-import { stagger } from "@/lib/motion";
 import type { CategoryGroup as Group } from "@/hooks/useCategories";
 import type { Category } from "@/lib/types";
 import CategoryRow from "@/components/categories/CategoryRow";
@@ -33,25 +31,18 @@ export default function CategoryGroup({
           No {group.label.toLowerCase()} categories yet.
         </div>
       ) : (
-        <motion.ul
-          className="space-y-2"
-          variants={stagger}
-          initial="hidden"
-          animate="show"
-        >
-          <AnimatePresence initial={false}>
-            {group.items.map((cat) => (
-              <CategoryRow
-                key={cat.id}
-                category={cat}
-                used={usage[cat.id] ?? 0}
-                editing={editingId === cat.id}
-                onEdit={() => onEdit(cat)}
-                onDelete={() => onDelete(cat)}
-              />
-            ))}
-          </AnimatePresence>
-        </motion.ul>
+        <ul className="space-y-2">
+          {group.items.map((cat) => (
+            <CategoryRow
+              key={cat.id}
+              category={cat}
+              used={usage[cat.id] ?? 0}
+              editing={editingId === cat.id}
+              onEdit={() => onEdit(cat)}
+              onDelete={() => onDelete(cat)}
+            />
+          ))}
+        </ul>
       )}
     </div>
   );

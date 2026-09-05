@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import type { CurrencyCode } from "./config";
+import type { CurrencyCode } from "@/lib/config";
 import {
   UtensilsCrossed,
   ShoppingCart,

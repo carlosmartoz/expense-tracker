@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useStore } from "@/lib/store";
 import { monthKeyOf, sortedMonthKeys } from "@/lib/format";
-import { currenciesUsed, sumByCurrency } from "@/lib/totals";
+import { currenciesUsed, sumEveryCurrency } from "@/lib/totals";
 import type { Filters, Transaction } from "@/lib/types";
 
 const NO_FILTERS: Filters = {
@@ -41,7 +41,7 @@ export function useTransactionFilters() {
       .sort((a, b) => (a.date < b.date ? 1 : -1));
   }, [transactions, filters]);
 
-  const totals = useMemo(() => sumByCurrency(filtered), [filtered]);
+  const totals = useMemo(() => sumEveryCurrency(filtered), [filtered]);
 
   return {
     filters,

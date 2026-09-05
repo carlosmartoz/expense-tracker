@@ -1,166 +1,102 @@
 "use client";
 
 import {
-  createContext,
-  useContext,
-  useEffect,
   useMemo,
-  useState,
+  useEffect,
+  useContext,
+  useReducer,
+  createContext,
   type ReactNode,
 } from "react";
-import type { Transaction, Category, TransactionType } from "./types";
-import { DEFAULT_CATEGORIES, isDefaultCategory } from "./types";
-import { load, save } from "./storage";
+import { uid } from "@/lib/uid";
+import { load, save } from "@/lib/storage";
+import { StoreActions, StoreData } from "@/types/store";
+import { initialState, reducer, type StoreState } from "@/lib/storeReducer";
 
-interface StoreValue {
-  transactions: Transaction[];
-  categories: Category[];
-  /** id -> category, for quick lookups in render. */
-  categoryMap: Record<string, Category>;
-  hydrated: boolean;
-  addTransaction: (t: Omit<Transaction, "id">) => void;
-  updateTransaction: (id: string, patch: Omit<Transaction, "id">) => void;
-  deleteTransaction: (id: string) => void;
-  /** Wipes everything and starts over from the shipped categories. */
-  clearAll: () => void;
-  /** Swaps in an imported backup, replacing everything currently held. */
-  replaceAll: (next: { transactions: Transaction[]; categories: Category[] }) => void;
-  addCategory: (c: { name: string; color: string; type: TransactionType }) => void;
-  /** Renames or recolours a category. Refuses on a default: those are fixed. */
-  updateCategory: (id: string, patch: { name?: string; color?: string }) => void;
-  /** Adds any category from DEFAULT_CATEGORIES this ledger doesn't have yet. */
-  addMissingDefaults: () => void;
-  /** Moves the category's transactions to `moveToId`. Refuses on a default. */
-  deleteCategory: (id: string, moveToId: string) => void;
-}
-
-const StoreContext = createContext<StoreValue | null>(null);
-
-function uid(): string {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return crypto.randomUUID();
-  }
-  return `id-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-}
+const DataContext = createContext<StoreData | null>(null);
+const ActionsContext = createContext<StoreActions | null>(null);
 
 export function StoreProvider({ children }: { children: ReactNode }) {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [categories, setCategories] = useState<Category[]>(DEFAULT_CATEGORIES);
-  const [hydrated, setHydrated] = useState(false);
+  const [state, dispatch] = useReducer(reducer, initialState);
 
-  // localStorage has no server-side value, so stored data can only arrive here.
   useEffect(() => {
-    const stored = load();
-    /* eslint-disable react-hooks/set-state-in-effect */
-    setTransactions(stored ? stored.transactions : []);
-    setCategories(
-      stored && stored.categories.length ? stored.categories : DEFAULT_CATEGORIES
-    );
-    setHydrated(true);
-    /* eslint-enable react-hooks/set-state-in-effect */
+    dispatch({ type: "hydrated", snapshot: load() });
   }, []);
 
-  // Persist on every change (after hydration).
   useEffect(() => {
-    if (!hydrated) return;
-    save({ transactions, categories });
-  }, [transactions, categories, hydrated]);
+    if (!state.hydrated) return;
+
+    save({ transactions: state.transactions, categories: state.categories });
+  }, [state.transactions, state.categories, state.hydrated]);
 
   const categoryMap = useMemo(
-    () => Object.fromEntries(categories.map((c) => [c.id, c])),
-    [categories]
+    () => Object.fromEntries(state.categories.map((c) => [c.id, c])),
+    [state.categories],
   );
 
-  const value = useMemo<StoreValue>(
+  const data = useMemo<StoreData>(
     () => ({
-      transactions,
-      categories,
+      transactions: state.transactions,
+      categories: state.categories,
       categoryMap,
-      hydrated,
-      addTransaction: (t) =>
-        setTransactions((prev) =>
-          [...prev, { ...t, id: uid() }].sort((a, b) =>
-            a.date < b.date ? 1 : -1
-          )
-        ),
-      updateTransaction: (id, patch) =>
-        setTransactions((prev) =>
-          prev
-            .map((t) => (t.id === id ? { ...patch, id } : t))
-            .sort((a, b) => (a.date < b.date ? 1 : -1))
-        ),
-      deleteTransaction: (id) =>
-        setTransactions((prev) => prev.filter((t) => t.id !== id)),
-      clearAll: () => {
-        setTransactions([]);
-        setCategories(DEFAULT_CATEGORIES);
-      },
-      replaceAll: ({ transactions: nextTx, categories: nextCats }) => {
-        setTransactions(
-          [...nextTx].sort((a, b) => (a.date < b.date ? 1 : -1))
-        );
-        if (nextCats.length) setCategories(nextCats);
-      },
-      addCategory: ({ name, color, type }) =>
-        setCategories((prev) => {
-          const trimmed = name.trim();
-          if (!trimmed) return prev;
-          // Names only have to be unique within their own side of the book.
-          const clash = prev.some(
-            (c) =>
-              c.type === type && c.name.toLowerCase() === trimmed.toLowerCase()
-          );
-          if (clash) return prev;
-          return [
-            ...prev,
-            { id: uid(), name: trimmed, color, icon: "Tag", type },
-          ];
-        }),
-      addMissingDefaults: () =>
-        setCategories((prev) => {
-          const missing = DEFAULT_CATEGORIES.filter(
-            (d) => !prev.some((c) => c.id === d.id)
-          );
-          return missing.length ? [...prev, ...missing] : prev;
-        }),
-      updateCategory: (id, patch) => {
-        if (isDefaultCategory(id)) return;
-        setCategories((prev) =>
-          prev.map((c) => {
-            if (c.id !== id) return c;
-            const name = patch.name?.trim();
-            return {
-              ...c,
-              ...(name ? { name } : {}),
-              ...(patch.color ? { color: patch.color } : {}),
-            };
-          })
-        );
-      },
-      deleteCategory: (id, moveToId) => {
-        if (isDefaultCategory(id)) return;
-        const target = categories.find((c) => c.id === id);
-        const destination = categories.find((c) => c.id === moveToId);
-        if (!target || !destination || destination.id === target.id) return;
-        // Never leave a side of the book without a category to pick.
-        const remaining = categories.filter(
-          (c) => c.type === target.type && c.id !== id
-        );
-        if (remaining.length === 0) return;
-        setCategories((prev) => prev.filter((c) => c.id !== id));
-        setTransactions((prev) =>
-          prev.map((t) => (t.categoryId === id ? { ...t, categoryId: moveToId } : t))
-        );
-      },
+      hydrated: state.hydrated,
     }),
-    [transactions, categories, categoryMap, hydrated]
+
+    [state.transactions, state.categories, state.hydrated, categoryMap],
   );
 
-  return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
+  const actions = useMemo<StoreActions>(
+    () => ({
+      addTransaction: (draft) =>
+        dispatch({ type: "transaction/add", id: uid(), draft }),
+      updateTransaction: (id, patch) =>
+        dispatch({ type: "transaction/update", id, patch }),
+      deleteTransaction: (id) => dispatch({ type: "transaction/delete", id }),
+      clearAll: () => dispatch({ type: "clearAll" }),
+      replaceAll: ({ transactions, categories }) =>
+        dispatch({ type: "replaceAll", transactions, categories }),
+      addCategory: (draft) =>
+        dispatch({ type: "category/add", id: uid(), draft }),
+      updateCategory: (id, patch) =>
+        dispatch({ type: "category/update", id, patch }),
+      addMissingDefaults: () =>
+        dispatch({ type: "category/addMissingDefaults" }),
+      deleteCategory: (id, moveToId) =>
+        dispatch({ type: "category/delete", id, moveToId }),
+    }),
+    [],
+  );
+
+  return (
+    <ActionsContext.Provider value={actions}>
+      <DataContext.Provider value={data}>{children}</DataContext.Provider>
+    </ActionsContext.Provider>
+  );
 }
 
-export function useStore(): StoreValue {
-  const ctx = useContext(StoreContext);
-  if (!ctx) throw new Error("useStore must be used within StoreProvider");
+export function useStoreActions(): StoreActions {
+  const ctx = useContext(ActionsContext);
+
+  if (!ctx)
+    throw new Error("useStoreActions must be used within StoreProvider");
+
   return ctx;
 }
+
+export function useStoreData(): StoreData {
+  const ctx = useContext(DataContext);
+
+  if (!ctx) throw new Error("useStoreData must be used within StoreProvider");
+
+  return ctx;
+}
+
+export function useStore(): StoreData & StoreActions {
+  const data = useStoreData();
+
+  const actions = useStoreActions();
+
+  return useMemo(() => ({ ...data, ...actions }), [data, actions]);
+}
+
+export type { StoreState, StoreActions, StoreData };

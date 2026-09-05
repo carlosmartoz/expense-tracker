@@ -1,6 +1,6 @@
-import type { Transaction, Category, TransactionType } from "./types";
-import { CATEGORY_COLOR_VALUES, DEFAULT_CATEGORIES } from "./types";
-import { CURRENCIES, DEFAULT_CURRENCY } from "./config";
+import type { Transaction, Category, TransactionType } from "@/lib/types";
+import { CATEGORY_COLOR_VALUES, DEFAULT_CATEGORIES } from "@/lib/types";
+import { CURRENCIES, DEFAULT_CURRENCY } from "@/lib/config";
 
 // This module owns the storage format; nothing else touches localStorage.
 

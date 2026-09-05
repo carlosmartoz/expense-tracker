@@ -1,6 +1,6 @@
-import { CURRENCIES, DEFAULT_CURRENCY, LOCALE, type CurrencyCode } from "./config";
-import type { Transaction } from "./types";
-import { MAX_AMOUNT_INTEGER_DIGITS } from "./types";
+import { CURRENCIES, DEFAULT_CURRENCY, LOCALE, type CurrencyCode } from "@/lib/config";
+import type { Transaction } from "@/lib/types";
+import { MAX_AMOUNT_INTEGER_DIGITS } from "@/lib/types";
 
 // ARS convention: dot for thousands, comma for the decimal, two decimals.
 // Every currency groups this way, so one formatter serves them all.

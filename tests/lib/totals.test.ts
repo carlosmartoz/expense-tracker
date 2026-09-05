@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { currenciesUsed, sumByCurrency } from "@/lib/totals";
+import { currenciesUsed, sumByCurrency, sumEveryCurrency } from "@/lib/totals";
 import type { Transaction } from "@/lib/types";
 import type { CurrencyCode } from "@/lib/config";
 
@@ -88,5 +88,41 @@ describe("data that shouldn't exist but might", () => {
     const odd = { ...tx("expense", 10), currency: "XYZ" };
     const out = sumByCurrency([odd as unknown as Transaction, tx("expense", 5)]);
     expect(out.map((t) => t.currency)).toEqual(["ARS", "XYZ"]);
+  });
+});
+
+// The summary reads off this one, so its shape has to be the same every render:
+// a row appearing mid-session would shove the history down the page.
+describe("the summary's fixed set of rows", () => {
+  it("gives every declared currency a row, in declaration order", () => {
+    expect(sumEveryCurrency([]).map((t) => t.currency)).toEqual(["ARS", "USD"]);
+  });
+
+  it("zeroes the ones the ledger doesn't use", () => {
+    const out = sumEveryCurrency([tx("income", 500)]);
+    expect(out).toEqual([
+      { currency: "ARS", income: 500, expense: 0, balance: 500 },
+      { currency: "USD", income: 0, expense: 0, balance: 0 },
+    ]);
+  });
+
+  it("keeps the row set identical whichever currency is in use", () => {
+    const onlyArs = sumEveryCurrency([tx("expense", 10)]);
+    const onlyUsd = sumEveryCurrency([tx("expense", 10, "USD")]);
+    expect(onlyUsd.map((t) => t.currency)).toEqual(onlyArs.map((t) => t.currency));
+  });
+
+  it("totals the used ones exactly as sumByCurrency does", () => {
+    const mixed = [tx("income", 1000), tx("expense", 250, "USD")];
+    for (const row of sumByCurrency(mixed)) {
+      expect(sumEveryCurrency(mixed)).toContainEqual(row);
+    }
+  });
+
+  it("still shows a code the config doesn't declare, and shows it last", () => {
+    const odd = { ...tx("income", 7), currency: "BRL" };
+    const out = sumEveryCurrency([odd as unknown as Transaction]);
+    expect(out.map((t) => t.currency)).toEqual(["ARS", "USD", "BRL"]);
+    expect(out.at(-1)).toMatchObject({ income: 7, balance: 7 });
   });
 });

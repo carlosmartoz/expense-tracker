@@ -1,18 +1,11 @@
 "use client";
 
 import { Wallet } from "lucide-react";
-import { motion } from "motion/react";
-import { fadeUp } from "@/lib/motion";
 
 /** Stands in for the history when there is none. The form is right beside it. */
 export default function EmptyState() {
   return (
-    <motion.div
-      className="card flex flex-col items-center gap-4 p-12 text-center"
-      variants={fadeUp}
-      initial="hidden"
-      animate="show"
-    >
+    <div className="card flex flex-col items-center gap-4 p-12 text-center">
       <span className="grid h-14 w-14 place-items-center rounded-2xl bg-surface-raised text-text-secondary">
         <Wallet className="h-7 w-7" />
       </span>
@@ -31,6 +24,6 @@ export default function EmptyState() {
         Already have a backup? Use{" "}
         <span className="text-text-secondary">Import</span> in the sidebar.
       </p>
-    </motion.div>
+    </div>
   );
 }
