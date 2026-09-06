@@ -1,13 +1,12 @@
 import type { Transaction, Category, TransactionType } from "@/lib/types";
 import { DEFAULT_CATEGORIES, isDefaultCategory } from "@/lib/types";
 
-// Every rule the ledger obeys lives here, as a pure function of state and
-// action. No React, no localStorage: the provider wires those in around it.
+// Every rule the data obeys, as a pure function of state and action.
 
 export interface StoreState {
   transactions: Transaction[];
   categories: Category[];
-  /** False until the stored snapshot has been read. Nothing persists before. */
+  // False until the stored data has been read.
   hydrated: boolean;
 }
 
@@ -17,20 +16,17 @@ export const initialState: StoreState = {
   hydrated: false,
 };
 
-/** What a new transaction looks like before the store stamps an id on it. */
+// A new transaction, before it gets an id.
 export type TransactionDraft = Omit<Transaction, "id">;
 
-/** What a new category needs. The icon is fixed and the id comes with it. */
+// A new category, before it gets an id.
 export interface CategoryDraft {
   name: string;
   color: string;
   type: TransactionType;
 }
 
-/**
- * Ids arrive on the action rather than being minted in here, which is what
- * keeps the reducer deterministic and testable without stubbing `crypto`.
- */
+// Every action that creates something carries the new id.
 export type StoreAction =
   | {
       type: "hydrated";
@@ -50,7 +46,7 @@ export type StoreAction =
   | { type: "category/addMissingDefaults" }
   | { type: "category/delete"; id: string; moveToId: string };
 
-/** Newest first. The ledger is held sorted so no reader has to sort it. */
+// Sorts transactions newest first.
 function sortByDate(transactions: Transaction[]): Transaction[] {
   return [...transactions].sort((a, b) => (a.date < b.date ? 1 : -1));
 }
@@ -61,8 +57,7 @@ export function reducer(state: StoreState, action: StoreAction): StoreState {
       const stored = action.snapshot;
       return {
         transactions: stored ? stored.transactions : [],
-        // An empty category list is treated as no list at all: a ledger always
-        // has something to file a transaction under.
+        // An empty category list is treated as no list at all.
         categories:
           stored && stored.categories.length
             ? stored.categories
@@ -107,7 +102,7 @@ export function reducer(state: StoreState, action: StoreAction): StoreState {
       return {
         ...state,
         transactions: sortByDate(action.transactions),
-        // Same reasoning as hydration: an empty import keeps what is here.
+        // An empty import keeps the current categories.
         categories: action.categories.length
           ? action.categories
           : state.categories,
@@ -116,7 +111,7 @@ export function reducer(state: StoreState, action: StoreAction): StoreState {
     case "category/add": {
       const name = action.draft.name.trim();
       if (!name) return state;
-      // Names only have to be unique within their own side of the book.
+      // Names only have to be unique within their own type.
       const clash = state.categories.some(
         (c) =>
           c.type === action.draft.type &&
@@ -167,7 +162,7 @@ export function reducer(state: StoreState, action: StoreAction): StoreState {
       const target = state.categories.find((c) => c.id === action.id);
       const destination = state.categories.find((c) => c.id === action.moveToId);
       if (!target || !destination || destination.id === target.id) return state;
-      // Never leave a side of the book without a category to pick.
+      // Never leave income or expense without a category to pick.
       const remaining = state.categories.filter(
         (c) => c.type === target.type && c.id !== action.id
       );

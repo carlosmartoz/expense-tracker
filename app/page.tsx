@@ -53,7 +53,7 @@ export default function Home() {
         </div>
       </aside>
 
-      {/* Header, below xl — where there is no room for the sidebar */}
+      {/* Header, below xl */}
       <div className="sticky top-0 z-10 flex items-center gap-1 border-b border-border bg-surface-base/90 px-4 py-2 backdrop-blur xl:hidden">
         <span className="mr-auto min-w-0 truncate font-bold">{APP_NAME}</span>
         {TABS.map((t) => {
@@ -70,7 +70,7 @@ export default function Home() {
               }`}
             >
               <Icon className="h-4.5 w-4.5" />
-              {/* Room for the word on anything but a phone. */}
+              {/* The label, hidden on a phone. */}
               <span className="hidden sm:inline">{t.label}</span>
             </button>
           );

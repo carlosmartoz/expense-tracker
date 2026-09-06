@@ -7,7 +7,7 @@ export interface Swatch {
   name: string;
 }
 
-/** Swatches that name themselves on hover and on keyboard focus. */
+// Swatches that name themselves on hover and on keyboard focus.
 export default function ColorPicker({
   colors,
   value,
@@ -39,7 +39,7 @@ export default function ColorPicker({
                 <Check className="h-4 w-4 text-surface-base" strokeWidth={3} />
               )}
             </button>
-            {/* Out of the layout so it can't nudge the grid. */}
+            {/* The name tooltip, positioned outside the layout. */}
             <span
               role="tooltip"
               className="pointer-events-none absolute -top-7 left-1/2 z-10 -translate-x-1/2

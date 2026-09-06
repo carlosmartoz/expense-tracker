@@ -24,7 +24,7 @@ export default function CategoriesView() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Categories</h1>
           <p className="text-sm text-text-subtle">
-            One list for both sides of the book. The ones the app ships with are
+            One list for income and expenses. The ones the app comes with are
             fixed; the rest are yours.
           </p>
         </div>

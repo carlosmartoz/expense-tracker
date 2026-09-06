@@ -13,36 +13,31 @@ import {
   Wallet,
   PiggyBank,
   Tag,
-  Wrench,
-  Briefcase,
-  Receipt,
-  House,
-  Tv,
   Landmark,
 } from "lucide-react";
 
 export type TransactionType = "income" | "expense";
 
-/** The two sides of the book, in the order every list shows them. */
-export const SIDES = [
+// The two transaction types, in the order every list shows them.
+export const TRANSACTION_TYPES = [
   { value: "expense", label: "Expenses" },
   { value: "income", label: "Income" },
 ] as const satisfies readonly { value: TransactionType; label: string }[];
 
-// A category has a stable id and lives on one side of the book.
+// A category has a stable id and belongs to one type.
 
 export interface Category {
   id: string;
   name: string;
-  /** One of CATEGORY_COLORS. Applied to the category's icon and nothing else. */
+  // One of CATEGORY_COLORS. Applied to the category's icon.
   color: string;
-  /** Key into ICON_MAP. Categories created by hand fall back to "Tag". */
+  // Key into ICON_MAP. Categories created by hand fall back to "Tag".
   icon: string;
-  /** Which side of the book this category belongs to. Fixed once created. */
+  // Which type this category belongs to. Fixed once created.
   type: TransactionType;
 }
 
-/** Referenced by name so a category can be serialized. */
+// Icons by name.
 const ICON_MAP: Record<string, LucideIcon> = {
   UtensilsCrossed,
   ShoppingCart,
@@ -57,20 +52,14 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Wallet,
   PiggyBank,
   Tag,
-  // Retired, kept so older data still draws its icon.
-  Wrench,
-  Briefcase,
-  Receipt,
-  House,
-  Tv,
 };
 
 export function categoryIcon(icon: string | undefined): LucideIcon {
   return (icon && ICON_MAP[icon]) || Tag;
 }
 
-/** One per default plus the white both "Other" buckets share. */
-// Literals, not theme tokens: a token could be renamed out from under saved data.
+// One per default plus the white both "Other" categories share.
+// Literal hex values, not theme tokens.
 export const CATEGORY_COLORS = [
   { value: "#ffffff", name: "White" },
   { value: "#ef4444", name: "Red" },
@@ -85,15 +74,15 @@ export const CATEGORY_COLORS = [
   { value: "#ec4899", name: "Pink" },
 ] as const;
 
-/** The hex values on their own, for anything that only needs to check one. */
+// The hex values on their own.
 export const CATEGORY_COLOR_VALUES: readonly string[] = CATEGORY_COLORS.map(
   (c) => c.value
 );
 
-/** Fixed: never renamed, recoloured or deleted. The floor a ledger stands on. */
-// The only source for a default's colour and icon; see the migration chain.
+// The categories every user starts with. Never renamed or deleted.
+// The only source for a default's colour and icon.
 export const DEFAULT_CATEGORIES: Category[] = [
-  // Food and Supermarket stay apart: eating out and stocking up differ.
+  // Food is eating out; Supermarket is stocking up.
   { id: "Food", name: "Food", color: "#ef4444", icon: "UtensilsCrossed", type: "expense" },
   { id: "Supermarket", name: "Supermarket", color: "#eab308", icon: "ShoppingCart", type: "expense" },
   { id: "Transport", name: "Transport", color: "#06b6d4", icon: "Car", type: "expense" },
@@ -112,22 +101,22 @@ export const DEFAULT_CATEGORIES: Category[] = [
 
 const DEFAULT_IDS = new Set(DEFAULT_CATEGORIES.map((c) => c.id));
 
-/** Defaults are fixed: the app's own vocabulary, not a starting point. */
+// True when the id is one of the default categories.
 export function isDefaultCategory(id: string): boolean {
   return DEFAULT_IDS.has(id);
 }
 
-/** Max characters for a category name. */
+// Max characters for a category name.
 export const MAX_CATEGORY_NAME_LENGTH = 24;
 
-/** Digits before the comma. Seven allows up to 9.999.999,99. */
+// Digits allowed before the comma.
 export const MAX_AMOUNT_INTEGER_DIGITS = 7;
 
 export interface Transaction {
   id: string;
   type: TransactionType;
   amount: number; // always positive; sign is derived from `type`
-  /** Face value only. Currencies are never converted into one another. */
+  // Which currency the amount is in. Never converted.
   currency: CurrencyCode;
   categoryId: string;
   description: string;
@@ -135,11 +124,11 @@ export interface Transaction {
 }
 
 export interface Filters {
-  /** Category id or "all" */
+  // Category id or "all"
   categoryId: string;
   type: TransactionType | "all";
   currency: CurrencyCode | "all";
-  /** YYYY-MM (month key) or "all" */
+  // YYYY-MM (month key) or "all"
   month: string;
   search: string;
 }

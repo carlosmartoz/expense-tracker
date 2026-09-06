@@ -5,7 +5,7 @@ import { Download, Trash2, Upload } from "lucide-react";
 import { useBackup } from "@/hooks/useBackup";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 
-/** Export, import and start over. Labelled in the sidebar, icons in the header. */
+// Export, import and start over.
 export default function DataMenu({ compact = false }: { compact?: boolean }) {
   const b = useBackup();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -23,7 +23,7 @@ export default function DataMenu({ compact = false }: { compact?: boolean }) {
         accept=".json"
         onChange={(e) => {
           const file = e.target.files?.[0];
-          // Cleared straight away so picking the same file twice still fires.
+          // Cleared so the same file can be picked again.
           e.target.value = "";
           if (file) b.importFile(file);
         }}

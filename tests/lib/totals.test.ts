@@ -3,8 +3,7 @@ import { currenciesUsed, sumByCurrency, sumEveryCurrency } from "@/lib/totals";
 import type { Transaction } from "@/lib/types";
 import type { CurrencyCode } from "@/lib/config";
 
-// The rule the whole feature rests on: currencies are counted apart, never
-// added together. A single figure would need a rate, and this app has none.
+// Currencies are counted apart, never added together.
 
 let n = 0;
 function tx(
@@ -23,7 +22,7 @@ function tx(
   };
 }
 
-describe("totalling a ledger", () => {
+describe("totalling transactions", () => {
   it("balances income against expenses", () => {
     const out = sumByCurrency([tx("income", 1000), tx("expense", 250)]);
     expect(out).toEqual([
@@ -36,14 +35,14 @@ describe("totalling a ledger", () => {
     expect(out[0].balance).toBe(-300);
   });
 
-  it("still gives a figure for an empty ledger", () => {
+  it("still gives a figure when there are no transactions", () => {
     expect(sumByCurrency([])).toEqual([
       { currency: "ARS", income: 0, expense: 0, balance: 0 },
     ]);
   });
 });
 
-describe("two currencies in one ledger", () => {
+describe("two currencies in one set of data", () => {
   const mixed = [
     tx("income", 950000, "ARS"),
     tx("expense", 6500, "ARS"),
@@ -77,8 +76,8 @@ describe("two currencies in one ledger", () => {
 
 describe("data that shouldn't exist but might", () => {
   it("counts a transaction with no currency as the default", () => {
-    const orphan = { ...tx("expense", 10), currency: undefined };
-    const out = sumByCurrency([orphan as unknown as Transaction]);
+    const noCurrency = { ...tx("expense", 10), currency: undefined };
+    const out = sumByCurrency([noCurrency as unknown as Transaction]);
     expect(out).toEqual([
       { currency: "ARS", income: 0, expense: 10, balance: -10 },
     ]);
@@ -91,14 +90,13 @@ describe("data that shouldn't exist but might", () => {
   });
 });
 
-// The summary reads off this one, so its shape has to be the same every render:
-// a row appearing mid-session would shove the history down the page.
+// The summary's rows must be the same every render.
 describe("the summary's fixed set of rows", () => {
   it("gives every declared currency a row, in declaration order", () => {
     expect(sumEveryCurrency([]).map((t) => t.currency)).toEqual(["ARS", "USD"]);
   });
 
-  it("zeroes the ones the ledger doesn't use", () => {
+  it("zeroes the ones the data doesn't use", () => {
     const out = sumEveryCurrency([tx("income", 500)]);
     expect(out).toEqual([
       { currency: "ARS", income: 500, expense: 0, balance: 500 },

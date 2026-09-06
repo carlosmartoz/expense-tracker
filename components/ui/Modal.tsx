@@ -5,7 +5,7 @@ import { X } from "lucide-react";
 import IconButton from "@/components/ui/IconButton";
 import Portal from "@/components/ui/Portal";
 
-/** A titled panel over a dimmed page. Closes on Escape, backdrop or the X. */
+// A titled panel over a dimmed page. Closes on Escape, backdrop or the X.
 export default function Modal({
   open,
   title,

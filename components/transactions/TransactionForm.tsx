@@ -10,14 +10,13 @@ import Field from "@/components/ui/Field";
 import SegmentedToggle from "@/components/ui/SegmentedToggle";
 import Select from "@/components/ui/Select";
 
-// Singular, unlike the shared SIDES: this toggle picks the one transaction
-// being written, where the Categories screen names a whole group.
-const SIDES = [
+// Singular labels, for the one transaction being written.
+const TYPE_SEGMENTS = [
   { value: "expense", label: "Expense" },
   { value: "income", label: "Income" },
 ] as const;
 
-// The code, not the symbol: "$" alone wouldn't say which of the two it is.
+// The code, not the symbol.
 const CURRENCIES = CURRENCY_CODES.map((code) => ({ value: code, label: code }));
 
 export default function TransactionForm({
@@ -25,7 +24,7 @@ export default function TransactionForm({
   initial,
 }: {
   onDone?: () => void;
-  /** When provided, the form edits this transaction instead of creating one. */
+  // When provided, the form edits this transaction.
   initial?: Transaction;
 }) {
   const form = useTransactionForm(initial, onDone);
@@ -34,7 +33,7 @@ export default function TransactionForm({
     <form onSubmit={form.submit} className="space-y-4">
       <SegmentedToggle
         ariaLabel="Type"
-        segments={SIDES}
+        segments={TYPE_SEGMENTS}
         value={form.type}
         onChange={form.setType}
       />
@@ -42,7 +41,7 @@ export default function TransactionForm({
       <Field
         label="Amount"
         hint={
-          /* Always in the layout so hitting the cap doesn't shift the panel. */
+          // Always in the layout, invisible until the cap is hit.
           <p
             id="amount-limit"
             aria-hidden={!form.atLimit}
@@ -54,8 +53,7 @@ export default function TransactionForm({
           </p>
         }
       >
-        {/* Stretched, not centred: the toggle sets the row height and the
-            input grows to meet it, so the two boxes line up. */}
+        {/* The amount field and the currency picker. */}
         <div className="flex gap-2">
           <input
             inputMode="decimal"
@@ -111,7 +109,7 @@ export default function TransactionForm({
         />
       </Field>
 
-      {/* Grouped with its button so the form's spacing doesn't pay twice. */}
+      {/* The date field and the submit button. */}
       <div className="space-y-1">
         <ErrorText>{form.error}</ErrorText>
         <button type="submit" className="btn-primary w-full">

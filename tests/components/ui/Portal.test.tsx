@@ -4,8 +4,7 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 
-// The dialog mounts inside a sticky sidebar, which is its own stacking context.
-// These fail if the portal is ever removed.
+// Checks the dialog escapes a sticky sidebar's stacking context.
 
 let root: Root | null = null;
 let host: HTMLElement | null = null;

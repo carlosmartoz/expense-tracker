@@ -5,7 +5,7 @@ export interface Segment<T extends string> {
   label: string;
 }
 
-/** Two or three mutually exclusive choices as a pill. The picked one is light. */
+// Two or three mutually exclusive choices as a pill.
 export default function SegmentedToggle<T extends string>({
   segments,
   value,

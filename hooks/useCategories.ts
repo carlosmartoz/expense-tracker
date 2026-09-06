@@ -6,7 +6,7 @@ import {
   CATEGORY_COLORS,
   DEFAULT_CATEGORIES,
   isDefaultCategory,
-  SIDES,
+  TRANSACTION_TYPES,
   type Category,
   type TransactionType,
 } from "@/lib/types";
@@ -17,7 +17,7 @@ export interface CategoryGroup {
   items: Category[];
 }
 
-/** The categories screen: the list, the create/edit form, and removal. */
+// The categories screen: the list, the create/edit form, and removal.
 export function useCategories() {
   const {
     categories,
@@ -42,20 +42,20 @@ export function useCategories() {
 
   const groups = useMemo<CategoryGroup[]>(
     () =>
-      SIDES.map((side) => ({
-        type: side.value,
-        label: side.label,
-        items: categories.filter((c) => c.type === side.value),
+      TRANSACTION_TYPES.map((option) => ({
+        type: option.value,
+        label: option.label,
+        items: categories.filter((c) => c.type === option.value),
       })),
     [categories]
   );
 
-  /** Defaults only seed a fresh browser, so an older ledger can be short a few. */
+  // How many default categories are missing.
   const missingDefaults = DEFAULT_CATEGORIES.filter(
     (d) => !categories.some((c) => c.id === d.id)
   ).length;
 
-  /** How many transactions point at each category. */
+  // How many transactions point at each category.
   const usage = useMemo(() => {
     const counts: Record<string, number> = {};
     for (const t of transactions) {
@@ -64,12 +64,12 @@ export function useCategories() {
     return counts;
   }, [transactions]);
 
-  /** Where a deleted category's transactions can go: same side, minus itself. */
+  // Where a deleted category's transactions can go.
   const moveOptions = deleting
     ? categories.filter((c) => c.type === deleting.type && c.id !== deleting.id)
     : [];
 
-  /** An edit makes the last attempt's message stale. */
+  // Clears the error message.
   function clearError() {
     if (error) setError(null);
   }
@@ -105,7 +105,7 @@ export function useCategories() {
       setError("Enter a category name.");
       return;
     }
-    // Names only have to be unique within their own side of the book.
+    // Names only have to be unique within their own type.
     const clash = categories.some(
       (c) =>
         c.id !== editingId &&

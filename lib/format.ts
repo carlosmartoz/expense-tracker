@@ -2,8 +2,7 @@ import { CURRENCIES, DEFAULT_CURRENCY, LOCALE, type CurrencyCode } from "@/lib/c
 import type { Transaction } from "@/lib/types";
 import { MAX_AMOUNT_INTEGER_DIGITS } from "@/lib/types";
 
-// ARS convention: dot for thousands, comma for the decimal, two decimals.
-// Every currency groups this way, so one formatter serves them all.
+// Formats amounts as "1.234,56": dot for thousands, comma for decimals.
 const amountFormatter = new Intl.NumberFormat(CURRENCIES[DEFAULT_CURRENCY].locale, {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
@@ -13,8 +12,7 @@ export function formatAmount(value: number): string {
   return amountFormatter.format(Number.isFinite(value) ? value : 0);
 }
 
-/** formatAmount with the symbol, sign first: "-$ 1.200,00", "US$ 150,00".
-    An unrecognised code falls back to the default rather than printing nothing. */
+// Formats an amount with its symbol: "-$ 1.200,00", "US$ 150,00".
 export function formatMoney(
   value: number,
   currency: CurrencyCode = DEFAULT_CURRENCY
@@ -25,7 +23,7 @@ export function formatMoney(
   return `${sign}${symbol} ${formatAmount(Math.abs(n))}`;
 }
 
-/** Parse a display string like "2.672.371,00" back into a number. */
+// Parse a display string like "2.672.371,00" back into a number.
 export function parseAmount(input: string): number {
   if (!input) return NaN;
   const normalized = input
@@ -35,10 +33,10 @@ export function parseAmount(input: string): number {
   return Number(normalized);
 }
 
-/** The largest amount the form accepts, e.g. 9999999.99. */
+// The largest amount the form accepts, e.g. 9999999.99.
 export const MAX_AMOUNT = Number(`${"9".repeat(MAX_AMOUNT_INTEGER_DIGITS)}.99`);
 
-/** Formats as you type: "2672371" -> "2.672.371", capped at the ceiling. */
+// Formats as you type: "2672371" -> "2.672.371".
 export function formatAmountInput(raw: string): string {
   let cleaned = raw.replace(/[^\d,]/g, "");
   // keep only the first comma
@@ -68,7 +66,7 @@ export function monthKeyOf(isoDate: string): string {
   return isoDate.slice(0, 7); // YYYY-MM
 }
 
-/** Every month that has at least one transaction, oldest first. */
+// Every month that has at least one transaction, oldest first.
 export function sortedMonthKeys(transactions: Transaction[]): string[] {
   return Array.from(new Set(transactions.map((t) => monthKeyOf(t.date)))).sort();
 }

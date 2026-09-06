@@ -1,47 +1,44 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { load, save, migrate, VERSION, type Snapshot } from "@/lib/storage";
-import { CATEGORY_COLOR_VALUES, DEFAULT_CATEGORIES } from "@/lib/types";
+import { clear, load, save, type Snapshot } from "@/lib/storage";
+import { DEFAULT_CATEGORIES } from "@/lib/types";
 import type { Category, Transaction } from "@/lib/types";
 
 // The one place a mistake silently eats data, so it gets the closest look.
 
 const KEY = "expense-tracker";
-const OLD_TX = "expense-tracker:transactions:v2";
-const OLD_CAT = "expense-tracker:categories:v1";
 
-// A realistic old install: two keys, no version stamp.
-const OLD_TRANSACTIONS = [
-  // That `currency` is the free-form v1 field, not today's: it is dropped at
-  // v2 and never consulted again, which the chain below pins down.
-  { id: "a", type: "expense", amount: 6500, category: "Food", currency: "US Dollars",
-    description: "Delivery", date: "2026-08-12", tags: ["Credit card"] },
-  { id: "b", type: "expense", amount: 4990, category: "Subscriptions",
-    description: "Netflix", date: "2026-08-05" },
-  { id: "c", type: "income", amount: 950000, category: "Income",
-    description: "Salary", date: "2026-08-03", tags: ["Bank transfer"] },
-  { id: "d", type: "expense", amount: 8000, category: "custom-1",
-    description: "Dentist", date: "2026-08-20" },
+const CUSTOM: Category = {
+  id: "custom-1",
+  name: "Dentist",
+  color: "#14b8a6",
+  icon: "Tag",
+  type: "expense",
+};
+
+const TX: Transaction[] = [
+  {
+    id: "a",
+    type: "expense",
+    amount: 9500,
+    currency: "ARS",
+    categoryId: "Supermarket",
+    description: "Supermarket",
+    date: "2026-08-26",
+  },
+  {
+    id: "b",
+    type: "income",
+    amount: 950000,
+    currency: "USD",
+    categoryId: "Salary",
+    description: "Salary",
+    date: "2026-08-03",
+  },
 ];
 
-const OLD_CATEGORIES = [
-  { id: "Food", name: "Food", color: "var(--color-cat-food)", icon: "UtensilsCrossed", isDefault: true },
-  { id: "Subscriptions", name: "Subscriptions", color: "var(--color-cat-subscriptions)", icon: "Tv", isDefault: true },
-  { id: "Debts", name: "Debts", color: "#ef4444", icon: "Landmark", isDefault: true },
-  { id: "Income", name: "Income", color: "var(--color-cat-income)", icon: "Wallet", isDefault: true },
-  { id: "custom-1", name: "Health", color: "#14b8a6", icon: "Tag", isDefault: false },
-];
-
-function seedLegacyKeys() {
-  localStorage.setItem(OLD_TX, JSON.stringify(OLD_TRANSACTIONS));
-  localStorage.setItem(OLD_CAT, JSON.stringify(OLD_CATEGORIES));
-}
-
-function asSnapshot(version: number): Snapshot {
-  return {
-    version,
-    transactions: OLD_TRANSACTIONS as unknown as Transaction[],
-    categories: OLD_CATEGORIES as unknown as Category[],
-  };
+function stored(): unknown {
+  const raw = localStorage.getItem(KEY);
+  return raw ? JSON.parse(raw) : null;
 }
 
 beforeEach(() => {
@@ -57,240 +54,103 @@ describe("a browser with nothing in it", () => {
     localStorage.setItem(KEY, "{not json");
     expect(load()).toBeNull();
   });
+
+  it("survives a payload that isn't an object", () => {
+    localStorage.setItem(KEY, '"hello"');
+    expect(load()).toBeNull();
+  });
 });
 
-describe("adopting the two old keys", () => {
-  it("brings every transaction and category across", () => {
-    seedLegacyKeys();
-    const out = load();
-    expect(out?.transactions).toHaveLength(4);
-    expect(out?.categories).toHaveLength(5);
+describe("a round-trip", () => {
+  const snapshot: Snapshot = {
+    transactions: TX,
+    categories: [...DEFAULT_CATEGORIES, CUSTOM],
+  };
+
+  it("brings back exactly what went in", () => {
+    save(snapshot);
+    expect(load()).toEqual(snapshot);
   });
 
-  it("removes the old keys once the new one is written", () => {
-    seedLegacyKeys();
-    load();
-    expect(localStorage.getItem(KEY)).not.toBeNull();
-    expect(localStorage.getItem(OLD_TX)).toBeNull();
-    expect(localStorage.getItem(OLD_CAT)).toBeNull();
+  it("keeps every transaction on its own currency", () => {
+    save(snapshot);
+    expect(load()?.transactions.map((t) => t.currency)).toEqual(["ARS", "USD"]);
   });
 
-  it("copes when only one of the two keys exists", () => {
-    localStorage.setItem(OLD_TX, JSON.stringify(OLD_TRANSACTIONS));
-    const out = load();
-    expect(out?.transactions).toHaveLength(4);
-    expect(out?.categories).toEqual([]);
+  it("writes nothing but transactions and categories", () => {
+    save(snapshot);
+    expect(Object.keys(stored() as object).sort()).toEqual([
+      "categories",
+      "transactions",
+    ]);
   });
+});
 
-  it("treats a snapshot written without a version stamp as the first one", () => {
+describe("data that isn't in the current shape", () => {
+  it("is refused when a transaction is missing fields", () => {
     localStorage.setItem(
       KEY,
-      JSON.stringify({ transactions: OLD_TRANSACTIONS, categories: OLD_CATEGORIES })
+      JSON.stringify({ transactions: [{ id: "a" }], categories: [] }),
     );
-    expect(load()?.version).toBe(VERSION);
-  });
-});
-
-describe("climbing the migration chain", () => {
-  it.each([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])("reaches the current version starting from v%i", (from) => {
-    localStorage.setItem(KEY, JSON.stringify(asSnapshot(from)));
-    expect(load()?.version).toBe(VERSION);
+    expect(load()).toBeNull();
   });
 
-  it("gives every transaction a currency", () => {
-    const out = migrate(asSnapshot(1));
-    expect(out.transactions.every((t) => t.currency === "ARS")).toBe(true);
-  });
-
-  it("does not read the free-form currency v2 threw away", () => {
-    // "US Dollars" was never a code and can't be trusted into the new field;
-    // everything written before there was a choice was in the default.
-    const out = migrate(asSnapshot(1));
-    expect(out.transactions[0].currency).toBe("ARS");
-  });
-
-  it("leaves a currency that is already set alone", () => {
-    const snapshot = asSnapshot(10);
-    snapshot.transactions = snapshot.transactions.map((t, i) => ({
-      ...t,
-      currency: i === 0 ? "USD" : "ARS",
-    })) as Transaction[];
-    const out = migrate(snapshot);
-    expect(out.transactions.map((t) => t.currency)).toEqual([
-      "USD", "ARS", "ARS", "ARS",
-    ]);
-  });
-
-  it("replaces a currency it doesn't recognise rather than storing it", () => {
-    const snapshot = asSnapshot(10);
-    snapshot.transactions = snapshot.transactions.map((t) => ({
-      ...t,
-      currency: "XYZ",
-    })) as unknown as Transaction[];
-    expect(migrate(snapshot).transactions.every((t) => t.currency === "ARS")).toBe(true);
-  });
-
-  it("drops tags", () => {
-    const out = migrate(asSnapshot(1));
-    expect(out.transactions.every((t) => !("tags" in t))).toBe(true);
-  });
-
-  it("renames category to categoryId, keeping the value", () => {
-    const out = migrate(asSnapshot(1));
-    expect(out.transactions.map((t) => t.categoryId)).toEqual([
-      "Food",
-      "Subscriptions",
-      "Income",
-      "custom-1",
-    ]);
-    expect(out.transactions.every((t) => !("category" in t))).toBe(true);
-  });
-
-  it("puts the old Income bucket on the income side and everything else on expenses", () => {
-    const byId = Object.fromEntries(
-      migrate(asSnapshot(1)).categories.map((c) => [c.id, c])
+  it("is refused when a transaction has no currency", () => {
+    const { currency, ...rest } = TX[0];
+    void currency;
+    localStorage.setItem(
+      KEY,
+      JSON.stringify({ transactions: [rest], categories: DEFAULT_CATEGORIES }),
     );
-    expect(byId.Income.type).toBe("income");
-    expect(byId.Food.type).toBe("expense");
-    expect(byId["custom-1"].type).toBe("expense");
+    expect(load()).toBeNull();
   });
 
-  it("drops isDefault", () => {
-    const out = migrate(asSnapshot(1));
-    expect(out.categories.every((c) => !("isDefault" in c))).toBe(true);
+  it("is refused when a currency isn't one the app knows", () => {
+    localStorage.setItem(
+      KEY,
+      JSON.stringify({
+        transactions: [{ ...TX[0], currency: "XYZ" }],
+        categories: DEFAULT_CATEGORIES,
+      }),
+    );
+    expect(load()).toBeNull();
   });
 
-  it("keeps retired defaults, because transactions still point at them", () => {
-    const ids = migrate(asSnapshot(1)).categories.map((c) => c.id);
-    expect(ids).toContain("Subscriptions");
-    expect(ids).toContain("Debts");
+  it("is refused when a category is missing fields", () => {
+    localStorage.setItem(
+      KEY,
+      JSON.stringify({ transactions: [], categories: [{ id: "Food" }] }),
+    );
+    expect(load()).toBeNull();
   });
 
-  it("does not inject the newer default categories", () => {
-    const ids = migrate(asSnapshot(1)).categories.map((c) => c.id);
-    expect(ids).not.toContain("Shopping");
-    expect(ids).not.toContain("Salary");
-  });
-
-  it("leaves every transaction pointing at a category that exists", () => {
-    const out = migrate(asSnapshot(1));
-    const ids = new Set(out.categories.map((c) => c.id));
-    expect(out.transactions.every((t) => ids.has(t.categoryId))).toBe(true);
-  });
-
-  it("touches nothing else", () => {
-    const out = migrate(asSnapshot(1));
-    expect(out.transactions.map((t) => t.amount)).toEqual([6500, 4990, 950000, 8000]);
-    expect(out.transactions.map((t) => t.description)).toEqual([
-      "Delivery", "Netflix", "Salary", "Dentist",
-    ]);
-    expect(out.transactions.map((t) => t.date)).toEqual([
-      "2026-08-12", "2026-08-05", "2026-08-03", "2026-08-20",
-    ]);
-  });
-
-  it("puts every category on a colour from the current palette", () => {
-    const out = migrate(asSnapshot(1));
-    const palette = CATEGORY_COLOR_VALUES;
-    expect(out.categories.every((c) => palette.includes(c.color))).toBe(true);
-  });
-
-  it("leaves no var() token behind, since those no longer resolve", () => {
-    const out = migrate(asSnapshot(1));
-    expect(out.categories.some((c) => c.color.startsWith("var("))).toBe(false);
-  });
-
-  it("puts each shipped category back on its own colour and icon", () => {
-    const out = migrate(asSnapshot(1));
-    for (const def of DEFAULT_CATEGORIES) {
-      const got = out.categories.find((c) => c.id === def.id);
-      if (!got) continue; // the fixture doesn't carry every default
-      expect(got.color).toBe(def.color);
-      expect(got.icon).toBe(def.icon);
-    }
-  });
-
-  it("leaves a category the reader made alone", () => {
-    const out = migrate(asSnapshot(1));
-    const custom = out.categories.find((c) => c.id === "custom-1");
-    expect(custom?.name).toBe("Health");
-    // Subscriptions is retired and stays exactly as the reader left it.
-    const retired = out.categories.find((c) => c.id === "Subscriptions");
-    expect(retired).toBeTruthy();
-  });
-
-  // No "every category has its own colour" check on purpose: with one colour
-  // per default, anything else must share. types.test.ts covers the shipped set.
-
-  it("changes nothing when it runs again", () => {
-    const once = migrate(asSnapshot(1));
-    const twice = migrate(once);
-    expect(twice).toEqual(once);
-  });
-
-  it("leaves a snapshot that is already current alone", () => {
-    const current: Omit<Snapshot, "version"> = {
-      transactions: [{ id: "z", type: "income", amount: 10, currency: "USD", categoryId: "Salary", description: "x", date: "2026-01-01" }],
-      categories: [{ id: "Salary", name: "Salary", color: "#ec4899", icon: "Wallet", type: "income" }],
-    };
-    save(current);
-    const out = load();
-    expect(out?.transactions[0].categoryId).toBe("Salary");
-    expect(out?.transactions[0].currency).toBe("USD");
-    expect(out?.categories[0].type).toBe("income");
-  });
-});
-
-describe("what actually lands in storage", () => {
-  it("carries no trace of the retired fields", () => {
-    localStorage.setItem(KEY, JSON.stringify(asSnapshot(1)));
-    const migrated = load()!;
-    save({ transactions: migrated.transactions, categories: migrated.categories });
-    const raw = localStorage.getItem(KEY)!;
-    expect(raw).not.toContain('"tags"');
-    expect(raw).not.toContain('"isDefault"');
-    expect(raw).not.toContain('"category":');
-    // `currency` is a live field again, so what's stored is the new one only.
-    expect(raw).not.toContain('"US Dollars"');
-    expect(raw).toContain('"currency":"ARS"');
-  });
-
-  it("stamps the current version on write", () => {
-    save({ transactions: [], categories: [] });
-    expect(JSON.parse(localStorage.getItem(KEY)!).version).toBe(VERSION);
+  it("is refused when transactions and categories aren't arrays", () => {
+    localStorage.setItem(KEY, JSON.stringify({ transactions: 1, categories: 2 }));
+    expect(load()).toBeNull();
   });
 });
 
 describe("starting over", () => {
   it("leaves no key behind", () => {
-    save({
-      transactions: [
-        { id: "a", type: "expense", amount: 10, currency: "ARS", categoryId: "Food", description: "x", date: "2026-01-01" },
-      ],
-      categories: DEFAULT_CATEGORIES,
-    });
-    expect(localStorage.getItem(KEY)).not.toBeNull();
-
+    save({ transactions: TX, categories: DEFAULT_CATEGORIES });
     save({ transactions: [], categories: DEFAULT_CATEGORIES });
     expect(localStorage.getItem(KEY)).toBeNull();
     expect(load()).toBeNull();
   });
 
-  it("also drops the keys written by older versions", () => {
-    localStorage.setItem(OLD_TX, "[]");
-    localStorage.setItem(OLD_CAT, "[]");
-    save({ transactions: [], categories: DEFAULT_CATEGORIES });
-    expect(localStorage.getItem(OLD_TX)).toBeNull();
-    expect(localStorage.getItem(OLD_CAT)).toBeNull();
+  it("keeps storing once a category has been added", () => {
+    save({ transactions: [], categories: [...DEFAULT_CATEGORIES, CUSTOM] });
+    expect(load()?.categories).toHaveLength(DEFAULT_CATEGORIES.length + 1);
   });
 
-  it("keeps storing once a category has been added", () => {
-    const withCustom = [
-      ...DEFAULT_CATEGORIES,
-      { id: "mine", name: "Pets", color: "#ef4444", icon: "Tag", type: "expense" as const },
-    ];
-    save({ transactions: [], categories: withCustom });
-    expect(localStorage.getItem(KEY)).not.toBeNull();
-    expect(load()?.categories).toHaveLength(withCustom.length);
+  it("keeps storing once a default has been removed", () => {
+    save({ transactions: [], categories: DEFAULT_CATEGORIES.slice(1) });
+    expect(load()?.categories).toHaveLength(DEFAULT_CATEGORIES.length - 1);
+  });
+
+  it("clear removes the key on its own", () => {
+    save({ transactions: TX, categories: DEFAULT_CATEGORIES });
+    clear();
+    expect(localStorage.getItem(KEY)).toBeNull();
   });
 });

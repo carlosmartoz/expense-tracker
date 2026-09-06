@@ -6,7 +6,7 @@ import {
   isDefaultCategory,
 } from "@/lib/types";
 
-// Rules a hand edit could break silently: a colour reused, an entry dangling.
+// Rules a hand edit could break: a colour reused, an entry dangling.
 
 describe("the default categories", () => {
   it("all take a colour from the palette", () => {
@@ -35,7 +35,7 @@ describe("the default categories", () => {
     expect(new Set(others.map((c) => c.icon)).size).toBe(1);
   });
 
-  it("cover both sides of the book", () => {
+  it("cover both transaction types", () => {
     for (const type of ["income", "expense"] as const) {
       expect(DEFAULT_CATEGORIES.some((c) => c.type === type)).toBe(true);
     }
@@ -76,7 +76,7 @@ describe("the colour palette", () => {
 });
 
 describe("telling a default from a category someone made", () => {
-  it("recognises every shipped id", () => {
+  it("recognises every default id", () => {
     expect(DEFAULT_CATEGORIES.every((c) => isDefaultCategory(c.id))).toBe(true);
   });
 

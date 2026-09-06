@@ -1,7 +1,7 @@
 "use client";
 
 import { FilterX } from "lucide-react";
-import { categoryIcon, SIDES, type Filters } from "@/lib/types";
+import { categoryIcon, TRANSACTION_TYPES, type Filters } from "@/lib/types";
 import { formatMonthKey } from "@/lib/format";
 import { type CurrencyCode } from "@/lib/config";
 import { useStore } from "@/lib/store";
@@ -10,7 +10,7 @@ import Select, { type SelectOption } from "@/components/ui/Select";
 interface Props {
   filters: Filters;
   months: string[];
-  /** Every currency the ledger holds, which decides whether to offer the filter. */
+  // Every currency in use.
   currencies: CurrencyCode[];
   onChange: (next: Filters) => void;
   onClear: () => void;
@@ -41,7 +41,7 @@ export default function FiltersBar({
     ...months.map((m) => ({ value: m, label: formatMonthKey(m) })),
   ];
 
-  // When a type is selected, only that side's categories are worth offering.
+  // With a type selected, only that type's categories are listed.
   const categoryOptions: SelectOption[] = [
     { value: "all", label: "All categories" },
     ...categories
@@ -54,12 +54,10 @@ export default function FiltersBar({
       })),
   ];
 
-  // A ledger in one currency has nothing to choose between, so it gets no
-  // control — but one already set has to stay reachable to be cleared.
+  // Shown only with more than one currency, or one already set.
   const showCurrency = currencies.length > 1 || filters.currency !== "all";
 
-  // The chosen one stays listed even if the last of it was just deleted, so
-  // the control never sits there showing a blank.
+  // The chosen currency stays listed even if the last of it was deleted.
   const currencyChoices = [
     ...new Set(
       filters.currency === "all"
@@ -73,7 +71,10 @@ export default function FiltersBar({
     ...currencyChoices.map((c) => ({ value: c, label: c })),
   ];
 
-  const typeOptions: SelectOption[] = [{ value: "all", label: "All" }, ...SIDES];
+  const typeOptions: SelectOption[] = [
+    { value: "all", label: "All" },
+    ...TRANSACTION_TYPES,
+  ];
 
   return (
     <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
@@ -117,7 +118,7 @@ export default function FiltersBar({
         options={typeOptions}
         onChange={(v) => {
           const next = v as Filters["type"];
-          // Drop the category filter if it belongs to the other side now.
+          // Drop the category filter if it belongs to the other type now.
           const chosen = categories.find((c) => c.id === filters.categoryId);
           const orphaned = next !== "all" && chosen && chosen.type !== next;
           patch({ type: next, ...(orphaned ? { categoryId: "all" } : {}) });

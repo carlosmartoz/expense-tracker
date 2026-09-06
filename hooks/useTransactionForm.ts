@@ -21,7 +21,7 @@ function todayISO(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-/** Counts the digits typed before the comma, ignoring leading zeros. */
+// Counts the digits typed before the comma, ignoring leading zeros.
 function integerDigits(raw: string): number {
   return raw
     .replace(/[^\d,]/g, "")
@@ -29,16 +29,16 @@ function integerDigits(raw: string): number {
     .replace(/^0+(?=\d)/, "").length;
 }
 
-/** What the form exposes. Not exported: the component reads it off the hook. */
+// What the form exposes.
 interface TransactionFormState {
   type: TransactionType;
   amount: string;
   currency: CurrencyCode;
   description: string;
   date: string;
-  /** The category actually in effect, which may differ from the last pick. */
+  // The category actually in effect.
   categoryId: string;
-  /** Categories on the chosen side of the book. */
+  // Categories of the chosen type.
   available: Category[];
   atLimit: boolean;
   error: string | null;
@@ -49,12 +49,12 @@ interface TransactionFormState {
   setCategoryId: (id: string) => void;
   setDescription: (text: string) => void;
   setDate: (iso: string) => void;
-  /** Re-formats the amount once the field loses focus. */
+  // Re-formats the amount once the field loses focus.
   normaliseAmount: () => void;
   submit: (e: React.FormEvent) => void;
 }
 
-/** Everything the new/edit transaction form does, minus how it looks. */
+// The state and handlers for the new/edit transaction form.
 export function useTransactionForm(
   initial?: Transaction,
   onDone?: () => void
@@ -80,12 +80,12 @@ export function useTransactionForm(
     () => categories.filter((c) => c.type === type),
     [categories, type]
   );
-  // Falls back to the first available after the type toggle flips.
+  // Falls back to the first available category.
   const categoryId = available.some((c) => c.id === pickedCategory)
     ? pickedCategory
     : (available[0]?.id ?? "");
 
-  /** An edit makes the last attempt's message stale. Guarded to avoid churn. */
+  // Clears the error message.
   function clearError() {
     if (error) setError(null);
   }
@@ -101,7 +101,7 @@ export function useTransactionForm(
 
   function setAmount(raw: string) {
     clearError();
-    // Digits past the cap are dropped, so say so.
+    // Flags that digits past the cap were dropped.
     setAtLimit(integerDigits(raw) > MAX_AMOUNT_INTEGER_DIGITS);
     setAmountRaw(formatAmountInput(raw));
   }
@@ -126,7 +126,7 @@ export function useTransactionForm(
       setError("Enter a valid amount greater than 0.");
       return;
     }
-    // An imported amount can be over the cap and reach here via the edit form.
+    // An imported amount can be over the cap.
     if (value > MAX_AMOUNT) {
       setError(`Maximum is ${formatMoney(MAX_AMOUNT, currency)}.`);
       return;

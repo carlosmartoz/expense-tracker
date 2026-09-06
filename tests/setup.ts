@@ -1,6 +1,6 @@
 import { beforeEach } from "vitest";
 
-// An in-memory localStorage the tests control; Node's own needs a backing file.
+// An in-memory localStorage for the tests.
 const store = new Map<string, string>();
 
 const memoryStorage = {
@@ -20,7 +20,7 @@ Object.defineProperty(globalThis, "localStorage", {
   writable: true,
 });
 
-// storage.ts bails out without a window, so give it one.
+// storage.ts needs a window to exist.
 if (!("window" in globalThis)) {
   Object.defineProperty(globalThis, "window", {
     value: { localStorage: memoryStorage },

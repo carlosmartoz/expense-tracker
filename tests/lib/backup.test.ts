@@ -1,10 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { BackupError, backupFilename, parseJSON, toJSON } from "@/lib/backup";
-import { VERSION } from "@/lib/storage";
 import { DEFAULT_CATEGORIES, type Transaction } from "@/lib/types";
 
-// A ledger with both sides of the book and both currencies in it: enough shape
-// that a round-trip has something to lose.
+// Data with both transaction types and both currencies.
 const CATS = DEFAULT_CATEGORIES;
 const TX: Transaction[] = [
   { id: "a", type: "expense", amount: 9500, currency: "ARS",
@@ -24,9 +22,9 @@ describe("JSON round-trip", () => {
     expect(out.categories).toEqual(CATS);
   });
 
-  it("stamps the current version on the way out", () => {
-    expect(JSON.parse(toJSON({ transactions: TX, categories: CATS })).version)
-      .toBe(VERSION);
+  it("writes nothing but transactions and categories", () => {
+    const out = JSON.parse(toJSON({ transactions: TX, categories: CATS }));
+    expect(Object.keys(out).sort()).toEqual(["categories", "transactions"]);
   });
 
   it("brings each amount back in the currency it left in", () => {
@@ -36,23 +34,18 @@ describe("JSON round-trip", () => {
     ]);
   });
 
-  it("reads a backup written before these changes", () => {
+  it("refuses a file written in an older format", () => {
     const old = JSON.stringify({
       version: 1,
       transactions: [
-        { id: "a", type: "expense", amount: 6500, category: "Food", currency: "ARS",
+        { id: "a", type: "expense", amount: 6500, category: "Food",
           description: "Delivery", date: "2026-08-12", tags: ["Credit card"] },
       ],
       categories: [
         { id: "Food", name: "Food", color: "#f59e0b", icon: "UtensilsCrossed", isDefault: true },
       ],
     });
-    const out = parseJSON(old);
-    expect(out.version).toBe(VERSION);
-    expect(out.transactions[0].categoryId).toBe("Food");
-    expect(out.transactions[0]).not.toHaveProperty("tags");
-    // A file from before the choice existed comes back in the default.
-    expect(out.transactions[0].currency).toBe("ARS");
+    expect(() => parseJSON(old)).toThrow(BackupError);
   });
 
   it.each([
@@ -62,6 +55,11 @@ describe("JSON round-trip", () => {
     [
       "a currency that isn't one",
       '{"transactions":[{"id":"a","type":"expense","amount":1,"date":"2026-01-01","currency":"XYZ"}],"categories":[]}',
+      "missing fields",
+    ],
+    [
+      "categories missing fields",
+      '{"transactions":[],"categories":[{"id":"Food"}]}',
       "missing fields",
     ],
   ])("refuses %s with a readable message", (_label, input, fragment) => {

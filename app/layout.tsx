@@ -1,11 +1,13 @@
+import "@/styles/globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "@/styles/globals.css";
 import { StoreProvider } from "@/lib/store";
 import { APP_NAME, LOCALE } from "@/lib/config";
 
+// Fonts
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
+// Metadata
 export const metadata: Metadata = {
   title: APP_NAME,
   description: "Track your income and expenses and visualize your money.",

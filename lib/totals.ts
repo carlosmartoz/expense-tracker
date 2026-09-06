@@ -1,9 +1,7 @@
 import { CURRENCY_CODES, DEFAULT_CURRENCY, type CurrencyCode } from "@/lib/config";
 import type { Transaction } from "@/lib/types";
 
-// Currencies are never added together. What comes out is one sum per currency,
-// never a single figure — that would need an exchange rate, and a rate that
-// changes rewrites the past every time it is touched.
+// Sums transactions, one total per currency.
 
 export interface Totals {
   currency: CurrencyCode;
@@ -12,16 +10,13 @@ export interface Totals {
   balance: number;
 }
 
-/** Unknown codes sort last rather than first, which -1 would give. */
+// Sort position of a currency. Unknown codes go last.
 function rank(currency: CurrencyCode): number {
   const i = CURRENCY_CODES.indexOf(currency);
   return i === -1 ? CURRENCY_CODES.length : i;
 }
 
-/**
- * One entry per currency actually present, in the order CURRENCIES declares.
- * An empty list still totals the default, so the summary always has a figure.
- */
+// One entry per currency present, in the order CURRENCIES declares.
 export function sumByCurrency(transactions: Transaction[]): Totals[] {
   const totals = new Map<CurrencyCode, Totals>();
 
@@ -45,12 +40,7 @@ export function sumByCurrency(transactions: Transaction[]): Totals[] {
     .sort((a, b) => rank(a.currency) - rank(b.currency));
 }
 
-/**
- * One entry per declared currency whether or not the ledger uses it, plus any
- * code the data holds that the config doesn't declare. The summary is built
- * off this so its rows are the same from the first render: a currency going
- * from unused to used fills a row in instead of pushing the page around.
- */
+// One entry per declared currency, used or not, plus any unknown code.
 export function sumEveryCurrency(transactions: Transaction[]): Totals[] {
   const present = new Map(
     sumByCurrency(transactions).map((row) => [row.currency, row])
@@ -61,7 +51,7 @@ export function sumEveryCurrency(transactions: Transaction[]): Totals[] {
       present.get(currency) ?? { currency, income: 0, expense: 0, balance: 0 }
   );
 
-  // An undeclared code still has to show what it holds, and still sorts last.
+  // Undeclared codes go after the declared ones.
   const undeclared = [...present.values()].filter(
     (row) => !CURRENCY_CODES.includes(row.currency)
   );
@@ -69,7 +59,7 @@ export function sumEveryCurrency(transactions: Transaction[]): Totals[] {
   return [...declared, ...undeclared];
 }
 
-/** Every currency a ledger holds, oldest-declared first. */
+// Every currency the data holds, oldest-declared first.
 export function currenciesUsed(transactions: Transaction[]): CurrencyCode[] {
   return sumByCurrency(transactions).map((t) => t.currency);
 }

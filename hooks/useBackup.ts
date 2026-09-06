@@ -16,7 +16,7 @@ interface Pending {
   apply: () => void;
 }
 
-/** Downloading a backup, reading one back, and starting over. */
+// Exporting, importing and clearing the data.
 export function useBackup() {
   const { transactions, categories, clearAll, replaceAll } = useStore();
   const [pending, setPending] = useState<Pending | null>(null);
@@ -35,7 +35,7 @@ export function useBackup() {
     flash("Backup downloaded.");
   }
 
-  /** Reads a picked file. The DOM input stays with the component. */
+  // Reads a picked backup file.
   async function importFile(file: File) {
     setError(null);
     setNote(null);

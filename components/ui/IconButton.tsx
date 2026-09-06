@@ -2,7 +2,7 @@
 
 import type { LucideIcon } from "lucide-react";
 
-/** A bare icon action. The label serves as both tooltip and accessible name. */
+// An icon button. The label is its tooltip and accessible name.
 export default function IconButton({
   icon: Icon,
   label,

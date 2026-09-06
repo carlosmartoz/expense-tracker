@@ -10,13 +10,13 @@ interface Props {
   message?: React.ReactNode;
   confirmLabel?: string;
   cancelLabel?: string;
-  /** "danger" paints the confirm button red (destructive actions). */
+  // "danger" paints the confirm button red (destructive actions).
   variant?: "danger" | "default";
   onConfirm: () => void;
   onCancel: () => void;
 }
 
-/** Replaces window.confirm(). Closes on Escape, backdrop click or Cancel. */
+// Replaces window.confirm(). Closes on Escape, backdrop click or Cancel.
 export default function ConfirmDialog({
   open,
   title,

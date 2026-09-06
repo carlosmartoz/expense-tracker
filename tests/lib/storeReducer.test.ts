@@ -3,8 +3,7 @@ import { initialState, reducer, type StoreState } from "@/lib/storeReducer";
 import { DEFAULT_CATEGORIES } from "@/lib/types";
 import type { Category, Transaction } from "@/lib/types";
 
-// The rules used to live inside the provider, where only a browser could reach
-// them. As a plain function they are checkable one rule at a time.
+// The reducer's rules, checked one at a time.
 
 function tx(over: Partial<Transaction> = {}): Transaction {
   return {
@@ -32,7 +31,7 @@ function stateWith(over: Partial<StoreState> = {}): StoreState {
 }
 
 describe("hydration", () => {
-  it("falls back to the shipped categories when nothing is stored", () => {
+  it("falls back to the default categories when nothing is stored", () => {
     const next = reducer(initialState, { type: "hydrated", snapshot: null });
     expect(next.transactions).toEqual([]);
     expect(next.categories).toEqual(DEFAULT_CATEGORIES);
@@ -50,7 +49,7 @@ describe("hydration", () => {
 });
 
 describe("transactions", () => {
-  it("stamps the given id and keeps the ledger newest-first", () => {
+  it("adds the given id and keeps the list newest-first", () => {
     let s = stateWith();
     s = reducer(s, {
       type: "transaction/add",
@@ -128,7 +127,7 @@ describe("adding a category", () => {
     expect(after).toBe(before);
   });
 
-  it("allows the same name on the other side of the book", () => {
+  it("allows the same name on the other type", () => {
     const s = reducer(stateWith(), {
       type: "category/add",
       id: "new",
@@ -173,7 +172,7 @@ describe("deleting a category", () => {
     transactions: [tx({ id: "a", categoryId: CUSTOM.id }), tx({ id: "b" })],
   });
 
-  it("moves the orphaned transactions to the destination", () => {
+  it("moves the leftover transactions to the destination", () => {
     const s = reducer(base, {
       type: "category/delete",
       id: CUSTOM.id,
@@ -211,7 +210,7 @@ describe("deleting a category", () => {
     expect(after).toBe(base);
   });
 
-  it("never empties a side of the book", () => {
+  it("never leaves a type without categories", () => {
     const lonely = stateWith({ categories: [CUSTOM], transactions: [] });
     const after = reducer(lonely, {
       type: "category/delete",
@@ -223,7 +222,7 @@ describe("deleting a category", () => {
 });
 
 describe("wholesale changes", () => {
-  it("clearAll goes back to an empty ledger on the shipped categories", () => {
+  it("clearAll goes back to no transactions on the default categories", () => {
     const s = reducer(stateWith({ categories: [CUSTOM], transactions: [tx()] }), {
       type: "clearAll",
     });
@@ -231,7 +230,7 @@ describe("wholesale changes", () => {
     expect(s.categories).toEqual(DEFAULT_CATEGORIES);
   });
 
-  it("replaceAll sorts the imported ledger", () => {
+  it("replaceAll sorts the imported transactions", () => {
     const s = reducer(stateWith(), {
       type: "replaceAll",
       transactions: [
@@ -253,7 +252,7 @@ describe("wholesale changes", () => {
     expect(s.categories).toEqual([CUSTOM]);
   });
 
-  it("addMissingDefaults tops up an older ledger without duplicating", () => {
+  it("addMissingDefaults tops up older data without duplicating", () => {
     const short = stateWith({ categories: [DEFAULT_CATEGORIES[0], CUSTOM] });
     const s = reducer(short, { type: "category/addMissingDefaults" });
     expect(s.categories).toHaveLength(DEFAULT_CATEGORIES.length + 1);

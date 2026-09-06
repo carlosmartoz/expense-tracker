@@ -5,11 +5,9 @@ import { createPortal } from "react-dom";
 
 const subscribe = () => () => {};
 
-/** Renders children at the end of <body>. */
-// The sidebar and the form card are sticky, so each is its own stacking
-// context: an overlay rendered inside one can't paint above the other.
+// Renders children at the end of <body>.
 export default function Portal({ children }: { children: ReactNode }) {
-  // False on the server, true in the browser, without setState in an effect.
+  // False on the server, true in the browser.
   const isClient = useSyncExternalStore(
     subscribe,
     () => true,

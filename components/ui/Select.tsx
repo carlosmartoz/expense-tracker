@@ -6,9 +6,9 @@ import { ChevronDown, Check, type LucideIcon } from "lucide-react";
 export interface SelectOption {
   value: string;
   label: string;
-  /** Optional leading icon shown in the trigger and list. */
+  // Optional leading icon shown in the trigger and list.
   icon?: LucideIcon;
-  /** Optional color for the leading icon (any CSS color, e.g. a var() token). */
+  // Optional color for the leading icon (any CSS color, e.g. a var() token).
   iconColor?: string;
 }
 
@@ -17,12 +17,12 @@ interface SelectProps {
   options: SelectOption[];
   onChange: (value: string) => void;
   placeholder?: string;
-  /** Accessible label when there's no visible <label>. */
+  // Accessible label when there's no visible <label>.
   ariaLabel?: string;
   className?: string;
 }
 
-/** Dropdown that matches the dark UI; a native <select> popup can't be styled. */
+// A dropdown that matches the app's styling.
 // Keyboard: arrows / Home / End to move, Enter or Space to pick, Escape to close.
 export default function Select({
   value,
@@ -65,7 +65,7 @@ export default function Select({
     setOpen(false);
   }
 
-  /** Highlights the current value. Here, not in an effect, so it lands in one render. */
+  // Highlights the current value.
   function openList() {
     const idx = options.findIndex((o) => o.value === value);
     setHighlight(idx >= 0 ? idx : 0);

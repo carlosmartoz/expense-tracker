@@ -1,6 +1,6 @@
 "use client";
 
-/** Holds a line whether or not there's a message, so nothing below it shifts. */
+// Holds a line of space whether or not there's a message.
 // min-h-5 is text-sm's line-height.
 export default function ErrorText({ children }: { children?: string | null }) {
   return (

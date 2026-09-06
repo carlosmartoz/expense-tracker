@@ -14,7 +14,7 @@ const NO_FILTERS: Filters = {
   search: "",
 };
 
-/** Filters the ledger and sums whatever is left showing. */
+// Filters the transactions and sums whatever is left showing.
 export function useTransactionFilters() {
   const { transactions } = useStore();
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
@@ -24,17 +24,17 @@ export function useTransactionFilters() {
     [transactions]
   );
 
-  /** Drives whether the currency filter is worth showing at all. */
+  // Every currency in use.
   const currencies = useMemo(() => currenciesUsed(transactions), [transactions]);
 
   const filtered = useMemo(() => {
-    const needle = filters.search.trim().toLowerCase();
+    const query = filters.search.trim().toLowerCase();
     const matches = (t: Transaction) =>
       (filters.categoryId === "all" || t.categoryId === filters.categoryId) &&
       (filters.type === "all" || t.type === filters.type) &&
       (filters.currency === "all" || t.currency === filters.currency) &&
       (filters.month === "all" || monthKeyOf(t.date) === filters.month) &&
-      (!needle || t.description.toLowerCase().includes(needle));
+      (!query || t.description.toLowerCase().includes(query));
 
     return transactions
       .filter(matches)

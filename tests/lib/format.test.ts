@@ -13,7 +13,7 @@ import {
 import { MAX_AMOUNT_INTEGER_DIGITS } from "@/lib/types";
 import { DEFAULT_CURRENCY } from "@/lib/config";
 
-// English text, Argentine money: a deliberate pairing worth pinning down.
+// English text, Argentine money.
 
 describe("money", () => {
   it.each([
@@ -35,7 +35,7 @@ describe("money", () => {
   });
 });
 
-// Two currencies, one grouping: only the symbol tells them apart.
+// Two currencies, one grouping; only the symbol differs.
 describe("which currency an amount is in", () => {
   it("defaults to the one everything was written in before there was a choice", () => {
     expect(formatMoney(1234.5)).toBe(formatMoney(1234.5, DEFAULT_CURRENCY));
@@ -153,7 +153,7 @@ describe("dates", () => {
   });
 });
 
-describe("the months a ledger covers", () => {
+describe("the months the data covers", () => {
   const rows = [
     { date: "2026-08-30" },
     { date: "2026-04-02" },
@@ -165,7 +165,7 @@ describe("the months a ledger covers", () => {
     expect(sortedMonthKeys(rows)).toEqual(["2026-04", "2026-06", "2026-08"]);
   });
 
-  it("returns nothing for an empty ledger", () => {
+  it("returns nothing when there are no transactions", () => {
     expect(sortedMonthKeys([])).toEqual([]);
   });
 });

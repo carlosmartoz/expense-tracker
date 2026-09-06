@@ -3,9 +3,7 @@
 import { formatMoney } from "@/lib/format";
 import type { Totals } from "@/lib/totals";
 
-/** What the filters currently add up to — one row per currency, never a sum
-    across them. Every currency gets a row whether or not it is in use, so the
-    block keeps its height and nothing below it moves. */
+// The totals for the current filters, one row per currency.
 export default function BalanceSummary({ totals }: { totals: Totals[] }) {
   return (
     <div className="space-y-2">

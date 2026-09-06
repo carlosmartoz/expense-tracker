@@ -2,7 +2,7 @@
 
 import { Wallet } from "lucide-react";
 
-/** Stands in for the history when there is none. The form is right beside it. */
+// Shown in place of the history when there are no transactions.
 export default function EmptyState() {
   return (
     <div className="card flex flex-col items-center gap-4 p-12 text-center">

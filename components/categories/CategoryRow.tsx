@@ -39,7 +39,7 @@ export default function CategoryRow({
         </p>
       </div>
 
-      {/* A default carries no buttons rather than dead ones. */}
+      {/* Defaults carry no buttons. */}
       {!fixed && (
         <>
           <IconButton

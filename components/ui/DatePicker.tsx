@@ -6,7 +6,7 @@ import { formatDate } from "@/lib/format";
 import { LOCALE } from "@/lib/config";
 
 interface DatePickerProps {
-  /** ISO date string, YYYY-MM-DD. */
+  // ISO date string, YYYY-MM-DD.
   value: string;
   onChange: (iso: string) => void;
   ariaLabel?: string;
@@ -25,7 +25,7 @@ function parseISO(v: string): { y: number; m: number; d: number } | null {
   return { y, m: m - 1, d };
 }
 
-/** Calendar popover; a native date input can't be styled to match. */
+// A calendar popover for picking a date.
 // Keyboard: Enter, Space or ArrowDown opens, Escape closes.
 export default function DatePicker({
   value,
@@ -42,7 +42,7 @@ export default function DatePicker({
     return { y: base.y, m: base.m };
   });
 
-  /** Jumps the calendar to the selected month, in the same render. */
+  // Jumps the calendar to the selected month.
   function openCalendar() {
     if (selected) setView({ y: selected.y, m: selected.m });
     setOpen(true);

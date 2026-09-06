@@ -13,16 +13,20 @@ import { load, save } from "@/lib/storage";
 import { StoreActions, StoreData } from "@/types/store";
 import { initialState, reducer, type StoreState } from "@/lib/storeReducer";
 
+// One context for the data, one for the actions.
 const DataContext = createContext<StoreData | null>(null);
 const ActionsContext = createContext<StoreActions | null>(null);
 
+// Holds the data and keeps it in sync with localStorage.
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
+  // Reads the stored data once, after mount.
   useEffect(() => {
     dispatch({ type: "hydrated", snapshot: load() });
   }, []);
 
+  // Saves the data on every change, once it has been read.
   useEffect(() => {
     if (!state.hydrated) return;
 
@@ -34,6 +38,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     [state.categories],
   );
 
+  // The data half of the store.
   const data = useMemo<StoreData>(
     () => ({
       transactions: state.transactions,
@@ -45,6 +50,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     [state.transactions, state.categories, state.hydrated, categoryMap],
   );
 
+  // The actions half of the store.
   const actions = useMemo<StoreActions>(
     () => ({
       addTransaction: (draft) =>
@@ -74,6 +80,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// The store's actions.
 export function useStoreActions(): StoreActions {
   const ctx = useContext(ActionsContext);
 
@@ -83,6 +90,7 @@ export function useStoreActions(): StoreActions {
   return ctx;
 }
 
+// The store's data.
 export function useStoreData(): StoreData {
   const ctx = useContext(DataContext);
 
@@ -91,6 +99,7 @@ export function useStoreData(): StoreData {
   return ctx;
 }
 
+// The store's data and actions together.
 export function useStore(): StoreData & StoreActions {
   const data = useStoreData();
 

@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 
-/** A labelled control. The label is plain text, so it wraps rather than binds. */
+// A labelled control.
 export default function Field({
   label,
   hint,

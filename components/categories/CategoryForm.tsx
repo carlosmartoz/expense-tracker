@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, Plus, X } from "lucide-react";
-import { CATEGORY_COLORS, MAX_CATEGORY_NAME_LENGTH, SIDES } from "@/lib/types";
+import { CATEGORY_COLORS, MAX_CATEGORY_NAME_LENGTH, TRANSACTION_TYPES } from "@/lib/types";
 import type { useCategories } from "@/hooks/useCategories";
 import ColorPicker from "@/components/ui/ColorPicker";
 import ErrorText from "@/components/ui/ErrorText";
@@ -27,15 +27,15 @@ export default function CategoryForm({ form }: { form: Form }) {
         hint={
           editing && (
             <p className="mt-1 text-xs text-text-subtle">
-              A category keeps the side it was created on.
+              A category keeps the type it was created with.
             </p>
           )
         }
       >
-        {/* Switching sides would move its transactions to the wrong half. */}
+        {/* Type. Locked once the category exists. */}
         <SegmentedToggle
-          ariaLabel="Side"
-          segments={SIDES}
+          ariaLabel="Type"
+          segments={TRANSACTION_TYPES}
           value={form.type}
           onChange={form.setType}
           disabled={Boolean(editing)}
@@ -60,7 +60,7 @@ export default function CategoryForm({ form }: { form: Form }) {
         />
       </Field>
 
-      {/* Grouped with its buttons so the form's spacing doesn't pay twice. */}
+      {/* The name field and the form buttons. */}
       <div className="space-y-1">
         <ErrorText>{form.error}</ErrorText>
         <div className="flex gap-2">

@@ -1,30 +1,14 @@
-import { migrate, VERSION, type Snapshot } from "@/lib/storage";
-import { APP_NAME, CURRENCIES } from "@/lib/config";
+import { isCategory, isTransaction, type Snapshot } from "@/lib/storage";
+import { APP_NAME } from "@/lib/config";
 
-// One format, JSON: a backup is always a whole ledger, never a partial one.
-
+// Reads and writes the JSON backup file.
 export class BackupError extends Error {}
 
-export function toJSON(snapshot: Omit<Snapshot, "version">): string {
-  return JSON.stringify({ version: VERSION, ...snapshot }, null, 2);
+export function toJSON(snapshot: Snapshot): string {
+  return JSON.stringify(snapshot, null, 2);
 }
 
-function isTransactionish(v: unknown): boolean {
-  if (!v || typeof v !== "object") return false;
-  const t = v as Record<string, unknown>;
-  return (
-    typeof t.id === "string" &&
-    (t.type === "income" || t.type === "expense") &&
-    typeof t.amount === "number" &&
-    typeof t.date === "string" &&
-    // Absent in a file written before there was more than one currency;
-    // the migration chain stamps those. Present but unknown is a broken file.
-    (t.currency === undefined ||
-      (typeof t.currency === "string" && t.currency in CURRENCIES))
-  );
-}
-
-/** Reads a backup, migrating an older file the same way stored data is. */
+// Reads a backup file.
 export function parseJSON(text: string): Snapshot {
   let raw: unknown;
   try {
@@ -38,20 +22,19 @@ export function parseJSON(text: string): Snapshot {
   const obj = raw as Partial<Snapshot>;
   if (!Array.isArray(obj.transactions) || !Array.isArray(obj.categories)) {
     throw new BackupError(
-      `That file isn't an ${APP_NAME} backup — it has no transactions and categories.`
+      `That file isn't an ${APP_NAME} backup — it has no transactions and categories.`,
     );
   }
-  if (obj.transactions.length && !obj.transactions.every(isTransactionish)) {
+  if (!obj.transactions.every(isTransaction)) {
     throw new BackupError("Some transactions in that file are missing fields.");
   }
-  return migrate({
-    version: typeof obj.version === "number" ? obj.version : 1,
-    transactions: obj.transactions,
-    categories: obj.categories,
-  });
+  if (!obj.categories.every(isCategory)) {
+    throw new BackupError("Some categories in that file are missing fields.");
+  }
+  return { transactions: obj.transactions, categories: obj.categories };
 }
 
-/** e.g. "expense-tracker-2026-08-30.json" */
+// e.g. "expense-tracker-2026-08-30.json"
 export function backupFilename(): string {
   const today = new Date().toISOString().slice(0, 10);
   return `${APP_NAME.toLowerCase().replace(/\s+/g, "-")}-${today}.json`;
@@ -59,7 +42,7 @@ export function backupFilename(): string {
 
 export function download(filename: string, content: string): void {
   const url = URL.createObjectURL(
-    new Blob([content], { type: "application/json" })
+    new Blob([content], { type: "application/json" }),
   );
   const a = document.createElement("a");
   a.href = url;
