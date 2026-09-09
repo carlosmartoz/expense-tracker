@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useStore } from "@/lib/store";
 import { monthKeyOf, sortedMonthKeys } from "@/lib/format";
+import { LOCALE } from "@/lib/config";
 import { currenciesUsed, sumEveryCurrency } from "@/lib/totals";
 import type { Filters, Transaction } from "@/lib/types";
 
@@ -16,7 +17,7 @@ const NO_FILTERS: Filters = {
 
 // Filters the transactions and sums whatever is left showing.
 export function useTransactionFilters() {
-  const { transactions } = useStore();
+  const { transactions, categoryMap } = useStore();
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
 
   const months = useMemo(
@@ -36,10 +37,18 @@ export function useTransactionFilters() {
       (filters.month === "all" || monthKeyOf(t.date) === filters.month) &&
       (!query || t.description.toLowerCase().includes(query));
 
+    // Newest date first, and within one date every category stays together.
     return transactions
       .filter(matches)
-      .sort((a, b) => (a.date < b.date ? 1 : -1));
-  }, [transactions, filters]);
+      .sort((a, b) => {
+        if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+        const nameA = categoryMap[a.categoryId]?.name ?? "";
+        const nameB = categoryMap[b.categoryId]?.name ?? "";
+        if (nameA !== nameB) return nameA.localeCompare(nameB, LOCALE);
+        // Same name, different category: keep the order stable anyway.
+        return a.categoryId < b.categoryId ? -1 : a.categoryId > b.categoryId ? 1 : 0;
+      });
+  }, [transactions, filters, categoryMap]);
 
   const totals = useMemo(() => sumEveryCurrency(filtered), [filtered]);
 

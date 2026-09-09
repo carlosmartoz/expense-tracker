@@ -64,11 +64,17 @@ export default function DataMenu({ compact = false }: { compact?: boolean }) {
         </button>
       </div>
 
-      {!compact && b.error && (
-        <p className="mt-2 text-xs leading-snug text-danger">{b.error}</p>
-      )}
-      {!compact && b.note && (
-        <p className="mt-2 text-xs leading-snug text-text-secondary">{b.note}</p>
+      {/* Always two lines tall (2 x text-xs/leading-snug = 2.0625rem), so a
+          message appearing never shifts the buttons above it. */}
+      {!compact && (
+        <p
+          aria-live="polite"
+          className={`mt-2 line-clamp-2 min-h-[2.0625rem] text-xs leading-snug ${
+            b.error ? "text-danger" : "text-text-secondary"
+          }`}
+        >
+          {b.error ?? b.note}
+        </p>
       )}
 
       <ConfirmDialog
