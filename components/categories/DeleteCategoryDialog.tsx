@@ -1,6 +1,6 @@
 "use client";
 
-import { categoryIcon } from "@/lib/types";
+import { categoryIcon } from "@/lib/categories";
 import type { useCategories } from "@/hooks/useCategories";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import Select from "@/components/ui/Select";

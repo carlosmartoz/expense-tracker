@@ -1,9 +1,10 @@
 "use client";
 
 import { useTransactionForm } from "@/hooks/useTransactionForm";
-import { categoryIcon, type Transaction } from "@/lib/types";
+import { categoryIcon } from "@/lib/categories";
 import { formatMoney, MAX_AMOUNT } from "@/lib/format";
 import { CURRENCY_CODES } from "@/lib/config";
+import type { Transaction } from "@/types";
 import DatePicker from "@/components/ui/DatePicker";
 import ErrorText from "@/components/ui/ErrorText";
 import Field from "@/components/ui/Field";

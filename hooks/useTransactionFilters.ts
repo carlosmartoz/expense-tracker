@@ -5,7 +5,7 @@ import { useStore } from "@/lib/store";
 import { monthKeyOf, sortedMonthKeys } from "@/lib/format";
 import { LOCALE } from "@/lib/config";
 import { currenciesUsed, sumEveryCurrency } from "@/lib/totals";
-import type { Filters, Transaction } from "@/lib/types";
+import type { Filters, Transaction } from "@/types";
 
 const NO_FILTERS: Filters = {
   categoryId: "all",

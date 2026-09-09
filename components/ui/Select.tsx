@@ -1,16 +1,8 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import { ChevronDown, Check, type LucideIcon } from "lucide-react";
-
-export interface SelectOption {
-  value: string;
-  label: string;
-  // Optional leading icon shown in the trigger and list.
-  icon?: LucideIcon;
-  // Optional color for the leading icon (any CSS color, e.g. a var() token).
-  iconColor?: string;
-}
+import { ChevronDown, Check } from "lucide-react";
+import type { SelectOption } from "@/types";
 
 interface SelectProps {
   value: string;
@@ -147,7 +139,7 @@ export default function Select({
           role="listbox"
           tabIndex={-1}
           className="absolute z-20 mt-1.5 max-h-64 w-full overflow-auto rounded-xl border
-            border-white/10 bg-surface-panel p-1 shadow-card"
+            border-border bg-surface-panel p-1 shadow-card"
         >
           {options.map((opt, idx) => {
             const isSelected = opt.value === value;

@@ -1,3 +1,5 @@
+import type { CurrencyCode } from "@/types/CurrencyCode";
+
 // Shown in the browser tab and the sidebar.
 export const APP_NAME = "Expense Tracker";
 
@@ -9,8 +11,6 @@ export const CURRENCIES = {
   ARS: { code: "ARS", symbol: "$", locale: "es-AR" },
   USD: { code: "USD", symbol: "US$", locale: "es-AR" },
 } as const;
-
-export type CurrencyCode = keyof typeof CURRENCIES;
 
 // The currency codes, in declaration order.
 export const CURRENCY_CODES = Object.keys(CURRENCIES) as CurrencyCode[];

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useStore } from "@/lib/store";
-import type { Transaction } from "@/lib/types";
+import type { Transaction } from "@/types";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import Modal from "@/components/ui/Modal";
 import TransactionForm from "@/components/transactions/TransactionForm";
@@ -27,7 +27,7 @@ export default function TransactionList({
 
   return (
     <>
-      <ul className="divide-y divide-white/6">
+      <ul className="divide-y divide-border">
         {transactions.map((t) => (
           <TransactionRow
             key={t.id}

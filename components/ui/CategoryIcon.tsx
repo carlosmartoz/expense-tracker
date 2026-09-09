@@ -1,7 +1,7 @@
 "use client";
 
 import { createElement } from "react";
-import { categoryIcon } from "@/lib/types";
+import { categoryIcon } from "@/lib/categories";
 
 // A category's icon, in the category's colour.
 export default function CategoryIcon({

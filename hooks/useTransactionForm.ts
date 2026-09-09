@@ -2,24 +2,23 @@
 
 import { useMemo, useState } from "react";
 import { useStore } from "@/lib/store";
-import {
-  MAX_AMOUNT_INTEGER_DIGITS,
-  type Category,
-  type Transaction,
-  type TransactionType,
-} from "@/lib/types";
+import { useFormError } from "@/hooks/useFormError";
+import { MAX_AMOUNT_INTEGER_DIGITS } from "@/lib/transactions";
+import type {
+  Category,
+  CurrencyCode,
+  Transaction,
+  TransactionType,
+} from "@/types";
 import {
   formatAmount,
   formatAmountInput,
   formatMoney,
   MAX_AMOUNT,
   parseAmount,
+  todayISO,
 } from "@/lib/format";
-import { DEFAULT_CURRENCY, type CurrencyCode } from "@/lib/config";
-
-function todayISO(): string {
-  return new Date().toISOString().slice(0, 10);
-}
+import { DEFAULT_CURRENCY } from "@/lib/config";
 
 // Counts the digits typed before the comma, ignoring leading zeros.
 function integerDigits(raw: string): number {
@@ -73,8 +72,8 @@ export function useTransactionForm(
   const [pickedCategory, setPickedCategory] = useState(initial?.categoryId ?? "");
   const [description, setDescriptionRaw] = useState(initial?.description ?? "");
   const [date, setDateRaw] = useState(initial?.date ?? todayISO());
-  const [error, setError] = useState<string | null>(null);
   const [atLimit, setAtLimit] = useState(false);
+  const { error, setError, clearError, withClear } = useFormError();
 
   const available = useMemo(
     () => categories.filter((c) => c.type === type),
@@ -84,11 +83,6 @@ export function useTransactionForm(
   const categoryId = available.some((c) => c.id === pickedCategory)
     ? pickedCategory
     : (available[0]?.id ?? "");
-
-  // Clears the error message.
-  function clearError() {
-    if (error) setError(null);
-  }
 
   function setType(next: TransactionType) {
     clearError();
@@ -110,13 +104,6 @@ export function useTransactionForm(
     if (!amount) return;
     const value = parseAmount(amount);
     if (Number.isFinite(value)) setAmountRaw(formatAmount(value));
-  }
-
-  function withClear<T>(set: (v: T) => void) {
-    return (v: T) => {
-      clearError();
-      set(v);
-    };
   }
 
   function submit(e: React.FormEvent) {

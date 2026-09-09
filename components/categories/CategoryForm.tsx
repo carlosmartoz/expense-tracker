@@ -1,7 +1,8 @@
 "use client";
 
 import { Check, Plus, X } from "lucide-react";
-import { CATEGORY_COLORS, MAX_CATEGORY_NAME_LENGTH, TRANSACTION_TYPES } from "@/lib/types";
+import { CATEGORY_COLORS, MAX_CATEGORY_NAME_LENGTH } from "@/lib/categories";
+import { TRANSACTION_TYPES } from "@/lib/transactions";
 import type { useCategories } from "@/hooks/useCategories";
 import ColorPicker from "@/components/ui/ColorPicker";
 import ErrorText from "@/components/ui/ErrorText";

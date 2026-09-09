@@ -1,7 +1,6 @@
 "use client";
 
-import type { CategoryGroup as Group } from "@/hooks/useCategories";
-import type { Category } from "@/lib/types";
+import type { Category, CategoryGroup as Group } from "@/types";
 import CategoryRow from "@/components/categories/CategoryRow";
 
 export default function CategoryGroup({

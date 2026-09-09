@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useStore } from "@/lib/store";
 import {
   BackupError,
@@ -9,6 +9,9 @@ import {
   parseJSON,
   toJSON,
 } from "@/lib/backup";
+
+// How long a "Backup downloaded." style note stays up.
+const NOTE_MS = 3000;
 
 interface Pending {
   transactions: number;
@@ -23,11 +26,23 @@ export function useBackup() {
   const [confirmClear, setConfirmClear] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
+  const noteTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Drops the pending timer on unmount, so it can't fire into a gone component.
+  useEffect(
+    () => () => {
+      if (noteTimer.current) clearTimeout(noteTimer.current);
+    },
+    []
+  );
+
+  // Shows a note for a moment. A second note replaces the first rather than
+  // inheriting the time left on it.
   function flash(message: string) {
     setError(null);
     setNote(message);
-    setTimeout(() => setNote(null), 3000);
+    if (noteTimer.current) clearTimeout(noteTimer.current);
+    noteTimer.current = setTimeout(() => setNote(null), NOTE_MS);
   }
 
   function exportBackup() {

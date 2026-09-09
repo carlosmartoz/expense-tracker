@@ -30,6 +30,8 @@
   --color-danger: #f87171;
 
   /* ----- Effects ----- */
+  /* What a dialog dims the page behind it with. */
+  --color-overlay: rgba(0, 0, 0, 0.6);
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.5), 0 16px 40px rgba(0, 0, 0, 0.4);
 
   /* ----- Typography ----- */

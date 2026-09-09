@@ -1,8 +1,18 @@
-import { isCategory, isTransaction, type Snapshot } from "@/lib/storage";
 import { APP_NAME } from "@/lib/config";
+import { todayISO } from "@/lib/format";
+import { snapshotProblem } from "@/lib/validate";
+import type { Snapshot, SnapshotProblem } from "@/types";
 
 // Reads and writes the JSON backup file.
 export class BackupError extends Error {}
+
+// What each rejection reads like to someone who just picked the wrong file.
+const MESSAGES: Record<SnapshotProblem, string> = {
+  "not-an-object": `That file isn't an ${APP_NAME} backup.`,
+  "missing-lists": `That file isn't an ${APP_NAME} backup — it has no transactions and categories.`,
+  "bad-transaction": "Some transactions in that file are missing fields.",
+  "bad-category": "Some categories in that file are missing fields.",
+};
 
 export function toJSON(snapshot: Snapshot): string {
   return JSON.stringify(snapshot, null, 2);
@@ -16,28 +26,17 @@ export function parseJSON(text: string): Snapshot {
   } catch {
     throw new BackupError("That file isn't valid JSON.");
   }
-  if (!raw || typeof raw !== "object") {
-    throw new BackupError(`That file isn't an ${APP_NAME} backup.`);
-  }
-  const obj = raw as Partial<Snapshot>;
-  if (!Array.isArray(obj.transactions) || !Array.isArray(obj.categories)) {
-    throw new BackupError(
-      `That file isn't an ${APP_NAME} backup — it has no transactions and categories.`,
-    );
-  }
-  if (!obj.transactions.every(isTransaction)) {
-    throw new BackupError("Some transactions in that file are missing fields.");
-  }
-  if (!obj.categories.every(isCategory)) {
-    throw new BackupError("Some categories in that file are missing fields.");
-  }
-  return { transactions: obj.transactions, categories: obj.categories };
+
+  const problem = snapshotProblem(raw);
+  if (problem) throw new BackupError(MESSAGES[problem]);
+
+  const { transactions, categories } = raw as Snapshot;
+  return { transactions, categories };
 }
 
 // e.g. "expense-tracker-2026-08-30.json"
 export function backupFilename(): string {
-  const today = new Date().toISOString().slice(0, 10);
-  return `${APP_NAME.toLowerCase().replace(/\s+/g, "-")}-${today}.json`;
+  return `${APP_NAME.toLowerCase().replace(/\s+/g, "-")}-${todayISO()}.json`;
 }
 
 export function download(filename: string, content: string): void {

@@ -45,8 +45,9 @@ describe("an open dialog", () => {
     const dialog = document.querySelector('[role="dialog"]');
     expect(dialog).not.toBeNull();
     expect(sidebar.contains(dialog)).toBe(false);
+    // No ancestor between it and <body> can trap it in a stacking context.
     expect(dialog!.closest("aside")).toBeNull();
-    expect(dialog!.parentElement).toBe(document.body);
+    expect(document.body.contains(dialog)).toBe(true);
   });
 
   it("carries its content across", () => {

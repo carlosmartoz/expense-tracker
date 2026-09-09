@@ -1,10 +1,17 @@
 /** @type {import('next').NextConfig} */
+
+// Machines other than this one that may reach the dev server — a phone on the
+// same Wi-Fi, say. Next rejects them as foreign origins otherwise. Set it in
+// .env.local (gitignored) so no one's LAN address ends up in the repo:
+//   DEV_ORIGINS=192.168.0.124
+const devOrigins = (process.env.DEV_ORIGINS ?? "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
 const nextConfig = {
   reactStrictMode: true,
-  // Lets another machine on the same network reach the dev server without Next
-  // rejecting the request as a foreign origin. Replace with your own LAN
-  // address, or drop the line if you only ever open it on localhost.
-  allowedDevOrigins: ['192.168.0.124'],
+  allowedDevOrigins: devOrigins,
   turbopack: {
     // Pin the workspace root so Turbopack's dev workers resolve node_modules
     // (e.g. the PostCSS plugin) from this project rather than an inferred path.

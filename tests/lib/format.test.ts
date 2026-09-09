@@ -10,7 +10,7 @@ import {
   parseAmount,
   sortedMonthKeys,
 } from "@/lib/format";
-import { MAX_AMOUNT_INTEGER_DIGITS } from "@/lib/types";
+import { MAX_AMOUNT_INTEGER_DIGITS } from "@/lib/transactions";
 import { DEFAULT_CURRENCY } from "@/lib/config";
 
 // English text, Argentine money.

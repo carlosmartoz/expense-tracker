@@ -1,14 +1,7 @@
-import { CURRENCY_CODES, DEFAULT_CURRENCY, type CurrencyCode } from "@/lib/config";
-import type { Transaction } from "@/lib/types";
+import { CURRENCY_CODES, DEFAULT_CURRENCY } from "@/lib/config";
+import type { CurrencyCode, Totals, Transaction } from "@/types";
 
 // Sums transactions, one total per currency.
-
-export interface Totals {
-  currency: CurrencyCode;
-  income: number;
-  expense: number;
-  balance: number;
-}
 
 // Sort position of a currency. Unknown codes go last.
 function rank(currency: CurrencyCode): number {

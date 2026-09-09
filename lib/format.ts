@@ -1,6 +1,6 @@
-import { CURRENCIES, DEFAULT_CURRENCY, LOCALE, type CurrencyCode } from "@/lib/config";
-import type { Transaction } from "@/lib/types";
-import { MAX_AMOUNT_INTEGER_DIGITS } from "@/lib/types";
+import { CURRENCIES, DEFAULT_CURRENCY, LOCALE } from "@/lib/config";
+import { MAX_AMOUNT_INTEGER_DIGITS } from "@/lib/transactions";
+import type { CurrencyCode, Transaction } from "@/types";
 
 // Formats amounts as "1.234,56": dot for thousands, comma for decimals.
 const amountFormatter = new Intl.NumberFormat(CURRENCIES[DEFAULT_CURRENCY].locale, {
@@ -53,6 +53,33 @@ export function formatAmountInput(raw: string): string {
   const grouped = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   if (decPart !== undefined) return `${grouped},${decPart.slice(0, 2)}`;
   return grouped;
+}
+
+// ----- ISO dates (YYYY-MM-DD), always in the browser's own timezone -----
+// Date#toISOString would be UTC: east of Greenwich that reads as tomorrow
+// for the last hours of the evening, and "today" would be off by a day.
+
+const pad = (n: number) => String(n).padStart(2, "0");
+
+// Builds an ISO date from parts. `month` is 0-based, as Date uses it.
+export function isoDate(year: number, month: number, day: number): string {
+  return `${year}-${pad(month + 1)}-${pad(day)}`;
+}
+
+export function todayISO(): string {
+  const now = new Date();
+  return isoDate(now.getFullYear(), now.getMonth(), now.getDate());
+}
+
+// The parts of an ISO date, or null when the string isn't one.
+// `month` comes back 0-based, ready for `new Date(y, m, d)`.
+export function parseISODate(
+  value: string
+): { year: number; month: number; day: number } | null {
+  const parts = value.split("-").map(Number);
+  if (parts.length !== 3 || parts.some((n) => !Number.isFinite(n))) return null;
+  const [year, month, day] = parts;
+  return { year, month: month - 1, day };
 }
 
 export function formatMonthKey(monthKey: string): string {

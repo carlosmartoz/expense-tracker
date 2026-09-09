@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
 import { AlertTriangle } from "lucide-react";
+import { useDialog } from "@/hooks/useDialog";
 import Portal from "@/components/ui/Portal";
 
 interface Props {
@@ -27,24 +27,20 @@ export default function ConfirmDialog({
   onConfirm,
   onCancel,
 }: Props) {
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onCancel();
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [open, onCancel]);
+  const { titleId } = useDialog(open, onCancel);
 
   if (!open) return null;
 
   return (
     <Portal>
       <div
-        className="fixed inset-0 z-60 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+        className="fixed inset-0 z-60 flex items-center justify-center bg-overlay p-4 backdrop-blur-sm"
         onClick={onCancel}
-        role="dialog"
-        aria-modal="true"
       >
         <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={titleId}
           className="card w-full max-w-sm p-5"
           onClick={(e) => e.stopPropagation()}
         >
@@ -57,7 +53,9 @@ export default function ConfirmDialog({
               <AlertTriangle className="h-5 w-5" />
             </span>
             <div className="min-w-0">
-              <h2 className="text-lg font-bold text-text-primary">{title}</h2>
+              <h2 id={titleId} className="text-lg font-bold text-text-primary">
+                {title}
+              </h2>
               {message && (
                 <div className="mt-1 text-sm text-text-secondary">{message}</div>
               )}

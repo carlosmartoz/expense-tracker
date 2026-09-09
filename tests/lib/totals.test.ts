@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { currenciesUsed, sumByCurrency, sumEveryCurrency } from "@/lib/totals";
-import type { Transaction } from "@/lib/types";
-import type { CurrencyCode } from "@/lib/config";
+import type { CurrencyCode, Transaction } from "@/types";
 
 // Currencies are counted apart, never added together.
 

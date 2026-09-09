@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { initialState, reducer, type StoreState } from "@/lib/storeReducer";
-import { DEFAULT_CATEGORIES } from "@/lib/types";
-import type { Category, Transaction } from "@/lib/types";
+import { initialState, reducer } from "@/lib/storeReducer";
+import { DEFAULT_CATEGORIES } from "@/lib/categories";
+import type { Category, StoreState, Transaction } from "@/types";
 
 // The reducer's rules, checked one at a time.
 

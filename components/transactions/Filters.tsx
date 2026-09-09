@@ -1,11 +1,12 @@
 "use client";
 
 import { FilterX } from "lucide-react";
-import { categoryIcon, TRANSACTION_TYPES, type Filters } from "@/lib/types";
+import { categoryIcon } from "@/lib/categories";
+import { TRANSACTION_TYPES } from "@/lib/transactions";
 import { formatMonthKey } from "@/lib/format";
-import { type CurrencyCode } from "@/lib/config";
 import { useStore } from "@/lib/store";
-import Select, { type SelectOption } from "@/components/ui/Select";
+import Select from "@/components/ui/Select";
+import type { CurrencyCode, Filters, SelectOption } from "@/types";
 
 interface Props {
   filters: Filters;

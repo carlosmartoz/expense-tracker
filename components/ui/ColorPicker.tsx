@@ -1,11 +1,7 @@
 "use client";
 
 import { Check } from "lucide-react";
-
-export interface Swatch {
-  value: string;
-  name: string;
-}
+import type { Swatch } from "@/types";
 
 // Swatches that name themselves on hover and on keyboard focus.
 export default function ColorPicker({

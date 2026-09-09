@@ -1,7 +1,7 @@
 "use client";
 
 import { formatMoney } from "@/lib/format";
-import type { Totals } from "@/lib/totals";
+import type { Totals } from "@/types";
 
 // The totals for the current filters, one row per currency.
 export default function BalanceSummary({ totals }: { totals: Totals[] }) {

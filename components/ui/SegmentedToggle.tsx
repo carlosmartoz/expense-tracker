@@ -1,9 +1,6 @@
 "use client";
 
-export interface Segment<T extends string> {
-  value: T;
-  label: string;
-}
+import type { Segment } from "@/types";
 
 // Two or three mutually exclusive choices as a pill.
 export default function SegmentedToggle<T extends string>({

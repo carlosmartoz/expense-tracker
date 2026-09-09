@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { BackupError, backupFilename, parseJSON, toJSON } from "@/lib/backup";
-import { DEFAULT_CATEGORIES, type Transaction } from "@/lib/types";
+import { DEFAULT_CATEGORIES } from "@/lib/categories";
+import type { Transaction } from "@/types";
 
 // Data with both transaction types and both currencies.
 const CATS = DEFAULT_CATEGORIES;

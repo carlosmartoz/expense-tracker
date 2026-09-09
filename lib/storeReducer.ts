@@ -1,50 +1,13 @@
-import type { Transaction, Category, TransactionType } from "@/lib/types";
-import { DEFAULT_CATEGORIES, isDefaultCategory } from "@/lib/types";
+import { DEFAULT_CATEGORIES, isDefaultCategory } from "@/lib/categories";
+import type { StoreAction, StoreState, Transaction } from "@/types";
 
 // Every rule the data obeys, as a pure function of state and action.
-
-export interface StoreState {
-  transactions: Transaction[];
-  categories: Category[];
-  // False until the stored data has been read.
-  hydrated: boolean;
-}
 
 export const initialState: StoreState = {
   transactions: [],
   categories: DEFAULT_CATEGORIES,
   hydrated: false,
 };
-
-// A new transaction, before it gets an id.
-export type TransactionDraft = Omit<Transaction, "id">;
-
-// A new category, before it gets an id.
-export interface CategoryDraft {
-  name: string;
-  color: string;
-  type: TransactionType;
-}
-
-// Every action that creates something carries the new id.
-export type StoreAction =
-  | {
-      type: "hydrated";
-      snapshot: { transactions: Transaction[]; categories: Category[] } | null;
-    }
-  | { type: "transaction/add"; id: string; draft: TransactionDraft }
-  | { type: "transaction/update"; id: string; patch: TransactionDraft }
-  | { type: "transaction/delete"; id: string }
-  | { type: "clearAll" }
-  | { type: "replaceAll"; transactions: Transaction[]; categories: Category[] }
-  | { type: "category/add"; id: string; draft: CategoryDraft }
-  | {
-      type: "category/update";
-      id: string;
-      patch: { name?: string; color?: string };
-    }
-  | { type: "category/addMissingDefaults" }
-  | { type: "category/delete"; id: string; moveToId: string };
 
 // Sorts transactions newest first.
 function sortByDate(transactions: Transaction[]): Transaction[] {

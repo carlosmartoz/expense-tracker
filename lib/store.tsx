@@ -6,14 +6,16 @@ import {
   useContext,
   useReducer,
   createContext,
+  type Context,
   type ReactNode,
 } from "react";
 import { uid } from "@/lib/uid";
 import { load, save } from "@/lib/storage";
-import { StoreActions, StoreData } from "@/types/store";
-import { initialState, reducer, type StoreState } from "@/lib/storeReducer";
+import { initialState, reducer } from "@/lib/storeReducer";
+import type { StoreActions, StoreData } from "@/types";
 
-// One context for the data, one for the actions.
+// One context for the data, one for the actions: a component that only
+// dispatches reads the actions without re-rendering on every change.
 const DataContext = createContext<StoreData | null>(null);
 const ActionsContext = createContext<StoreActions | null>(null);
 
@@ -38,7 +40,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     [state.categories],
   );
 
-  // The data half of the store.
   const data = useMemo<StoreData>(
     () => ({
       transactions: state.transactions,
@@ -46,11 +47,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       categoryMap,
       hydrated: state.hydrated,
     }),
-
     [state.transactions, state.categories, state.hydrated, categoryMap],
   );
 
-  // The actions half of the store.
+  // `dispatch` is stable, so these are built once and never change identity.
   const actions = useMemo<StoreActions>(
     () => ({
       addTransaction: (draft) =>
@@ -80,32 +80,28 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// Reading a store context outside the provider is a wiring mistake, not a
+// state the UI should try to render around.
+function useRequiredContext<T>(ctx: Context<T | null>, hook: string): T {
+  const value = useContext(ctx);
+  if (!value) throw new Error(`${hook} must be used within StoreProvider`);
+  return value;
+}
+
 // The store's actions.
 export function useStoreActions(): StoreActions {
-  const ctx = useContext(ActionsContext);
-
-  if (!ctx)
-    throw new Error("useStoreActions must be used within StoreProvider");
-
-  return ctx;
+  return useRequiredContext(ActionsContext, "useStoreActions");
 }
 
 // The store's data.
 export function useStoreData(): StoreData {
-  const ctx = useContext(DataContext);
-
-  if (!ctx) throw new Error("useStoreData must be used within StoreProvider");
-
-  return ctx;
+  return useRequiredContext(DataContext, "useStoreData");
 }
 
 // The store's data and actions together.
 export function useStore(): StoreData & StoreActions {
   const data = useStoreData();
-
   const actions = useStoreActions();
 
   return useMemo(() => ({ ...data, ...actions }), [data, actions]);
 }
-
-export type { StoreState, StoreActions, StoreData };

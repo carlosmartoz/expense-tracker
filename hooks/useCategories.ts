@@ -2,20 +2,14 @@
 
 import { useMemo, useState } from "react";
 import { useStore } from "@/lib/store";
+import { useFormError } from "@/hooks/useFormError";
 import {
   CATEGORY_COLORS,
   DEFAULT_CATEGORIES,
   isDefaultCategory,
-  TRANSACTION_TYPES,
-  type Category,
-  type TransactionType,
-} from "@/lib/types";
-
-export interface CategoryGroup {
-  type: TransactionType;
-  label: string;
-  items: Category[];
-}
+} from "@/lib/categories";
+import { TRANSACTION_TYPES } from "@/lib/transactions";
+import type { Category, CategoryGroup, TransactionType } from "@/types";
 
 // The categories screen: the list, the create/edit form, and removal.
 export function useCategories() {
@@ -34,7 +28,7 @@ export function useCategories() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<Category | null>(null);
   const [moveTo, setMoveTo] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const { error, setError, withClear } = useFormError();
 
   const editing = editingId
     ? (categories.find((c) => c.id === editingId) ?? null)
@@ -68,18 +62,6 @@ export function useCategories() {
   const moveOptions = deleting
     ? categories.filter((c) => c.type === deleting.type && c.id !== deleting.id)
     : [];
-
-  // Clears the error message.
-  function clearError() {
-    if (error) setError(null);
-  }
-
-  function withClear<T>(set: (v: T) => void) {
-    return (v: T) => {
-      clearError();
-      set(v);
-    };
-  }
 
   function resetForm() {
     setEditingId(null);

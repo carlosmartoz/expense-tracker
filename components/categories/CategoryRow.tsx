@@ -1,7 +1,8 @@
 "use client";
 
 import { Pencil, Trash2 } from "lucide-react";
-import { isDefaultCategory, type Category } from "@/lib/types";
+import { isDefaultCategory } from "@/lib/categories";
+import type { Category } from "@/types";
 import CategoryIcon from "@/components/ui/CategoryIcon";
 import IconButton from "@/components/ui/IconButton";
 

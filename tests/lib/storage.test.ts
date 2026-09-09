@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { clear, load, save, type Snapshot } from "@/lib/storage";
-import { DEFAULT_CATEGORIES } from "@/lib/types";
-import type { Category, Transaction } from "@/lib/types";
+import { clear, load, save } from "@/lib/storage";
+import { DEFAULT_CATEGORIES } from "@/lib/categories";
+import type { Category, Snapshot, Transaction } from "@/types";
 
 // The one place a mistake silently eats data, so it gets the closest look.
 

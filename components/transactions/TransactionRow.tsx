@@ -2,7 +2,7 @@
 
 import { Pencil, Trash2 } from "lucide-react";
 import { formatDate, formatMoney } from "@/lib/format";
-import type { Category, Transaction } from "@/lib/types";
+import type { Category, Transaction } from "@/types";
 import CategoryIcon from "@/components/ui/CategoryIcon";
 import IconButton from "@/components/ui/IconButton";
 

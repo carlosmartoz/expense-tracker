@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
-import { formatDate } from "@/lib/format";
+import { formatDate, isoDate, parseISODate, todayISO } from "@/lib/format";
 import { LOCALE } from "@/lib/config";
 
 interface DatePickerProps {
@@ -15,16 +15,6 @@ interface DatePickerProps {
 
 const WEEKDAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
-const pad = (n: number) => String(n).padStart(2, "0");
-const toISO = (y: number, m: number, d: number) => `${y}-${pad(m + 1)}-${pad(d)}`;
-
-function parseISO(v: string): { y: number; m: number; d: number } | null {
-  const parts = v.split("-").map(Number);
-  if (parts.length !== 3 || parts.some((n) => !Number.isFinite(n))) return null;
-  const [y, m, d] = parts;
-  return { y, m: m - 1, d };
-}
-
 // A calendar popover for picking a date.
 // Keyboard: Enter, Space or ArrowDown opens, Escape closes.
 export default function DatePicker({
@@ -36,15 +26,17 @@ export default function DatePicker({
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
-  const selected = useMemo(() => parseISO(value), [value]);
+  const selected = useMemo(() => parseISODate(value), [value]);
   const [view, setView] = useState(() => {
-    const base = selected ?? parseISO(new Date().toISOString().slice(0, 10))!;
-    return { y: base.y, m: base.m };
+    const now = new Date();
+    return selected
+      ? { y: selected.year, m: selected.month }
+      : { y: now.getFullYear(), m: now.getMonth() };
   });
 
   // Jumps the calendar to the selected month.
   function openCalendar() {
-    if (selected) setView({ y: selected.y, m: selected.m });
+    if (selected) setView({ y: selected.year, m: selected.month });
     setOpen(true);
   }
 
@@ -60,7 +52,7 @@ export default function DatePicker({
     return () => document.removeEventListener("pointerdown", onPointerDown);
   }, [open]);
 
-  const todayISO = new Date().toISOString().slice(0, 10);
+  const today = todayISO();
 
   const firstWeekday = new Date(view.y, view.m, 1).getDay();
   const daysInMonth = new Date(view.y, view.m + 1, 0).getDate();
@@ -82,7 +74,7 @@ export default function DatePicker({
   }
 
   function pick(day: number) {
-    onChange(toISO(view.y, view.m, day));
+    onChange(isoDate(view.y, view.m, day));
     setOpen(false);
   }
 
@@ -117,7 +109,7 @@ export default function DatePicker({
       {open && (
         <div
           role="dialog"
-          className="absolute z-30 mt-1.5 w-[17rem] rounded-xl border border-white/10
+          className="absolute z-30 mt-1.5 w-68 rounded-xl border border-border
             bg-surface-panel p-3 shadow-card"
         >
           {/* Header */}
@@ -159,9 +151,9 @@ export default function DatePicker({
           <div className="grid grid-cols-7 gap-1">
             {cells.map((day, idx) => {
               if (day === null) return <div key={`e${idx}`} className="h-8" />;
-              const iso = toISO(view.y, view.m, day);
+              const iso = isoDate(view.y, view.m, day);
               const isSelected = iso === value;
-              const isToday = iso === todayISO;
+              const isToday = iso === today;
               return (
                 <button
                   key={iso}
@@ -171,7 +163,7 @@ export default function DatePicker({
                     isSelected
                       ? "bg-accent font-semibold text-accent-text"
                       : isToday
-                        ? "text-text-primary ring-1 ring-surface-raised0 hover:bg-surface-raised"
+                        ? "text-text-primary ring-1 ring-border-strong hover:bg-surface-raised"
                         : "text-text-primary hover:bg-surface-raised"
                   }`}
                 >
@@ -186,7 +178,7 @@ export default function DatePicker({
             <button
               type="button"
               onClick={() => {
-                onChange(todayISO);
+                onChange(today);
                 setOpen(false);
               }}
               className="cursor-pointer rounded-lg px-2 py-1 text-xs font-medium text-text-primary transition hover:bg-surface-raised"
